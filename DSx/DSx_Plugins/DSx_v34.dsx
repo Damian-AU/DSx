@@ -1,0 +1,70 @@
+package provide DSx_v34.dsx 1.0
+
+lappend ::run_after_startup run_DSx_updater
+
+set ::fum ""
+add_de1_variable "$::DSx_standby_pages" 500 1080 -justify center -anchor n -font [DSx_font font 10] -fill $::DSx_settings(blue) -textvariable {$::fum}
+
+proc run_DSx_updater {} {
+    update_favourite_file_version
+    after 1000 {set ::fum "Your favourite files have been\rupdated to work with DSx version 4.**"}
+    after 8000 {
+        set ::fum ""
+        file delete -force [skin_directory]/DSx_plugins/DSx_v34.dsx
+    }
+}
+
+##### old favourites proc and updater for pre version 4.00 30/9/2020 #####
+proc update_favourite_file_version {} {
+    if {[file exists [skin_directory]/DSx_User_set/pinkcup.fav] == 1} {
+        load_old_pinkcup
+        save_pinkcup
+        file delete -force [skin_directory]/DSx_User_set/pinkcup.fav
+    }
+    if {[file exists [skin_directory]/DSx_User_set/bluecup.fav] == 1} {
+        load_old_bluecup
+        save_bluecup
+        file delete -force [skin_directory]/DSx_User_set/bluecup.fav
+    }
+    if {[file exists [skin_directory]/DSx_User_set/orangecup.fav] == 1} {
+        load_old_orangecup
+        save_orangecup
+        file delete -force [skin_directory]/DSx_User_set/orangecup.fav
+    }
+}
+proc load_old_pinkcup {} {
+    array set ::settings [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/DSx_User_set/pinkcup.fav"]]
+    set ::DSx_settings(wsaw) $::settings(DSx_wsaw)
+    set ::DSx_settings(jug_size) $::settings(DSx_jug_size)
+    set ::DSx_settings(flush_time) $::settings(DSx_flush_time)
+    set ::DSx_settings(bean_weight) [round_to_one_digits $::settings(DSx_bean_weight)]
+    set_jug
+    set ::DSx_settings(pink_cup_indicator) "."
+    set ::DSx_settings(blue_cup_indicator) { }
+    set ::DSx_settings(orange_cup_indicator) { }
+    saw_switch
+}
+proc load_old_bluecup {} {
+    array set ::settings [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/DSx_User_set/bluecup.fav"]]
+    set ::DSx_settings(wsaw) $::settings(DSx_wsaw)
+    set ::DSx_settings(jug_size) $::settings(DSx_jug_size)
+    set ::DSx_settings(flush_time) $::settings(DSx_flush_time)
+    set ::DSx_settings(bean_weight) [round_to_one_digits $::settings(DSx_bean_weight)]
+    set_jug
+    set ::DSx_settings(blue_cup_indicator) "."
+    set ::DSx_settings(pink_cup_indicator) { }
+    set ::DSx_settings(orange_cup_indicator) { }
+    saw_switch
+}
+proc load_old_orangecup {} {
+    array set ::settings [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/DSx_User_set/orangecup.fav"]]
+    set ::DSx_settings(wsaw) $::settings(DSx_wsaw)
+    set ::DSx_settings(jug_size) $::settings(DSx_jug_size)
+    set ::DSx_settings(flush_time) $::settings(DSx_flush_time)
+    set ::DSx_settings(bean_weight) [round_to_one_digits $::settings(DSx_bean_weight)]
+    set_jug
+    set ::DSx_settings(orange_cup_indicator) "."
+    set ::DSx_settings(blue_cup_indicator) { }
+    set ::DSx_settings(pink_cup_indicator) { }
+    saw_switch
+}

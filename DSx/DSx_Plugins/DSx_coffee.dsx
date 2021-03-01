@@ -1,0 +1,3 @@
+package provide DSx_coffee.dsx 1.0
+DSx_plugin_page_name DSx_3_coffee
+lappend ::run_after_startup coffee_variables_check

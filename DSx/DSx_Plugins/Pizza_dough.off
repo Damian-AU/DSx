@@ -1,0 +1,252 @@
+package provide Pizza_dough.dsx 1.0
+#### Pizza dough calulator pluging by Damian v1.00 ####
+set version 2.0
+
+### Custom settings
+set ::DSx_settings(pizza_size_fav_1) 280
+set ::DSx_settings(pizza_hydration_fav_1) 64.0
+set ::DSx_settings(pizza_yeast_factor_fav_1) "Normal"
+set ::DSx_settings(pizza_waste_fav_1) 2.0
+
+set ::DSx_settings(pizza_size_fav_2) 280
+set ::DSx_settings(pizza_hydration_fav_2) 64.0
+set ::DSx_settings(pizza_yeast_factor_fav_2) "Fluffy"
+set ::DSx_settings(pizza_waste_fav_2) 2.0
+
+
+### Add the page to the backend ###
+DSx_plugin_page_name pizza_dough
+add_de1_variable "pizza_dough" 2150 1520 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -justify center -anchor center -textvariable {Pizza Dough Calculator [package version Pizza_dough]}
+### Page heading ###
+add_de1_variable "pizza_dough" 1280 120 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {Pizza Dough Calculator}
+
+### Starting values ###
+if {[info exists ::DSx_settings(pizza_quantity)] != 1} {
+    set ::DSx_settings(pizza_quantity) 4.0
+}
+if {[info exists ::DSx_settings(pizza_size)] != 1} {
+    set ::DSx_settings(pizza_size) 280.0
+}  
+if {[info exists ::DSx_settings(pizza_hydration)] != 1} {
+    set ::DSx_settings(pizza_hydration) 64.0
+}
+if {[info exists ::DSx_settings(pizza_yeast_factor)] != 1} {
+    set ::DSx_settings(pizza_yeast_factor) "Normal"
+}
+if {[info exists ::DSx_settings(pizza_waste)] != 1} {
+    set ::DSx_settings(pizza_waste) 2.0
+}
+
+if {[info exists ::DSx_settings(pizza_size_fav_1)] != 1} {
+    set ::DSx_settings(pizza_size_fav_1) 280
+}
+if {[info exists ::DSx_settings(pizza_hydration_fav_1)] != 1} {
+    set ::DSx_settings(pizza_hydration_fav_1) 64.0
+}
+if {[info exists ::DSx_settings(pizza_yeast_factor_fav_1)] != 1} {
+    set ::DSx_settings(pizza_yeast_factor_fav_1) "Normal"
+}
+if {[info exists ::DSx_settings(pizza_waste_fav_1)] != 1} {
+    set ::DSx_settings(pizza_waste_fav_1) 2.0
+}
+
+if {[info exists ::DSx_settings(pizza_size_fav_2)] != 1} {
+    set ::DSx_settings(pizza_size_fav_2) 280
+}
+if {[info exists ::DSx_settings(pizza_hydration_fav_2] != 1} {
+    set ::DSx_settings(pizza_hydration_fav_2) 65.0
+}
+if {[info exists ::DSx_settings(pizza_yeast_factor_fav_2] != 1} {
+    set ::DSx_settings(pizza_yeast_factor_fav_2) "Fluffy"
+}
+if {[info exists ::DSx_settings(pizza_waste_fav_2)] != 1} {
+    set ::DSx_settings(pizza_waste_fav_2) 2.0
+}
+if {[info exists ::DSx_settings(pizza_fav_1_name)] != 1} {
+    set ::DSx_settings(pizza_fav_1_name) "Normal"
+}
+if {[info exists ::DSx_settings(pizza_fav_2_name)] != 1} {
+    set ::DSx_settings(pizza_fav_2_name) "Fluffy"
+}
+
+### clean up variables from old versions
+if {[info exists ::settings(pizza_quantity)] == 1} {
+    unset -nocomplain ::settings(pizza_quantity)
+}
+if {[info exists ::settings(pizza_size)] == 1} {
+    unset  -nocomplain ::settings(pizza_size)
+}
+if {[info exists ::settings(pizza_hydration)] == 1} {
+    unset -nocomplain ::settings(pizza_hydration)
+}
+
+### favourites
+proc pizza_reset {} {
+    set ::DSx_settings(pizza_quantity) 4.0
+    set ::DSx_settings(pizza_size) 280.0
+    set ::DSx_settings(pizza_hydration) 64.0
+    set ::DSx_settings(pizza_yeast_factor) "Normal"
+    set ::DSx_settings(pizza_waste) 2.0
+    set ::DSx_settings(pizza_size_fav_1) 280
+    set ::DSx_settings(pizza_hydration_fav_1) 64.0
+    set ::DSx_settings(pizza_yeast_factor_fav_1) "Normal"
+    set ::DSx_settings(pizza_waste_fav_1) 2.0
+    set ::DSx_settings(pizza_size_fav_2) 280
+    set ::DSx_settings(pizza_hydration_fav_2) 65.0
+    set ::DSx_settings(pizza_yeast_factor_fav_2) "Fluffy"
+    set ::DSx_settings(pizza_waste_fav_2) 2.0
+    set ::DSx_settings(pizza_fav_1_name) "Normal"
+    set ::DSx_settings(pizza_fav_2_name) "Fluffy"
+}
+
+proc pizza_save_fav_1 {} {
+    set ::DSx_settings(pizza_yeast_factor_fav_1) $::DSx_settings(pizza_yeast_factor)
+    set ::DSx_settings(pizza_size_fav_1) $::DSx_settings(pizza_size)
+    set ::DSx_settings(pizza_hydration_fav_1) $::DSx_settings(pizza_hydration)
+    set ::DSx_settings(pizza_waste_fav_1) $::DSx_settings(pizza_waste)
+    pizza_yeast_text_colour
+}
+
+proc pizza_save_fav_2 {} {
+    set ::DSx_settings(pizza_yeast_factor_fav_2) $::DSx_settings(pizza_yeast_factor)
+    set ::DSx_settings(pizza_size_fav_2) $::DSx_settings(pizza_size)
+    set ::DSx_settings(pizza_hydration_fav_2) $::DSx_settings(pizza_hydration)
+    set ::DSx_settings(pizza_waste_fav_2) $::DSx_settings(pizza_waste)
+    pizza_yeast_text_colour
+}
+
+proc pizza_fav_1 {} {
+    set ::DSx_settings(pizza_yeast_factor) $::DSx_settings(pizza_yeast_factor_fav_1)
+    set ::DSx_settings(pizza_size) $::DSx_settings(pizza_size_fav_1)
+    set ::DSx_settings(pizza_hydration) $::DSx_settings(pizza_hydration_fav_1)
+    set ::DSx_settings(pizza_waste) $::DSx_settings(pizza_waste_fav_1)
+}
+proc pizza_fav_2 {} {
+    set ::DSx_settings(pizza_yeast_factor) $::DSx_settings(pizza_yeast_factor_fav_2)
+    set ::DSx_settings(pizza_size) $::DSx_settings(pizza_size_fav_2)
+    set ::DSx_settings(pizza_hydration) $::DSx_settings(pizza_hydration_fav_2)
+    set ::DSx_settings(pizza_waste) $::DSx_settings(pizza_waste_fav_2)
+}
+
+proc pizza_yeast_text_colour {} {
+    if {$::DSx_settings(pizza_yeast_factor) == $::DSx_settings(pizza_yeast_factor_fav_1) && $::DSx_settings(pizza_size) == $::DSx_settings(pizza_size_fav_1) && $::DSx_settings(pizza_hydration) == $::DSx_settings(pizza_hydration_fav_1) && $::DSx_settings(pizza_waste) == $::DSx_settings(pizza_waste_fav_1)} {
+        .can itemconfigure $::pizza_yeast_text_normal -fill $::DSx_settings(orange)
+    } else {
+        .can itemconfigure $::pizza_yeast_text_normal -fill $::DSx_settings(font_colour)
+    }
+    if {$::DSx_settings(pizza_yeast_factor) == $::DSx_settings(pizza_yeast_factor_fav_2) && $::DSx_settings(pizza_size) == $::DSx_settings(pizza_size_fav_2) && $::DSx_settings(pizza_hydration) == $::DSx_settings(pizza_hydration_fav_2) && $::DSx_settings(pizza_waste) == $::DSx_settings(pizza_waste_fav_2)} {
+        .can itemconfigure $::pizza_yeast_text_fluffy -fill $::DSx_settings(orange)
+    } else {
+        .can itemconfigure $::pizza_yeast_text_fluffy -fill $::DSx_settings(font_colour)
+    }
+}
+
+proc toggle_yeast_factor {} {
+    if {$::DSx_settings(pizza_yeast_factor) == "Normal"} {
+        set ::DSx_settings(pizza_yeast_factor) "Fluffy"
+    } else {
+        set ::DSx_settings(pizza_yeast_factor) "Normal"
+    }
+}
+
+
+### The calulations ###
+proc pizza_calculate {} {
+    set fbase [expr {5000000/836}]
+    set ff [expr {$fbase * 64 / $::DSx_settings(pizza_hydration)}]
+    set sf [expr {100000/836}]
+    set wbase [expr {3200000/836}]
+    set wf [expr {$wbase + $fbase - $ff}]
+    if {$::DSx_settings(pizza_yeast_factor) == "Fluffy"} {
+        set yf [expr {60000/836 * 1.25}]
+    } else {
+        set yf [expr {60000/836}]
+    }
+
+    set weight [expr {$::DSx_settings(pizza_quantity) * $::DSx_settings(pizza_size) * ((100 + $::DSx_settings(pizza_waste))/100)}]
+    set flour [expr {($weight*$ff/10000) - ($weight/10000 * ($yf - (60000/836)))}]
+    set salt [expr {$weight*$sf/10000}]
+    set water [expr {$weight*$wf/10000}]
+    set yeast [expr {$weight*$yf/10000}]
+    set ::pizza_flour [round_to_integer $flour]g
+    set ::pizza_salt [round_to_one_digits $salt]g
+    set ::pizza_water [round_to_integer $water]g
+    set ::pizza_yeast [round_to_one_digits $yeast]g
+    set ::pizza_batch [round_to_integer [expr {$::DSx_settings(pizza_quantity) * $::DSx_settings(pizza_size)}]]g
+    set ::pizza_waste [round_to_integer [expr {($flour + $water + $salt + $yeast) - ($::DSx_settings(pizza_quantity) * $::DSx_settings(pizza_size))}]]g
+
+    pizza_yeast_text_colour
+}
+
+
+### User Input ###
+add_de1_image "pizza_dough" 280 360 "[skin_directory_graphics]/icons/click1.png"
+add_de1_variable "pizza_dough" 524 330 -font [DSx_font font 9] -fill $::DSx_settings(font_colour) -justify center -anchor "center" -textvariable {Quantity}
+add_de1_variable "pizza_dough" 524 460 -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -justify center -anchor "center" -textvariable {[round_to_integer $::DSx_settings(pizza_quantity)]}
+add_de1_button "pizza_dough" {say "" $::settings(sound_button_in); horizontal_clicker 1 1 ::DSx_settings(pizza_quantity) 1 20 %x %y %x0 %y0 %x1 %y1; pizza_calculate;} 280 360 760 560 ""
+
+add_de1_image "pizza_dough" 1880 150 "[skin_directory_graphics]/icons/click1.png"
+add_de1_variable "pizza_dough" 2124 120 -font [DSx_font font 9] -fill $::DSx_settings(font_colour) -justify center -anchor "center"  -textvariable {Ball Weight}
+add_de1_variable "pizza_dough" 2124 250 -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -justify center -anchor "center" -textvariable {[round_to_integer $::DSx_settings(pizza_size)]g}
+add_de1_button "pizza_dough" {say "" $::settings(sound_button_in); horizontal_clicker 10 10 ::DSx_settings(pizza_size) 100 400 %x %y %x0 %y0 %x1 %y1; pizza_calculate;} 1880 150 2360 350 ""
+
+add_de1_image "pizza_dough" 1880 430 "[skin_directory_graphics]/icons/click1.png"
+add_de1_variable "pizza_dough" 2124 400 -font [DSx_font font 9] -fill $::DSx_settings(font_colour) -justify center -anchor "center"  -textvariable {Hydration}
+add_de1_variable "pizza_dough" 2124 530 -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -justify center -anchor "center" -textvariable {[round_to_integer $::DSx_settings(pizza_hydration)]%}
+add_de1_button "pizza_dough" {say "" $::settings(sound_button_in); horizontal_clicker 1 1 ::DSx_settings(pizza_hydration) 50 85 %x %y %x0 %y0 %x1 %y1; pizza_calculate;} 1880 430 2360 630 ""
+
+add_de1_image "pizza_dough" 1880 710 "[skin_directory_graphics]/icons/click1.png"
+add_de1_variable "pizza_dough" 2124 680 -font [DSx_font font 9] -fill $::DSx_settings(font_colour) -justify center -anchor "center"  -textvariable {Yeast}
+add_de1_variable "pizza_dough" 2124 810 -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -justify center -anchor "center" -textvariable {$::DSx_settings(pizza_yeast_factor)}
+add_de1_button "pizza_dough" {say "" $::settings(sound_button_in); toggle_yeast_factor; pizza_calculate;} 1880 710 2360 910 ""
+
+add_de1_image "pizza_dough" 1880 990 "[skin_directory_graphics]/icons/click1.png"
+add_de1_variable "pizza_dough" 2124 960 -font [DSx_font font 9] -fill $::DSx_settings(font_colour) -justify center -anchor "center"  -textvariable {Waste Factor}
+add_de1_variable "pizza_dough" 2124 1090 -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -justify center -anchor "center" -textvariable {$::DSx_settings(pizza_waste)%}
+add_de1_button "pizza_dough" {say "" $::settings(sound_button_in); horizontal_clicker 0.2 0.2 ::DSx_settings(pizza_waste) 0.0 3.0 %x %y %x0 %y0 %x1 %y1; pizza_calculate;} 1880 990 2360 1190 ""
+
+
+set ::pizza_yeast_text_normal [add_de1_variable "pizza_dough" 350 700 -justify center -anchor center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {$::DSx_settings(pizza_fav_1_name)}]
+set ::pizza_yeast_text_fluffy [add_de1_variable "pizza_dough" 690 700 -justify center -anchor center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {$::DSx_settings(pizza_fav_2_name)}]
+add_de1_button "pizza_dough" {say "" $::settings(sound_button_in); pizza_fav_1; pizza_calculate; pizza_yeast_text_colour;} 200 600 520 800 ""
+add_de1_button "pizza_dough" {say "" $::settings(sound_button_in); pizza_fav_2; pizza_calculate; pizza_yeast_text_colour;} 520 600 860 800 ""
+
+add_de1_variable "pizza_dough" 520 1000 -justify center -anchor center -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {save presets}
+add_de1_button "pizza_dough" {say "" $::settings(sound_button_in); page_show pizza_fav_setup;} 400 900 640 1100 ""
+
+add_DSx_background "pizza_fav_setup"
+
+add_de1_widget "pizza_fav_setup" entry 850 500  {
+	set ::globals(widget_pizza_fav_1_name) $widget
+	bind $widget <Return> {borg toast [translate "Name Saved"]; hide_android_keyboard}
+	bind $widget <Leave> hide_android_keyboard
+} -width 8 -font [DSx_font font 11]  -borderwidth 1 -highlightcolor $::DSx_settings(orange) -bg $::DSx_settings(bg_colour)  -foreground $::DSx_settings(font_colour) -textvariable ::DSx_settings(pizza_fav_1_name)
+
+
+add_de1_variable "pizza_fav_setup" 980 800 -justify center -anchor center -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {Save to left preset}
+add_DSx_button pizza_fav_setup {say "" $::settings(sound_button_in); pizza_save_fav_1; page_show pizza_dough;} 730 700 1230 900 ""
+add_de1_widget "pizza_fav_setup" entry 1450 500  {
+	set ::globals(widget_pizza_fav_2_name) $widget
+	bind $widget <Return> {borg toast [translate "Name Saved"]; hide_android_keyboard}
+	bind $widget <Leave> hide_android_keyboard
+} -width 8 -font [DSx_font font 11]  -borderwidth 1 -highlightcolor $::DSx_settings(orange) -bg $::DSx_settings(bg_colour)  -foreground $::DSx_settings(font_colour) -textvariable ::DSx_settings(pizza_fav_2_name)
+
+add_de1_variable "pizza_fav_setup" 1580 800 -justify center -anchor center -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {Save to right preset}
+add_DSx_button "pizza_fav_setup" {say "" $::settings(sound_button_in); pizza_save_fav_2; page_show pizza_dough;} 1330 700 1830 900 ""
+
+add_de1_variable "pizza_fav_setup" 1280 1100 -justify center -anchor center -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {Cancel}
+add_DSx_button "pizza_fav_setup" {say "" $::settings(sound_button_in); page_show pizza_dough;} 1160 1040 1400 1160 ""
+
+add_de1_variable "pizza_fav_setup" 200 1500 -justify center -anchor center -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Factory Reset}
+add_de1_button "pizza_fav_setup" {say "" $::settings(sound_button_in); pizza_reset; page_show pizza_dough;} 50 1400 300 1600 ""
+
+### Recipe ###
+add_de1_variable "pizza_dough" 1250 300 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {Ingredients}
+add_de1_variable "pizza_dough" 1050 430 -justify left -anchor w -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {$::pizza_flour  -  pizza flour}
+add_de1_variable "pizza_dough" 1050 530 -justify left -anchor w -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {$::pizza_salt  -  ground salt}
+add_de1_variable "pizza_dough" 1050 630 -justify left -anchor w -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {$::pizza_water  -  warm water}
+add_de1_variable "pizza_dough" 1050 730 -justify left -anchor w -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {$::pizza_yeast  -  dry yeast}
+add_de1_variable "pizza_dough" 1050 1070 -justify left -anchor w -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {$::pizza_batch batch weight\r+ $::pizza_waste waste allowance}
+
+
+pizza_calculate

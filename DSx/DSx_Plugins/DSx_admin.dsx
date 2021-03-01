@@ -1,0 +1,2 @@
+package provide DSx_admin.dsx 1.0
+DSx_plugin_page_name DSx_5_admin

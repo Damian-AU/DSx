@@ -1,0 +1,95 @@
+### Plug files must be named with a .dsx file extension.
+### we can give a pluging a version as below, if no version number is set, it will be allecated 1.0 as its version number
+set version 2.0
+
+### If you would like to return your plugin version number, you can use
+### package version demo
+### where demo would be your file name with out the .dsx file extension
+add_de1_variable "DSx_demo" 2150 1520 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -justify center -anchor center -textvariable {Demo page [package version demo]}
+
+
+
+### If you would like to add your page to the DSx pages carousel, you can do so by adding the following line of code,
+### where you would replace DSx_demo with your page name, and of cause remove the # so the line is not commented out.
+### You can test this demo page by removing the # if you like
+
+DSx_plugin_page_name DSx_demo
+
+
+### Pages added to the carousel have background and navigation buttons automaticly setup for you
+### For other pages, you can use the following line of code to set the background colour for your page/s
+### where you would replace replace DSx_demo with your page name or list of page names
+
+#add_DSx_background "DSx_demo"
+
+
+## Plugins load before the DSx skin loads, you can call any procedures (proc) while the plug is loading,
+## however if you need to call the procedure after the skin has loaded,
+## you can append your proc to the "::run_after_startup" list as shown below line of code,
+## where you would replace my_proc with your unique named proc.
+
+lappend ::run_after_startup my_proc
+
+##### now your ready to write your code, here is a simple example below #####
+proc my_proc {} {
+    #after 3000 load_bluecup
+}
+
+
+##### lets add some visual content ##
+### First some words on the page
+add_de1_variable "DSx_demo" 1200 200 -justify center -anchor n -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {Hey there!}
+
+### You can use add_DSx_button in place of add_de1_button to give the button a DSx style border
+### But lets set up a label and some funky display changes for the button first, we want the buttom to be added after other content
+### so that the other content does not block the tap area of button.
+
+set ::DSx_demo_button_label "Tap me"
+set ::face_font "\uf118"
+
+proc toggle_demo_button_label {} {
+    if {$::DSx_demo_button_label == "Tap me"} {
+        set ::progress_counter 0
+        set ::run_progress 1
+        progress
+        set ::DSx_demo_button_label $::face_font
+        .can itemconfigure $::DSx_demo_button_label_code -font [DSx_font {Font Awesome 5 Pro-Regular-400} 30] -fill $::DSx_settings(orange)
+        .can itemconfigure $::DSx_bg(DSx_demo) -outline $::DSx_settings(orange) -fill $::DSx_settings(blue)
+        catch {
+            .can itemconfigure $::DSx_demo_button_code -fill $::DSx_settings(orange)
+            .can itemconfigure $::DSx_demo_button_code -outline $::DSx_settings(orange)
+            }
+        after 3000 {
+        set ::run_progress 0
+        set ::DSx_demo_button_label "Tap me"
+        .can itemconfigure $::DSx_demo_button_label_code -font [DSx_font font 10] -fill $::DSx_settings(font_colour)
+        .can itemconfigure $::DSx_bg(DSx_demo) -outline $::DSx_settings(bg_colour) -fill $::DSx_settings(bg_colour)
+        catch {
+            .can itemconfigure $::DSx_demo_button_code -fill $::DSx_settings(font_colour)
+            .can itemconfigure $::DSx_demo_button_code -outline $::DSx_settings(font_colour)
+            }
+        after cancel {progress}
+        set ::progress_counter 0
+        }
+    }
+}
+
+set ::DSx_demo_button_label_code [add_de1_variable "DSx_demo" 1280 700 -justify center -anchor center -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {$::DSx_demo_button_label}]
+
+### Now we add the DSx style button
+### but I'm wrapping it in ::DSx_demo_button_code [] so I can configure it later, to make it change colour
+
+set ::DSx_demo_button_code [add_DSx_button "DSx_demo" {toggle_demo_button_label} 1180 600 1380 800]
+
+
+
+### Just for fun, lets add a progress bar
+
+set ::progress_counter 0
+add_de1_widget "DSx_demo" ProgressBar 1180 900 {} -width 100 -height 20 -type normal  -variable ::progress_counter -fg $::DSx_settings(orange) -bg #FFFFFF -maximum 60 -borderwidth 1 -relief flat
+proc progress {} {
+    if {$::run_progress == 1} {
+        incr ::progress_counter 1
+    }
+    after 50 {progress}
+}

@@ -1,0 +1,10 @@
+package provide wake_to_pinkcup.dsx 1.0
+set version 1.3.11
+lappend ::run_after_startup load_wake_to_pinkcup
+proc load_wake_to_pinkcup {} {
+    trace add execution clearshit {enter} wake_to_pinkcup
+}
+proc wake_to_pinkcup args {
+    load_pinkcup
+    borg toast "Reloading Pink Cup"
+}
