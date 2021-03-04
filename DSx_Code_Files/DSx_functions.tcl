@@ -7,14 +7,13 @@ proc DSx_startup {} {
     check_settings_for_DSx_added_variables
     set_other_variables
     DSx_pages
+    load_theme
     source "[homedir]/skins/default/standard_includes.tcl"
     set ::skindebug $::DSx_skindebug
     check_MySaver_exists
     join_DSx_plugins
     no_machine_prep
     history_vars
-    add_DSx_background $::DSx_all_pages
-    load_theme
     save_DSx_settings
     save_settings
 }
@@ -114,11 +113,16 @@ proc no_machine_prep {} {
 		start_idle
 	}
 }
+
+proc add_DSx_background {pages} {
+    foreach context $pages {
+        set ::DSx_bg($context) [.can create rect 0 0 $::settings(screen_size_width) $::settings(screen_size_height) -outline $::DSx_settings(bg_colour) -fill $::DSx_settings(bg_colour)]
+        add_visual_item_to_context $context $::DSx_bg($context)
+    }
+}
+
 proc add_DSx_button {pages code x1 y1 x2 y2 {options {}}} {
-
-
     add_de1_button "$pages" "$code" $x1 $y1 $x2 $y2 ""
-
 
     set arc_offset 32
     set colour $::DSx_settings(font_colour)
@@ -145,19 +149,17 @@ proc add_DSx_button {pages code x1 y1 x2 y2 {options {}}} {
     return $tag
 }
 
-proc add_DSx_background {pages} {
-    foreach context $pages {
-        set ::DSx_bg($context) [.can create rect 0 0 $::settings(screen_size_width) $::settings(screen_size_height) -outline $::DSx_settings(bg_colour) -fill $::DSx_settings(bg_colour)]
-        add_visual_item_to_context $context $::DSx_bg($context)
-    }
-}
 proc DSx_plugin_page_name {page_name} {
     lappend ::DSx_page_name $page_name
-    add_DSx_background $page_name
+    set ::plug($page_name) [add_de1_image $page_name 0 0 ]
+    set fn "[skin_directory_graphics]/background/$::DSx_settings(bg_name)"
+	$::plug($page_name) read $fn
 }
+
 proc DSx_plug_bg {} {
+    set fn "[skin_directory_graphics]/background/$::DSx_settings(bg_name)"
 	foreach k $::DSx_page_name {
-	    .can itemconfigure $::DSx_bg($k) -outline $::DSx_settings(bg_colour) -fill $::DSx_settings(bg_colour)
+	    $::plug($k) read $fn
 	}
 }
 
@@ -349,19 +351,17 @@ proc DSx_pages {} {
     set ::DSx_blank_pages {DSx_demo_graph message DSx_past DSx_h2g DSx_past_zoomed DSx_past2_zoomed DSx_past3_zoomed}
     set ::DSx_home_pages "$::DSx_standby_pages $::DSx_active_pages"
     set ::DSx_all_pages "$::DSx_admin_pages $::DSx_standby_pages $::DSx_active_pages $::DSx_other_pages2 $::DSx_blank_pages $::DSx_zoomed_pages $::DSx_steam_zoomed_pages"
-
     add_de1_page "DSx_power" "poweroff.png"
     add_de1_page "DSx_travel_prepare" "travel_prepare.jpg" "default"
     add_de1_page "DSx_descale_prepare" "descale_prepare.jpg" "default"
+    set ::theme_bg [add_de1_image $::DSx_all_pages 0 0 ]
 }
 set_next_page "hotwaterrinse" "preheat_2"
 
 proc load_theme {} {
 	borg spinner on
-    foreach k $::DSx_standby_pages {
-	    .can itemconfigure $::DSx_bg($k) -outline $::DSx_settings(bg_colour) -fill $::DSx_settings(bg_colour)
-	}
-
+    set fn "[skin_directory_graphics]/background/$::DSx_settings(bg_name)"
+	$::theme_bg read $fn
 	if {$::DSx_settings(bg_name) == "bg1.jpg"} {
         set ::DSx_settings(bg_colour) #000000
     } elseif {$::DSx_settings(bg_name) == "bg2.jpg"} {
@@ -437,7 +437,6 @@ proc theme_change {} {
     set_colour
     DSx_plug_bg
     dial_config_start
-    restart_set
 }
 
 proc set_other_variables {} {

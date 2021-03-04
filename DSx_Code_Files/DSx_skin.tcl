@@ -1,5 +1,5 @@
 #### Skin by Damian Brakel ####
-set ::DSx_settings(version) 4.44
+set ::DSx_settings(version) 4.45
 
 package provide DSx_skin 1.0
 package ifneeded DSx $::DSx_settings(version) [list source [file join "./skins/DSx/" skin.tcl]]

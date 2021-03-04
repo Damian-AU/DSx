@@ -1,6 +1,6 @@
 ### Plug files must be named with a .dsx file extension.
 ### we can give a pluging a version as below, if no version number is set, it will be allecated 1.0 as its version number
-set version 2.0
+set version 2.1
 
 ### If you would like to return your plugin version number, you can use
 ### package version demo
@@ -21,7 +21,6 @@ DSx_plugin_page_name DSx_demo
 ### where you would replace replace DSx_demo with your page name or list of page names
 
 #add_DSx_background "DSx_demo"
-
 
 ## Plugins load before the DSx skin loads, you can call any procedures (proc) while the plug is loading,
 ## however if you need to call the procedure after the skin has loaded,
@@ -54,7 +53,6 @@ proc toggle_demo_button_label {} {
         progress
         set ::DSx_demo_button_label $::face_font
         .can itemconfigure $::DSx_demo_button_label_code -font [DSx_font {Font Awesome 5 Pro-Regular-400} 30] -fill $::DSx_settings(orange)
-        .can itemconfigure $::DSx_bg(DSx_demo) -outline $::DSx_settings(orange) -fill $::DSx_settings(blue)
         catch {
             .can itemconfigure $::DSx_demo_button_code -fill $::DSx_settings(orange)
             .can itemconfigure $::DSx_demo_button_code -outline $::DSx_settings(orange)
@@ -63,7 +61,6 @@ proc toggle_demo_button_label {} {
         set ::run_progress 0
         set ::DSx_demo_button_label "Tap me"
         .can itemconfigure $::DSx_demo_button_label_code -font [DSx_font font 10] -fill $::DSx_settings(font_colour)
-        .can itemconfigure $::DSx_bg(DSx_demo) -outline $::DSx_settings(bg_colour) -fill $::DSx_settings(bg_colour)
         catch {
             .can itemconfigure $::DSx_demo_button_code -fill $::DSx_settings(font_colour)
             .can itemconfigure $::DSx_demo_button_code -outline $::DSx_settings(font_colour)
