@@ -1,10 +1,14 @@
 #### Skin by Damian Brakel ####
-set ::DSx_settings(version) 4.45
+set ::DSx_settings(version) 4.46
 
 package provide DSx_skin 1.0
+
+package require lambda
+
 package ifneeded DSx $::DSx_settings(version) [list source [file join "./skins/DSx/" skin.tcl]]
 package ifneeded DSx_functions $::DSx_settings(version) [list source [file join "./skins/DSx/DSx_Code_Files/" DSx_functions.tcl]]
 package require DSx_functions $::DSx_settings(version)
+
 
 DSx_startup
 profile_has_changed_set_colors
@@ -1421,9 +1425,16 @@ add_de1_image "DSx_3_coffee" 1030 1210 "[skin_directory_graphics]/icons/button4.
 add_de1_variable "DSx_3_coffee" 1135 1280 -justify center -anchor center -font [DSx_font font 9] -fill $::DSx_settings(font_colour) -textvariable {Mocha}
 add_de1_button "DSx_3_coffee" {say "" $::settings(sound_button_in); load_DSx_coffee_mocha; DSx_update_saw; clear_saw_font;} 1030 1210 1250 1350 ""
 add_de1_variable "settings_2c" 1280 730 -text [translate ""] -font Helv_16_bold -fill $::DSx_settings(red) -justify "center" -anchor "n" -textvariable {[donotedit]}
-trace add execution save_profile {enter} no_save_DSx_coffee
-trace add execution append_live_data_to_espresso_chart {enter} DSx_Coffee_control
 
+
+rename ::save_profile ::skin::dsx::save_profile_orig
+msg -INFO "DSx: rename ::save_profile ::skin::dsx::save_profile_orig"
+
+proc ::save_profile {args} {
+
+	no_save_DSx_coffee
+	::skin::dsx::save_profile_orig {*}$args
+}
 
 
 ###########################################################################################################################################

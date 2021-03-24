@@ -27,4 +27,5 @@ profile_title {Damian's LRv2}
 profile_language en
 preinfusion_stop_pressure 4.0
 profile_hide 0
+beverage_type espresso
 

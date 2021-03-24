@@ -1,5 +1,52 @@
 package provide DSx_functions $::DSx_settings(version)
 
+package require lambda
+
+
+# Check if adjustment should be made for the 2020-03 changes to core
+# Once a reasonable transitional period elapses, this could be replaced
+# by a set of `package require` statements and catch/try with messaging
+# that upgrading the de1app is needed.
+# These versions should not need to be updated, unless newer features are used.
+
+namespace eval ::skin::dsx {
+
+	if { [catch { package require de1_logging }] } {
+
+		rename ::msg ::skin::dsx::msg_orig
+		proc ::msg {args} {
+
+			::skin::dsx::msg_orig [join $args]
+		}
+	}
+
+
+	proc _package_version_helper {package_name version_string} {
+		if { [catch {set _v [package present $package_name]}] } { return False }
+		return [package vsatisfies $_v $version_string]
+	}
+
+	variable use_event_system [expr {    [_package_version_helper de1_gui		1.2]
+					  && [_package_version_helper de1_event		1.0]
+					  && [_package_version_helper de1_de1		1.1]
+					  && [_package_version_helper de1_device_scale	1.1]
+				     }]
+
+	if { $use_event_system } {
+
+		msg -INFO "DSx: use_event_system: True"
+
+	} else {
+
+		msg "NOTICE: DSx: use_event_system: False (prerequisites not found)"
+
+	}
+}
+
+
+
+
+
 proc DSx_startup {} {
     check_for_new_icons
     load_DSx_settings
@@ -3437,17 +3484,58 @@ proc save_steam_history {unused_old_state unused_new_state} {
     msg "Save this steam to history"
 
 }
-after idle {after 0 {register_state_change_handler Steam Idle save_steam_history}}
+
+if { $::skin::dsx::use_event_system } {
+	::de1::event::listener::on_major_state_change_add [lambda {event_dict} {
+		set ps [dict get $event_dict previous_state]
+		set ts [dict get $event_dict this_state]
+		if { $ps == "Steam" && $ts == "Idle" } {
+			save_steam_history $ps $ts}
+	}]
+} else {
+	::register_state_change_handler Steam Idle save_steam_history
+}
 
 
 proc DSx_live_graph_list {} {
 	return [list DSx_espresso_temperature_basket DSx_espresso_temperature_mix DSx_espresso_temperature_goal espresso_elapsed espresso_pressure espresso_weight espresso_weight_chartable espresso_flow espresso_flow_weight espresso_flow_weight_raw espresso_water_dispensed espresso_flow_weight_2x espresso_flow_2x espresso_resistance espresso_resistance_weight espresso_pressure_delta espresso_flow_delta espresso_flow_delta_negative espresso_flow_delta_negative_2x espresso_temperature_mix espresso_temperature_basket espresso_state_change espresso_pressure_goal espresso_flow_goal espresso_flow_goal_2x espresso_temperature_goal espresso_de1_explanation_chart_flow espresso_de1_explanation_chart_elapsed_flow espresso_de1_explanation_chart_flow_2x espresso_de1_explanation_chart_flow_1_2x espresso_de1_explanation_chart_flow_2_2x espresso_de1_explanation_chart_flow_3_2x espresso_de1_explanation_chart_pressure espresso_de1_explanation_chart_temperature espresso_de1_explanation_chart_temperature_10 espresso_de1_explanation_chart_pressure_1 espresso_de1_explanation_chart_pressure_2 espresso_de1_explanation_chart_pressure_3 espresso_de1_explanation_chart_elapsed_flow espresso_de1_explanation_chart_elapsed_flow_1 espresso_de1_explanation_chart_elapsed_flow_2 espresso_de1_explanation_chart_elapsed_flow_3 espresso_de1_explanation_chart_elapsed espresso_de1_explanation_chart_elapsed_1 espresso_de1_explanation_chart_elapsed_2 espresso_de1_explanation_chart_elapsed_3]
 }
 
-after idle {after 0 {register_state_change_handler Espresso Idle save_final_live_graph}}
-after idle {after 0 {register_state_change_handler Idle Espresso save_dose}}
+if { $::skin::dsx::use_event_system } {
 
-trace add execution clear_espresso_chart {enter} clear_temp_data
+	::de1::event::listener::after_flow_complete_add [lambda {event_dict} {
+		set ps [dict get $event_dict previous_state]
+		set ts [dict get $event_dict this_state]
+		if { $ps == "Espresso" } {
+			save_final_live_graph $ps $ts
+		}
+	}]
+
+	::de1::event::listener::on_major_state_change_add [lambda {event_dict} {
+		set ps [dict get $event_dict previous_state]
+		set ts [dict get $event_dict this_state]
+		if { $ps == "Idle" && $ts == "Espresso" } {
+			save_dose $ps $ts
+		}
+	}]
+
+} else {
+
+	::register_state_change_handler Espresso Idle save_final_live_graph
+	::register_state_change_handler Idle Espresso save_dose
+
+}
+
+
+rename ::clear_espresso_chart ::skin::dsx::clear_espresso_chart_orig
+msg -INFO "DSx: rename ::clear_espresso_chart ::skin::dsx::clear_espresso_chart_orig"
+
+proc ::clear_espresso_chart {args} {
+
+	clear_temp_data
+	::skin::dsx::clear_espresso_chart_orig {*}$args
+}
+
 
 
 proc backup_DSx_live_graph {} {
@@ -3973,6 +4061,7 @@ proc load_DSx_coffee_fruity {} {
 }
 
 proc load_DSx_coffee_common_settings {} {
+    set ::settings(beverage_type) espresso
     set ::settings(final_desired_shot_volume_advanced) 130
     set ::settings(final_desired_shot_volume_advanced_count_start) 0
     set ::settings(tank_desired_water_temperature) 0
@@ -4225,149 +4314,89 @@ proc profile_has_not_changed_set args {
     LRv2_preview
 }
 
-proc append_live_data_to_espresso_chart {} {
-	wsaw
-    if {$::de1_num_state($::de1(state)) == "Steam"} {
-		if {$::de1(substate) == $::de1_substate_types_reversed(pouring) || $::de1(substate) == $::de1_substate_types_reversed(preinfusion)} {
-			steam_pressure append [round_to_two_digits $::de1(pressure)]
-			steam_flow append [round_to_two_digits $::de1(flow)]
-			if {$::settings(enable_fahrenheit) == 1} {
-				steam_temperature append [round_to_integer [celsius_to_fahrenheit $::de1(steam_heater_temperature)]]
-			} else {
-				steam_temperature append [round_to_integer $::de1(steam_heater_temperature)]
-			}
-			steam_elapsed append  [expr {[steam_pour_millitimer]/1000.0}]
+
+
+if { $::skin::dsx::use_event_system } {
+
+	### TODO: Confirm if this can be done once, or really needs to be done on every update
+
+	::de1::event::listener::on_major_state_change_add [lambda {event_dict} {
+		if { [dict get $event_dict previous_state] == "Steam" } {
+			backup_DSx_steam_graph
 		}
-		backup_DSx_steam_graph
+	}]
 
-    	return
-    } elseif {$::de1_num_state($::de1(state)) != "Espresso"} {
-    	# we only store chart data during espresso
-    	# we could theoretically store this data during steam as well, if we want to have charts of steaming temperature and pressure
-    	return
-    }
-  	if {$::de1(substate) == $::de1_substate_types_reversed(pouring) || $::de1(substate) == $::de1_substate_types_reversed(preinfusion)} {
-		set millitime [espresso_millitimer]
+	rename ::gui::update::append_live_data_to_espresso_chart \
+		::skin::dsx::append_live_data_to_espresso_chart_orig
+	msg -INFO "DSx: rename ::gui::update::append_live_data_to_espresso_chart" \
+		"::skin::dsx::append_live_data_to_espresso_chart_orig"
 
-		if {$::de1(substate) == 4 || $::de1(substate) == 5} {
-			set mtime [expr {$millitime/1000.0}]
-			set last_elapsed_time_index [expr {[espresso_elapsed length] - 1}]
-			set last_elapsed_time 0
-			if {$last_elapsed_time_index >= 0} {
-				set last_elapsed_time [espresso_elapsed range $last_elapsed_time_index $last_elapsed_time_index]
-			}
-			if {$mtime > $last_elapsed_time} {
-				# this is for handling cases where a god shot has already loaded a time axis
-				espresso_elapsed append $mtime
-			}
-			if {$::de1(scale_weight) == ""} {
-				set ::de1(scale_weight) 0
-			}
-			espresso_weight append [round_to_two_digits $::de1(scale_weight)]
-			espresso_weight_chartable append [round_to_two_digits [expr {0.10 * $::de1(scale_weight)}]]
-			espresso_pressure append [round_to_two_digits $::de1(pressure)]
-			espresso_flow append [round_to_two_digits $::de1(flow)]
-			espresso_flow_2x append [round_to_two_digits [expr {2.0 * $::de1(flow)}]]
+	proc ::gui::update::append_live_data_to_espresso_chart {event_dict args} {
 
-			set resistance 0
-			catch {
-				#set resistance [expr {((($::de1(pressure)/(($::de1(flow)*$::de1(flow))+($::de1(pressure)*0.9)))-2)*5)+11}]
-				#set resistance [round_to_two_digits [expr {$::de1(pressure) / pow($::de1(flow), 2) }]]
-				set resistance [round_to_two_digits [expr {(1/$::de1(flow))*($::de1(pressure))}]]
-			}
-			espresso_resistance append $resistance
+		if { ! [::de1::state::is_flow_state \
+				[dict get $event_dict this_state] \
+				[dict get $event_dict this_substate]] } { return }
 
-			if {$::de1(scale_weight_rate) != ""} {
-				# if a bluetooth scale is recording shot weight, graph it along with the flow meter
-				espresso_flow_weight append [round_to_two_digits $::de1(scale_weight_rate)]
-				espresso_flow_weight_raw append [round_to_two_digits $::de1(scale_weight_rate_raw)]
-				espresso_flow_weight_2x append [expr {2.0 * [round_to_two_digits $::de1(scale_weight_rate)] }]
+		wsaw
 
-				set resistance_weight 0
-				catch {
-					if {$::de1(pressure) != 0 && $::de1(scale_weight_rate) != "" && $::de1(scale_weight_rate) != 0} {
-						# if the scale is available, use that instead of the flowmeter calculation, to determine resistance
-						#set resistance_weight [round_to_two_digits [expr {$::de1(pressure) / pow($::de1(scale_weight_rate), 2) }]]
-						set resistance [round_to_two_digits [expr {(1/$::de1(scale_weight_rate))*($::de1(pressure))}]]
-					}
-				}
+		::skin::dsx::append_live_data_to_espresso_chart_orig $event_dict {*}$args
 
-				espresso_resistance_weight append $resistance_weight
-			}
-			set flow_delta [diff_flow_rate]
-			set negative_flow_delta_for_chart 0
-			if {$::de1(substate) == $::de1_substate_types_reversed(preinfusion)} {
-				# don't track flow rate delta during preinfusion because the puck is absorbing water, and so the numbers aren't useful (likely just pump variability)
-				set flow_delta 0
-			}
-			if {$flow_delta > 0} {
-			    if {$::settings(enable_negative_flow_charts) == 1} {
-					# experimental chart from the top
-					set negative_flow_delta_for_chart [expr {6.0 - (10.0 * $flow_delta)}]
-					set negative_flow_delta_for_chart_2x [expr {12.0 - (10.0 * $flow_delta)}]
-					espresso_flow_delta_negative append $negative_flow_delta_for_chart
-					espresso_flow_delta_negative_2x append $negative_flow_delta_for_chart_2x
-				}
-				espresso_flow_delta append 0
-				#puts "negative flow_delta: $flow_delta ($negative_flow_delta_for_chart)"
-			} else {
-				espresso_flow_delta append [expr {abs(10*$flow_delta)}]
+		dict with event_dict {
 
-			    if {$::settings(enable_negative_flow_charts) == 1} {
-					espresso_flow_delta_negative append 6
-					espresso_flow_delta_negative_2x append 12
-					#puts "flow_delta: $flow_delta ($negative_flow_delta_for_chart)"
-				}
-			}
-			set pressure_delta [diff_pressure]
-			espresso_pressure_delta append [expr {abs ($pressure_delta) / $millitime}]
-			set ::previous_espresso_flow $::de1(flow)
-			set ::previous_espresso_pressure $::de1(pressure)
-			espresso_temperature_mix append [return_temperature_number $::de1(mix_temperature)]
-			espresso_temperature_basket append [return_temperature_number $::de1(head_temperature)]
-			espresso_state_change append $::state_change_chart_value
-			set ::previous_espresso_flow_time $millitime
-			# don't chart goals at zero, instead take them off the chart
-			if {$::de1(goal_flow) == 0} {
-				espresso_flow_goal append "-1"
-				espresso_flow_goal_2x append "-1"
-			} else {
-				espresso_flow_goal append $::de1(goal_flow)
-				espresso_flow_goal_2x append [expr {2.0 * $::de1(goal_flow)}]
-			}
-			# don't chart goals at zero, instead take them off the chart
-			if {$::de1(goal_pressure) == 0} {
-				espresso_pressure_goal append "-1"
-			} else {
-				espresso_pressure_goal append $::de1(goal_pressure)
-			}
-			espresso_temperature_goal append [return_temperature_number $::de1(goal_temperature)]
-			DSx_espresso_temperature_basket append [DSx_return_temperature_number $::de1(head_temperature)]
-			DSx_espresso_temperature_goal append [DSx_return_temperature_number $::de1(goal_temperature)]
-			DSx_espresso_temperature_mix append [DSx_return_temperature_number $::de1(mix_temperature)]
+			# TODO: See above note on calling backup_DSx_steam_graph only once
 
-			set total_water_volume [expr {$::de1(preinfusion_volume) + $::de1(pour_volume)}]
-			set total_water_volume_divided [expr {0.1 * ($::de1(preinfusion_volume) + $::de1(pour_volume))}]
-			espresso_water_dispensed append $total_water_volume_divided
+			# if { $this_state == "Steam"} { backup_DSx_steam_graph }
 
-			# stop espresso at a desired water volume, if set to > 0, but only for advanced shots
-			if {$::settings(settings_profile_type) == "settings_2c" && $::settings(final_desired_shot_volume_advanced) > 0 && $::de1(pour_volume) >= $::settings(final_desired_shot_volume_advanced)} {
-				# for advanced shots, it's TOTAL WATER VOLuME that is the trigger, since Preinfusion is not necessarily part of an advanced shot
-				msg "Water volume based Espresso stop was triggered at: $$::de1(pour_volume) ml > $::settings(final_desired_shot_volume_advanced) ml "
-			 	start_idle
-			 	say [translate {Stop}] $::settings(sound_button_in)
-			 	#borg toast [translate "Total volume reached"]
-			 	borg toast [translate "Espresso volume reached"]
-			} elseif {$::settings(scale_bluetooth_address) == ""} {
-				# if no scale connected, potentially use volumetric to stop the shot
-			 	if {($::settings(settings_profile_type) == "settings_2a" || $::settings(settings_profile_type) == "settings_2b") && $::settings(final_desired_shot_volume) > 0 && $::de1(pour_volume) >= $::settings(final_desired_shot_volume)} {
-			 		# for FLOW and PRESSURE shots, we normally use preinfusion, so POUR VOLUME is very close to WEIGHT
-					msg "Water volume based Espresso stop was triggered at: $::de1(pour_volume) ml > $::settings(final_desired_shot_volume) ml"
-				 	start_idle
-				 	say [translate {Stop}] $::settings(sound_button_in)
-				 	borg toast [translate "Espresso volume reached"]
-			 	}
-			}
+			# DSx chooses p/f, rather than p/(f^2)
+
+			set ::espresso_resistance(end) \
+				[round_to_two_digits \
+					 [expr {(1/$GroupFlow)*($GroupPressure)}]]
+
+			DSx_espresso_temperature_basket append \
+				[DSx_return_temperature_number $HeadTemp]
+
+			DSx_espresso_temperature_goal append \
+				[DSx_return_temperature_number $SetHeadTemp]
+
+			DSx_espresso_temperature_mix append \
+				[DSx_return_temperature_number $SetMixTemp]
 		}
-  	}
+
+		# Change from prior, record the data, then check for step-advance conditions
+		# TODO: Confirm that this makes logical sense with Damian
+
+		DSx_Coffee_control
+	}
+
+} else {
+
+	rename ::append_live_data_to_espresso_chart ::skin::dsx::append_live_data_to_espresso_chart_orig
+	msg "INFO: DSx: rename ::gui::update::append_live_data_to_espresso_chart" \
+		"::skin::dsx::append_live_data_to_espresso_chart_orig"
+
+	proc ::append_live_data_to_espresso_chart {args} {
+
+		wsaw
+
+		::skin::dsx::append_live_data_to_espresso_chart_orig {*}$args
+
+		if {$::de1_num_state($::de1(state)) == "Steam"} { backup_DSx_steam_graph }
+
+		# DSx chooses p/f, rather than p/(f^2)
+		set espresso_resistance(end) \
+			[round_to_two_digits [expr {(1/$::de1(flow))*($::de1(pressure))}]]
+
+		DSx_espresso_temperature_basket append \
+			[DSx_return_temperature_number $::de1(head_temperature)]
+		DSx_espresso_temperature_goal append \
+			[DSx_return_temperature_number $::de1(goal_temperature)]
+		DSx_espresso_temperature_mix append \
+			[DSx_return_temperature_number $::de1(mix_temperature)]
+
+		# Change from prior, record the data, then check for step-advance conditions
+		# TODO: Confirm that this makes logical sense with Damian
+
+		DSx_Coffee_control
+	}
 }
