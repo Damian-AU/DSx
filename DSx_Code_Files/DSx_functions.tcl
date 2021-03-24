@@ -20,17 +20,7 @@ namespace eval ::skin::dsx {
 		}
 	}
 
-
-	proc _package_version_helper {package_name version_string} {
-		if { [catch {set _v [package present $package_name]}] } { return False }
-		return [package vsatisfies $_v $version_string]
-	}
-
-	variable use_event_system [expr {    [_package_version_helper de1_gui		1.2]
-					  && [_package_version_helper de1_event		1.0]
-					  && [_package_version_helper de1_de1		1.1]
-					  && [_package_version_helper de1_device_scale	1.1]
-				     }]
+	variable use_event_system [ package vsatisfies [package version de1app] 1.34.26- ]
 
 	if { $use_event_system } {
 
@@ -4351,7 +4341,8 @@ if { $::skin::dsx::use_event_system } {
 
 			set ::espresso_resistance(end) \
 				[round_to_two_digits \
-					 [expr {(1/$GroupFlow)*($GroupPressure)}]]
+					 [expr { $GroupFlow > 0 &&  $GroupPressure > 0 ? \
+							 (1/$GroupFlow)*($GroupPressure) : 0 }]]
 
 			DSx_espresso_temperature_basket append \
 				[DSx_return_temperature_number $HeadTemp]
@@ -4360,7 +4351,7 @@ if { $::skin::dsx::use_event_system } {
 				[DSx_return_temperature_number $SetHeadTemp]
 
 			DSx_espresso_temperature_mix append \
-				[DSx_return_temperature_number $SetMixTemp]
+				[DSx_return_temperature_number $MixTemp]
 		}
 
 		# Change from prior, record the data, then check for step-advance conditions
@@ -4384,8 +4375,10 @@ if { $::skin::dsx::use_event_system } {
 		if {$::de1_num_state($::de1(state)) == "Steam"} { backup_DSx_steam_graph }
 
 		# DSx chooses p/f, rather than p/(f^2)
-		set espresso_resistance(end) \
-			[round_to_two_digits [expr {(1/$::de1(flow))*($::de1(pressure))}]]
+		set ::espresso_resistance(end) \
+			[round_to_two_digits \
+				 [expr { $::de1(flow) > 0 && $::de1(pressure) > 0 ? \
+						 (1/$::de1(flow))*($::de1(pressure)) : 0 }]]
 
 		DSx_espresso_temperature_basket append \
 			[DSx_return_temperature_number $::de1(head_temperature)]
