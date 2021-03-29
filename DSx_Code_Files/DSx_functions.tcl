@@ -3787,7 +3787,7 @@ proc DSx_moveon_clear {} {
 }
 
 proc DSx_Coffee_control args {
-    if {($::de1(substate) == 4 || $::de1(substate) == 5) && [info exists ::settings(current_frame_description)] == 1} {
+    if {$::de1(state) == 4 && [info exists ::settings(current_frame_description)] == 1} {
         if {[string match -nocase *$::DSx_step_saturating* $::settings(current_frame_description)] == 1} {
             if {$::de1(scale_weight) > $::DSx_settings(saturating_weight) && $::DSx_settings(saturating_weight) != 0} {
                 DSx_next_step
