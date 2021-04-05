@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 4.48
+set ::DSx_settings(version) 4.49
 
 package provide DSx_skin 1.0
 
@@ -38,7 +38,6 @@ if {[file exists "[skin_directory]/DSx_Home_Page/DSx_home.page"] == 1} {
     add_de1_variable "$::DSx_standby_pages" 2140 780 -justify center -anchor "n" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -textvariable {Ratio [round_to_one_digits $::DSx_settings(live_graph_beans)]g : $::DSx_settings(live_graph_weight)g ([last_extraction_ratio])}
     add_de1_variable "espresso" 2140 740 -justify center -anchor "n" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -textvariable {[DSx_espresso_elapsed_timer]s   [DSx_water_data]mL}
     add_de1_variable "espresso" 2140 780 -justify center -anchor "n" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -textvariable {Ratio [round_to_one_digits $::settings(grinder_dose_weight)]g : [round_to_one_digits $::de1(scale_sensor_weight)]g ([live_extraction_ratio])}
-
     add_de1_variable "espresso" 1810 370 -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -width [rescale_x_skin 520] -textvariable {[pressure_text]}
     add_de1_variable "espresso" 2120 370 -justify center -anchor "n" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -width [rescale_x_skin 520] -textvariable {[waterflow_text]}
     add_de1_variable "espresso" 2440 370 -justify left -anchor "ne" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -width [rescale_x_skin 520] -textvariable {[waterweight_text]}
@@ -48,11 +47,7 @@ if {[file exists "[skin_directory]/DSx_Home_Page/DSx_home.page"] == 1} {
     add_de1_image "$::DSx_home_pages" 2040 1280 "[skin_directory_graphics]/icons/settings.png"
     add_de1_image "$::DSx_home_pages" 2260 1280 "[skin_directory_graphics]/icons/power.png"
     add_de1_button "$::DSx_standby_pages" {say "" $::settings(sound_button_in); set ::current_espresso_page "off"; load_test; set_next_page off DSx_4_workflow; start_idle; page_show DSx_4_workflow} 1810 1250 2030 1500
-    if {$::DSx_settings(admin) == 1} {
-        add_de1_button "$::DSx_standby_pages" {say [translate {}] $::settings(sound_button_in); set ::current_espresso_page "off"; load_test; set_next_page off DSx_5_admin; start_idle; page_show DSx_5_admin}  2030 1250 2250 1500
-        } else {
-        add_de1_button "$::DSx_standby_pages" { say [translate {settings}] $::settings(sound_button_in); set ::current_espresso_page "off"; show_settings;} 2030 1250 2250 1500
-    }
+    add_de1_button "$::DSx_standby_pages" { say [translate {settings}] $::settings(sound_button_in); set ::current_espresso_page "off"; show_settings;} 2030 1250 2250 1500
     add_de1_button "$::DSx_standby_pages" {say [translate {sleep}] $::settings(sound_button_in); set ::current_espresso_page "off"; off_timer;} 2250 1250 2470 1500
     ### Left Side
     add_de1_image "$::DSx_home_pages" 140 350 "[skin_directory_graphics]/icons/history.png"
@@ -605,7 +600,6 @@ add_de1_button "$::DSx_other_pages" {say "" $::settings(sound_button_in); restor
         if {$::DSx_settings(graph_weight_total_b) != $::DSx_settings(graph_weight_total) \
             || $::DSx_settings(tare_off_b) != $::settings(tare_only_on_espresso_start) \
             || $::DSx_settings(font_size_b) != $::settings(default_font_calibration) \
-            || $::DSx_settings(admin_b) != $::DSx_settings(admin) \
             || $::restart == 1
             } {
             set_next_page off DSx_message; page_show DSx_message
@@ -1019,7 +1013,6 @@ add_de1_button "DSx_4_workflow" {say "" $::settings(sound_button_in); save_orang
 # Profile
 add_de1_variable "DSx_4_workflow" 1280 220 -text "" -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center" -width [rescale_x_skin 1200] -textvariable {$::settings(profile_title)}
 add_de1_button "DSx_4_workflow" {say [translate {}] $::settings(sound_button_in); set ::DSx_workflow_to_settings_1 1; show_settings; after 500 update_de1_explanation_chart; say [translate {settings}] $::settings(sound_button_in); set_next_page off settings_1; page_show off; set ::settings(active_settings_tab) settings_1; set_profiles_scrollbar_dimensions} 1040 140 1540 300
-add_de1_widget "DSx_4_workflow" checkbutton 1920 750 {set ::DSx_4_workflow_checkbutton_1 $widget} -text [translate "LRv2/3 fast fill"] -indicatoron true  -font "[DSx_font font 8]" -bg $::DSx_settings(bg_colour) -justify left -anchor nw -foreground #26a -variable ::DSx_settings(LRv2_presets) -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #26a -relief flat;
 add_de1_image "DSx_4_workflow" 1210 340 "[skin_directory_graphics]/icons/button7.png"
 add_de1_variable "DSx_4_workflow" 1340 310 -justify center -anchor center -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {flow}
 add_de1_variable "DSx_4_workflow" 1490 310 -justify center -anchor center -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {mass}
@@ -1165,12 +1158,10 @@ set ::DSx_skin_slider 0
 set ::DSx_skin_scrollbar [add_de1_widget "DSx_admin_skin" scale 10000 1 {} -from 0 -to .90 -bigincrement 0.2 -background $::DSx_settings(font_colour) -borderwidth 1 -showvalue 0 -resolution .01 -length [rescale_x_skin 400] -width [rescale_y_skin 150] -variable ::DSx_skin_slider -font [DSx_font font 10] -sliderlength [rescale_x_skin 125] -relief flat -command {listbox_moveto $::globals(DSx_tablet_styles_listbox) $::DSx_skin_slider}  -foreground $::DSx_settings(font_colour) -troughcolor $::DSx_settings(bg_colour) -borderwidth 0  -highlightthickness 0]
 
 add_de1_widget "DSx_5_admin" checkbutton 1850 1180 {} -text [translate "Backup before updating"] -indicatoron true  -font "[DSx_font font 8]" -bg $::DSx_settings(bg_colour) -justify left -anchor nw -foreground $::DSx_settings(font_colour) -variable ::DSx_settings(backup_b4_update)  -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa  -relief flat -command save_DSx_settings
-if {$::DSx_settings(admin) == 1} {
-    add_de1_image "settings_1 settings_2a settings_2b settings_2c settings_2c2" 1280 0 "[skin_directory_graphics]/admin/tabover.png"
-    add_de1_image "DSx_descale_prepare" 1200 1450 "[skin_directory_graphics]/admin/cleanbuttonW.png"
-    add_de1_text "DSx_descale_prepare" 1490 1504 -text [translate "Clean now"] -font [DSx_font font 10] -fill "#444444" -anchor "center"
-    add_de1_button "DSx_descale_prepare" {say [translate {Clean}] $::settings(sound_button_in); start_cleaning} 1160 1200 1860 1600
-}
+
+add_de1_image "DSx_descale_prepare" 1200 1450 "[skin_directory_graphics]/admin/cleanbuttonW.png"
+add_de1_text "DSx_descale_prepare" 1490 1504 -text [translate "Clean now"] -font [DSx_font font 10] -fill "#444444" -anchor "center"
+add_de1_button "DSx_descale_prepare" {say [translate {Clean}] $::settings(sound_button_in); start_cleaning} 1160 1200 1860 1600
 
 add_de1_variable "DSx_5_admin" 1280 60 -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -textvariable {Main Settings}
 set ::de1(app_update_button_label) [translate "Update"]
@@ -1293,8 +1284,7 @@ add_de1_widget "DSx_units" checkbutton 1400 660 {} -text [translate "AM/PM"] -in
 add_de1_widget "DSx_units" checkbutton 1400 740 {} -text [translate "1.234,56"] -indicatoron true  -font [DSx_font font 10] -bg $::DSx_settings(bg_colour) -anchor nw -foreground $::DSx_settings(font_colour) -variable ::settings(enable_commanumbers)  -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa
 add_de1_widget "DSx_units" checkbutton 1400 820 {} -text [translate "Record log file"] -indicatoron true  -font "[DSx_font font 10]" -bg $::DSx_settings(bg_colour) -justify left -anchor nw -foreground $::DSx_settings(font_colour) -variable ::settings(log_enabled) -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa  -relief flat -command save_settings
 add_de1_widget "DSx_units" checkbutton 1400 900 {set ::DSx_theme_checkbutton_2 $widget} -text [translate "Tare only on espresso start"] -indicatoron true  -font "[DSx_font font 10]" -bg $::DSx_settings(bg_colour) -justify left -anchor nw -foreground $::DSx_settings(font_colour) -variable ::settings(tare_only_on_espresso_start)  -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa  -relief flat -command save_settings
-add_de1_widget "DSx_units" checkbutton 1400 980 {} -text [translate "Use DSx style App settings pages"] -indicatoron true  -font "[DSx_font font 10]" -bg $::DSx_settings(bg_colour) -justify left -anchor nw -foreground $::DSx_settings(font_colour) -variable ::DSx_settings(admin)  -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa  -relief flat -command save_DSx_settings
-add_de1_widget "DSx_units" checkbutton 1400 1060 {} -text [translate "Save steam history"] -indicatoron true  -font "[DSx_font font 10]" -bg $::DSx_settings(bg_colour) -justify left -anchor nw -foreground $::DSx_settings(font_colour) -variable ::DSx_settings(save_DSx_steam_history)  -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa  -relief flat -command save_DSx_settings
+add_de1_widget "DSx_units" checkbutton 1400 980 {} -text [translate "Save steam history"] -indicatoron true  -font "[DSx_font font 10]" -bg $::DSx_settings(bg_colour) -justify left -anchor nw -foreground $::DSx_settings(font_colour) -variable ::DSx_settings(save_DSx_steam_history)  -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa  -relief flat -command save_DSx_settings
 
 # Water level
 add_de1_text "DSx_units" 260 910  -text [translate "Refill level"] -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -justify "left" -anchor "nw"
@@ -1357,22 +1347,6 @@ add_de1_text "DSx_descale_prepare" 340 1504 -text [translate "Cancel"] -font [DS
 add_de1_text "DSx_descale_prepare" 2233 1504 -text [translate "Descale now"] -font [DSx_font font 10] -fill "#444444" -anchor "center"
 add_de1_button "DSx_descale_prepare" {say [translate {Cancel}] $::settings(sound_button_in);set_next_page off DSx_5_admin; page_show DSx_5_admin;} 0 1200 700 1600 ""
 add_de1_button "DSx_descale_prepare" {say [translate {Ok}] $::settings(sound_button_in); start_decaling} 1860 1200 2560 1600 ""
-
-### Calibrate
-add_de1_text "calibrate calibrate2" 1280 1310 -text [translate "Done"] -font Helv_10_bold -fill "#fAfBff" -anchor "center"
-add_de1_button "calibrate calibrate2" {say [translate {Done}] $::settings(sound_button_in);
-    if {[ifexists ::calibration_disabled_fahrenheit] == 1} {
-        set ::settings(enable_fahrenheit) 1
-        unset -nocomplain ::calibration_disabled_fahrenheit
-        msg "Calibration re-enabled Fahrenheit"
-    }
-
-    save_settings; set_next_page off DSx_5_admin;
-    set_heater_tweaks;
-    set ::DSx_settings(backup_phase_2_flow_rate) $::settings(phase_2_flow_rate)
-    set ::DSx_settings(backup_espresso_warmup_timeout) $::settings(espresso_warmup_timeout)
-    page_show DSx_5_admin;} 980 1210 1580 1410 ""
-
 
 ###### DSx Coffee ########################################################################################
 add_de1_variable "DSx_3_coffee" 1280 60 -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -textvariable {DSx coffee Setup Page}

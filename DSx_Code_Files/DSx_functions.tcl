@@ -33,10 +33,6 @@ namespace eval ::skin::dsx {
 	}
 }
 
-
-
-
-
 proc DSx_startup {} {
     check_for_new_icons
     load_DSx_settings
@@ -253,16 +249,9 @@ proc check_DSx_variables {} {
     if {[info exists ::DSx_skindebug] == 0} {
         set ::DSx_skindebug 0
     }
-    if {[info exists ::DSx_settings(backup_phase_2_flow_rate)] == 0} {
-        set ::DSx_settings(backup_phase_2_flow_rate) $::settings(phase_2_flow_rate)
-        set ::DSx_settings(backup_espresso_warmup_timeout) $::settings(espresso_warmup_timeout)
-    }
     if {[info exists ::DSx_settings(original_clock_font)] == 0} {
         set ::DSx_settings(original_clock_font) 1
         set ::DSx_settings(clock_font) {Comic Sans MS}
-    }
-    if {[info exists ::DSx_settings(LRv2_presets)] == 0} {
-        set ::DSx_settings(LRv2_presets) 1
     }
     if {[info exists ::DSx_settings(bean_nett_range)] == 0} {
         set ::DSx_settings(bean_nett_range) 30
@@ -319,7 +308,6 @@ proc check_DSx_variables {} {
         set ::settings(DSx_volume) 0
         set ::DSx_settings(past_volume1) 0
         set ::DSx_settings(past_volume2) 0
-        set ::DSx_settings(admin) 0
         set ::DSx_settings(font_name) "Roboto-Regular"
         set ::DSx_settings(clock_hide) 0
         set ::DSx_settings(clock_hide_ss) 0
@@ -613,7 +601,6 @@ proc load_test {} {
    set ::DSx_settings(graph_weight_total_b) $::DSx_settings(graph_weight_total)
    set ::DSx_settings(tare_off_b) $::settings(tare_only_on_espresso_start)
    set ::DSx_settings(font_size_b) $::settings(default_font_calibration)
-   set ::DSx_settings(admin_b) $::DSx_settings(admin)
    check_skin_backup
    backup_settings
 }
@@ -3059,7 +3046,6 @@ proc wsaw_cal_value {} {
 }
 
 proc DSx_espresso {} {
-    start_LRv2_presets
     set ::current_espresso_page off
     set_next_page off off
     start_espresso
@@ -3551,8 +3537,6 @@ proc backup_DSx_live_graph {} {
 proc save_final_live_graph {unused_old_state unused_new_state} {
     backup_DSx_live_graph
     save_DSx_settings
-    end_LRv2_presets
-
 }
 proc DSx_water_data {} {
     set piv [round_to_integer $::de1(preinfusion_volume)]
@@ -3718,22 +3702,6 @@ proc clear_temp_data {args} {
     DSx_espresso_temperature_mix append [DSx_return_temperature_number $::settings(espresso_temperature)]
     DSx_espresso_temperature_goal length 0
     DSx_espresso_temperature_goal append [DSx_return_temperature_number $::settings(espresso_temperature)]
-}
-
-proc start_LRv2_presets {} {
-    if {$::DSx_settings(LRv2_presets) == 1 && ($::settings(profile_title) == {Damian's LRv2} || $::settings(profile_title) == {Damian's LRv3})} {
-        set ::settings(phase_2_flow_rate) 80
-        set ::settings(espresso_warmup_timeout) 30
-        set_heater_tweaks
-    }
-}
-proc end_LRv2_presets {} {
-    if {$::DSx_settings(LRv2_presets) == 1} {
-        set ::settings(phase_2_flow_rate) $::DSx_settings(backup_phase_2_flow_rate)
-        set ::settings(espresso_warmup_timeout) $::DSx_settings(backup_espresso_warmup_timeout)
-        set_heater_tweaks
-        save_settings
-    }
 }
 
 proc DSx_list_rotate {xs {n 1}} {
@@ -4228,8 +4196,6 @@ proc DSx_preview_tablet_skin {} {
 	DSx_current_listbox_item $::globals(DSx_tablet_styles_listbox)
 }
 
-
-
 proc set_DSx_skins_scrollbar_dimensions {} {
     $::DSx_skin_scrollbar configure -length [winfo height $::globals(DSx_tablet_styles_listbox)]
     set coords [.can coords $::globals(DSx_tablet_styles_listbox) ]
@@ -4250,6 +4216,7 @@ proc load_DSx_language {} {
 	#make_current_listbox_item_blue $::DSx_languages_widget
 	DSx_current_listbox_item $::DSx_languages_widget
 }
+
 proc fill_DSx_languages_listbox {} {
 
 	set widget $::DSx_languages_widget
@@ -4280,7 +4247,6 @@ proc fill_DSx_languages_listbox {} {
 	$::DSx_languages_widget yview $current
 }
 
-
 proc set_DSx_languages_scrollbar_dimensions {} {
     # set the height of the scrollbar to be the same as the listbox
     $::DSx_languages_scrollbar configure -length [winfo height $::DSx_languages_widget]
@@ -4295,7 +4261,6 @@ proc DSx_scheduler_feature_hide_show_refresh {} {
 	}
 }
 
-
 ##########
 
 ### over write
@@ -4303,8 +4268,6 @@ proc profile_has_not_changed_set args {
 	set ::settings(profile_has_changed) 0
     LRv2_preview
 }
-
-
 
 if { $::skin::dsx::use_event_system } {
 
