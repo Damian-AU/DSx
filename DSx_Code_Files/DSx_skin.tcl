@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 4.49
+set ::DSx_settings(version) 4.50
 
 package provide DSx_skin 1.0
 
@@ -695,14 +695,12 @@ add_de1_widget "DSx_past" graph 40 80 {
 	$widget element create DSx_past_line_espresso_flow_2x  -xdata espresso_elapsed1 -ydata DSx_past_espresso_flow_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
 	$widget element create DSx_past_line_espresso_flow_weight_2x  -xdata espresso_elapsed1 -ydata DSx_past_espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
 	$widget element create DSx_past_line2_espresso_pressure -xdata espresso_elapsed1 -ydata DSx_past_espresso_pressure -symbol none -label "" -linewidth [rescale_x_skin 8] -color #008c4c  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
-    $widget element create DSx_past_line_espresso_pressure_goal -xdata espresso_elapsed1 -ydata DSx_past_espresso_pressure_goal -symbol none -label "" -linewidth [rescale_x_skin 8] -color #69fdb3  -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
-    $widget element create DSx_past_line_espresso_flow_goal_2x  -xdata espresso_elapsed1 -ydata DSx_past_espresso_flow_goal_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #7aaaff -smooth $::settings(live_graph_smoothing_technique) -pixels 0  -dashes {5 5};
-    $widget element create DSx_past_line_espresso_temperature_goal_01 -xdata espresso_elapsed1 -ydata DSx_past_espresso_temperature_goal_01 -symbol none -label ""  -linewidth [rescale_x_skin 5] -color #ffa5a6 -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
-    $widget element create DSx_past_line_espresso_temperature_basket_01 -xdata espresso_elapsed1 -ydata DSx_past_espresso_temperature_basket_01 -symbol none -label ""  -linewidth [rescale_x_skin 5] -color #e73249 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
-    $widget element create DSx_past_line_espresso_resistance  -xdata espresso_elapsed1 -ydata DSx_past_espresso_resistance -symbol none -label "" -linewidth [rescale_x_skin 5] -color #e5e500 -smooth $::settings(live_graph_smoothing_technique) -pixels 0
-
-    $widget element create DSx_past_line_espresso_state_change_1 -xdata espresso_elapsed1 -ydata DSx_past_espresso_state_change -label "" -linewidth 3 -color #AAAAAA  -pixels 0 ;
-
+    $widget element create DSx_past_line_espresso_pressure_goal -xdata espresso_elapsed1 -ydata DSx_past_espresso_pressure_goal -symbol none -label "" -linewidth $::DSx_settings(hist_goal_curve) -color #69fdb3  -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
+    $widget element create DSx_past_line_espresso_flow_goal_2x  -xdata espresso_elapsed1 -ydata DSx_past_espresso_flow_goal_2x -symbol none -label "" -linewidth $::DSx_settings(hist_goal_curve) -color #7aaaff -smooth $::settings(live_graph_smoothing_technique) -pixels 0  -dashes {5 5};
+    $widget element create DSx_past_line_espresso_temperature_goal_01 -xdata espresso_elapsed1 -ydata DSx_past_espresso_temperature_goal_01 -symbol none -label ""  -linewidth $::DSx_settings(hist_temp_goal_curve) -color #ffa5a6 -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
+    $widget element create DSx_past_line_espresso_temperature_basket_01 -xdata espresso_elapsed1 -ydata DSx_past_espresso_temperature_basket_01 -symbol none -label ""  -linewidth $::DSx_settings(hist_temp_curve) -color #e73249 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create DSx_past_line_espresso_resistance  -xdata espresso_elapsed1 -ydata DSx_past_espresso_resistance -symbol none -label "" -linewidth $::DSx_settings(hist_resistance_curve) -color #e5e500 -smooth $::settings(live_graph_smoothing_technique) -pixels 0
+    $widget element create DSx_past_line_espresso_state_change_1 -xdata espresso_elapsed1 -ydata DSx_past_espresso_state_change -label "" -linewidth $::DSx_settings(hist_goal_curve) -color #AAAAAA  -pixels 0 ;
     $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 7] -min 0.0;
 	$widget axis configure y -color #008c4c -tickfont [DSx_font font 7] -min 0.0 -max $::DSx_settings(zoomed_y_axis_max) -subdivisions 5 -majorticks {0 1 2 3 4 5 6 7 8 9 10 11 12}  -hide 0;
 	$widget axis configure y2 -color #206ad4 -tickfont [DSx_font font 7] -min 0.0 -max $::DSx_settings(zoomed_y2_axis_max) -subdivisions 2 -majorticks {0 0.5 1 1.5 2 2.5 3 3.5 4 4.5 5 5.5 6 6.5 7 7.5 8} -hide 0;
@@ -721,20 +719,15 @@ add_de1_widget "DSx_past" graph 1300 80 {
 	$widget element create DSx_past2_line_espresso_flow_2x  -xdata espresso_elapsed2 -ydata DSx_past2_espresso_flow_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
 	$widget element create DSx_past2_line_espresso_flow_weight_2x  -xdata espresso_elapsed2 -ydata DSx_past2_espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
 	$widget element create DSx_past2_line2_espresso_pressure -xdata espresso_elapsed2 -ydata DSx_past2_espresso_pressure -symbol none -label "" -linewidth [rescale_x_skin 8] -color #008c4c  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
-    $widget element create DSx_past2_line_espresso_pressure_goal -xdata espresso_elapsed2 -ydata DSx_past2_espresso_pressure_goal -symbol none -label "" -linewidth [rescale_x_skin 8] -color #69fdb3  -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
-    $widget element create DSx_past2_line_espresso_flow_goal_2x  -xdata espresso_elapsed2 -ydata DSx_past2_espresso_flow_goal_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #7aaaff -smooth $::settings(live_graph_smoothing_technique) -pixels 0  -dashes {5 5};
-    $widget element create DSx_past2_line_espresso_temperature_goal_01 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_temperature_goal_01 -symbol none -label ""  -linewidth [rescale_x_skin 5] -color #ffa5a6 -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
-    $widget element create DSx_past2_line_espresso_temperature_basket_01 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_temperature_basket_01 -symbol none -label ""  -linewidth [rescale_x_skin 5] -color #e73249 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
-    $widget element create DSx_past2_line_espresso_resistance  -xdata espresso_elapsed2 -ydata DSx_past2_espresso_resistance -symbol none -label "" -linewidth [rescale_x_skin 5] -color #e5e500 -smooth $::settings(live_graph_smoothing_technique) -pixels 0
-
-    $widget element create DSx_past2_line_espresso_state_change_1 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_state_change -label "" -linewidth 3 -color #AAAAAA  -pixels 0 ;
-
+    $widget element create DSx_past2_line_espresso_pressure_goal -xdata espresso_elapsed2 -ydata DSx_past2_espresso_pressure_goal -symbol none -label "" -linewidth $::DSx_settings(hist_goal_curve) -color #69fdb3  -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
+    $widget element create DSx_past2_line_espresso_flow_goal_2x  -xdata espresso_elapsed2 -ydata DSx_past2_espresso_flow_goal_2x -symbol none -label "" -linewidth $::DSx_settings(hist_goal_curve) -color #7aaaff -smooth $::settings(live_graph_smoothing_technique) -pixels 0  -dashes {5 5};
+    $widget element create DSx_past2_line_espresso_temperature_goal_01 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_temperature_goal_01 -symbol none -label ""  -linewidth $::DSx_settings(hist_temp_goal_curve) -color #ffa5a6 -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
+    $widget element create DSx_past2_line_espresso_temperature_basket_01 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_temperature_basket_01 -symbol none -label ""  -linewidth $::DSx_settings(hist_temp_curve) -color #e73249 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create DSx_past2_line_espresso_resistance  -xdata espresso_elapsed2 -ydata DSx_past2_espresso_resistance -symbol none -label "" -linewidth $::DSx_settings(hist_resistance_curve) -color #e5e500 -smooth $::settings(live_graph_smoothing_technique) -pixels 0
+    $widget element create DSx_past2_line_espresso_state_change_1 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_state_change -label "" -linewidth $::DSx_settings(hist_goal_curve) -color #AAAAAA  -pixels 0 ;
     $widget element create DSx_past2_line2_steam_pressure -xdata espresso_elapsed2 -ydata DSx_past2_steam_pressure -symbol none -label "" -linewidth [rescale_x_skin 8] -color #008c4c  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create DSx_past2_line2_steam_flow -xdata espresso_elapsed2 -ydata DSx_past2_steam_flow -symbol none -label "" -linewidth [rescale_x_skin 8] -color #4e85f4  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create DSx_past2_line2_steam_temperature -xdata espresso_elapsed2 -ydata DSx_past2_steam_temperature -symbol none -label "" -linewidth [rescale_x_skin 8] -color #e73249  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
-
-
-
     $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 7] -min 0.0;
 	$widget axis configure y -color #008c4c -tickfont [DSx_font font 7] -min 0.0 -max $::DSx_settings(zoomed_y_axis_max) -subdivisions 5 -majorticks {0 1 2 3 4 5 6 7 8 9 10 11 12}  -hide 0;
 	$widget axis configure y2 -color #206ad4 -tickfont [DSx_font font 7] -min 0.0 -max $::DSx_settings(zoomed_y2_axis_max) -subdivisions 2 -majorticks {0 0.5 1 1.5 2 2.5 3 3.5 4 4.5 5 5.5 6 6.5 7 7.5 8} -hide 0;
@@ -774,14 +767,12 @@ add_de1_widget "DSx_past_zoomed" graph 30 80 {
 	$widget element create DSx_past_line_espresso_flow_2x  -xdata espresso_elapsed1 -ydata DSx_past_espresso_flow_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
 	$widget element create DSx_past_line_espresso_flow_weight_2x  -xdata espresso_elapsed1 -ydata DSx_past_espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
 	$widget element create DSx_past_line2_espresso_pressure -xdata espresso_elapsed1 -ydata DSx_past_espresso_pressure -symbol none -label "" -linewidth [rescale_x_skin 8] -color #008c4c  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
-    $widget element create DSx_past_line_espresso_pressure_goal -xdata espresso_elapsed1 -ydata DSx_past_espresso_pressure_goal -symbol none -label "" -linewidth [rescale_x_skin 8] -color #69fdb3  -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
-    $widget element create DSx_past_line_espresso_flow_goal_2x  -xdata espresso_elapsed1 -ydata DSx_past_espresso_flow_goal_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #7aaaff -smooth $::settings(live_graph_smoothing_technique) -pixels 0  -dashes {5 5};
-    $widget element create DSx_past_line_espresso_temperature_goal_01 -xdata espresso_elapsed1 -ydata DSx_past_espresso_temperature_goal_01 -symbol none -label ""  -linewidth [rescale_x_skin 5] -color #ffa5a6 -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
-    $widget element create DSx_past_line_espresso_temperature_basket_01 -xdata espresso_elapsed1 -ydata DSx_past_espresso_temperature_basket_01 -symbol none -label ""  -linewidth [rescale_x_skin 5] -color #e73249 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
-    $widget element create DSx_past_line_espresso_resistance  -xdata espresso_elapsed1 -ydata DSx_past_espresso_resistance -symbol none -label "" -linewidth [rescale_x_skin 5] -color #e5e500 -smooth $::settings(live_graph_smoothing_technique) -pixels 0
-
-    $widget element create DSx_past_line_espresso_state_change_1 -xdata espresso_elapsed1 -ydata DSx_past_espresso_state_change -label "" -linewidth 3 -color #AAAAAA  -pixels 0 ;
-
+    $widget element create DSx_past_line_espresso_pressure_goal -xdata espresso_elapsed1 -ydata DSx_past_espresso_pressure_goal -symbol none -label "" -linewidth $::DSx_settings(hist_goal_curve) -color #69fdb3  -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
+    $widget element create DSx_past_line_espresso_flow_goal_2x  -xdata espresso_elapsed1 -ydata DSx_past_espresso_flow_goal_2x -symbol none -label "" -linewidth $::DSx_settings(hist_goal_curve) -color #7aaaff -smooth $::settings(live_graph_smoothing_technique) -pixels 0  -dashes {5 5};
+    $widget element create DSx_past_line_espresso_temperature_goal_01 -xdata espresso_elapsed1 -ydata DSx_past_espresso_temperature_goal_01 -symbol none -label ""  -linewidth $::DSx_settings(hist_temp_goal_curve) -color #ffa5a6 -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
+    $widget element create DSx_past_line_espresso_temperature_basket_01 -xdata espresso_elapsed1 -ydata DSx_past_espresso_temperature_basket_01 -symbol none -label ""  -linewidth $::DSx_settings(hist_temp_curve) -color #e73249 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create DSx_past_line_espresso_resistance  -xdata espresso_elapsed1 -ydata DSx_past_espresso_resistance -symbol none -label "" -linewidth $::DSx_settings(hist_resistance_curve) -color #e5e500 -smooth $::settings(live_graph_smoothing_technique) -pixels 0
+    $widget element create DSx_past_line_espresso_state_change_1 -xdata espresso_elapsed1 -ydata DSx_past_espresso_state_change -label "" -linewidth $::DSx_settings(hist_goal_curve) -color #AAAAAA  -pixels 0 ;
     $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 9] -min 0.0;
 	$widget axis configure y -color #008c4c -tickfont [DSx_font font 9] -min 0.0 -max 17 -subdivisions 5 -majorticks {0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16}  -hide 0;
 	$widget axis configure y2 -color #206ad4 -tickfont [DSx_font font 9] -min 0.0 -max 8.5 -subdivisions 2 -majorticks {0 0.5 1 1.5 2 2.5 3 3.5 4 4.5 5 5.5 6 6.5 7 7.5 8} -hide 0;
@@ -800,14 +791,12 @@ add_de1_widget "DSx_past2_zoomed" graph 30 80 {
 	$widget element create DSx_past2_line_espresso_flow_2x  -xdata espresso_elapsed2 -ydata DSx_past2_espresso_flow_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
 	$widget element create DSx_past2_line_espresso_flow_weight_2x  -xdata espresso_elapsed2 -ydata DSx_past2_espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
 	$widget element create DSx_past2_line2_espresso_pressure -xdata espresso_elapsed2 -ydata DSx_past2_espresso_pressure -symbol none -label "" -linewidth [rescale_x_skin 8] -color #69fdb3  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
-    $widget element create DSx_past2_line_espresso_pressure_goal -xdata espresso_elapsed2 -ydata DSx_past2_espresso_pressure_goal -symbol none -label "" -linewidth [rescale_x_skin 8] -color #69fdb3  -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
-    $widget element create DSx_past2_line_espresso_flow_goal_2x  -xdata espresso_elapsed2 -ydata DSx_past2_espresso_flow_goal_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #7aaaff -smooth $::settings(live_graph_smoothing_technique) -pixels 0  -dashes {5 5};
-    $widget element create DSx_past2_line_espresso_temperature_goal_01 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_temperature_goal_01 -symbol none -label ""  -linewidth [rescale_x_skin 5] -color #ffa5a6 -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
-    $widget element create DSx_past2_line_espresso_temperature_basket_01 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_temperature_basket_01 -symbol none -label ""  -linewidth [rescale_x_skin 5] -color #e73249 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
-    $widget element create DSx_past2_line_espresso_resistance  -xdata espresso_elapsed2 -ydata DSx_past2_espresso_resistance -symbol none -label "" -linewidth [rescale_x_skin 5] -color #e5e500 -smooth $::settings(live_graph_smoothing_technique) -pixels 0
-
-    $widget element create DSx_past2_line_espresso_state_change_1 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_state_change -label "" -linewidth 3 -color #AAAAAA  -pixels 0 ;
-
+    $widget element create DSx_past2_line_espresso_pressure_goal -xdata espresso_elapsed2 -ydata DSx_past2_espresso_pressure_goal -symbol none -label "" -linewidth $::DSx_settings(hist_goal_curve) -color #69fdb3  -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
+    $widget element create DSx_past2_line_espresso_flow_goal_2x  -xdata espresso_elapsed2 -ydata DSx_past2_espresso_flow_goal_2x -symbol none -label "" -linewidth $::DSx_settings(hist_goal_curve) -color #7aaaff -smooth $::settings(live_graph_smoothing_technique) -pixels 0  -dashes {5 5};
+    $widget element create DSx_past2_line_espresso_temperature_goal_01 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_temperature_goal_01 -symbol none -label ""  -linewidth $::DSx_settings(hist_temp_goal_curve) -color #ffa5a6 -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
+    $widget element create DSx_past2_line_espresso_temperature_basket_01 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_temperature_basket_01 -symbol none -label ""  -linewidth $::DSx_settings(hist_temp_curve) -color #e73249 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create DSx_past2_line_espresso_resistance  -xdata espresso_elapsed2 -ydata DSx_past2_espresso_resistance -symbol none -label "" -linewidth $::DSx_settings(hist_resistance_curve) -color #e5e500 -smooth $::settings(live_graph_smoothing_technique) -pixels 0
+    $widget element create DSx_past2_line_espresso_state_change_1 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_state_change -label "" -linewidth $::DSx_settings(hist_goal_curve) -color #AAAAAA  -pixels 0 ;
     $widget element create DSx_past2_line2_steam_pressure -xdata espresso_elapsed2 -ydata DSx_past2_steam_pressure -symbol none -label "" -linewidth [rescale_x_skin 8] -color #008c4c  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create DSx_past2_line2_steam_flow -xdata espresso_elapsed2 -ydata DSx_past2_steam_flow -symbol none -label "" -linewidth [rescale_x_skin 8] -color #4e85f4  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create DSx_past2_line2_steam_temperature -xdata espresso_elapsed2 -ydata DSx_past2_steam_temperature -symbol none -label "" -linewidth [rescale_x_skin 8] -color #e73249  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
@@ -867,6 +856,7 @@ add_de1_button "DSx_past" {
             } else {
                 set_next_page off off; start_idle; page_show off;
             }
+    save_DSx_settings
 } 1170 1390 1390 1600
 
 add_de1_button "DSx_past" {
@@ -882,11 +872,6 @@ add_de1_button "DSx_past" {
 } 1680 1390 1900 1600
 source "[homedir]/skins/Insight/scentone.tcl"
 
-##### DAMIAN Flow Correction
-#add_de1_variable "DSx_past" 1550 1444 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center" -textvariable {DSxFlow}
-#add_de1_variable "DSx_past" 1550 1494 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center" -textvariable {$::DSx_settings(flow_correction)}
-#add_de1_button "DSx_past" {say "" $::settings(sound_button_in); history_flow_correction;} 1440 1360 1660 1600
-set ::DSx_settings(flow_correction)  off
 #####
 add_de1_text "DSx_past DSx_past_zoomed DSx_past2_zoomed DSx_past3_zoomed" 1280 30 -text [translate "History Viewer"] -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -justify "center" -anchor "center"
 add_de1_text "DSx_past" 2500 30 -text [translate "Flow (mL/s)"] -font [DSx_font font 7] -fill "#206ad4" -justify "left" -anchor "ne"
@@ -908,9 +893,9 @@ add_de1_variable "DSx_past" 1280 1304 -text "" -font [DSx_font font 12] -fill $:
 add_de1_variable "DSx_past" 1680 1304 -text "" -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center" -textvariable {$::DSx_settings(show_history_resistance)}
 add_de1_button "DSx_past" {say "" $::settings(sound_button_in); set_next_page off off; history_godshots_switch; after 200; fill_DSx_past2_shots_listbox; reset_messages} 1506 1010 1870 1180
 add_de1_button "DSx_past" {say "" $::settings(sound_button_in); unset -nocomplain ::settings_backup; array set ::settings_backup [array get ::settings]; set_next_page off off; page_show DSx_h2g; reset_messages} 696 1010 1060 1180
-add_de1_button "DSx_past" {say "" $::settings(sound_button_in); set_next_page off off; history_graph_temperature; after 200; reset_messages} 696 1210 1060 1380
-add_de1_button "DSx_past" {say "" $::settings(sound_button_in); set_next_page off off; history_graph_goal; after 200; reset_messages} 1101 1210 1465 1380
-add_de1_button "DSx_past" {say "" $::settings(sound_button_in); set_next_page off off; history_graph_resistance; after 200; reset_messages} 1501 1210 1865 1380
+add_de1_button "DSx_past" {say "" $::settings(sound_button_in); history_graph_temperature;} 696 1210 1060 1380
+add_de1_button "DSx_past" {say "" $::settings(sound_button_in); history_graph_goal;} 1101 1210 1465 1380
+add_de1_button "DSx_past" {say "" $::settings(sound_button_in); history_graph_resistance;} 1501 1210 1865 1380
 ## shot data
 add_de1_variable "DSx_past" 640 56 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor center -justify center -textvariable {$::DSx_settings(shot_date_time)}
 add_de1_variable "DSx_past" 40 800 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor "nw" -justify left -width [rescale_x_skin  800] -textvariable {$::DSx_settings(past_profile_title)}

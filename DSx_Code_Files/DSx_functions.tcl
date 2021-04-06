@@ -330,12 +330,6 @@ proc check_DSx_variables {} {
     if {$::settings(steam_temperature) > 130} {
             set ::DSx_settings(steam_temperature_backup) $::settings(steam_temperature)
     }
-    if {[info exists ::DSx_settings(show_history_resistance)] == 0 } {
-        set ::DSx_settings(show_history_resistance) off
-    }
-    if {[info exists ::DSx_settings(flow_correction)] == 0 } {
-        set ::DSx_settings(flow_correction) off
-    }
     if {[info exists ::DSx_settings(flush_time)] == 0 } {
         set ::DSx_settings(flush_time) $::settings(preheat_volume)
     }
@@ -2040,7 +2034,7 @@ proc history_prep {} {
     borg spinner off
     borg systemui $::android_full_screen_flags
 }
-#set ::DSx_settings(flow_correction) {on}
+
 proc DSx_past_shot_reference_reset {} {
 	DSx_past_espresso_pressure length 0
 	DSx_past_espresso_temperature_basket length 0
@@ -2063,35 +2057,23 @@ proc DSx_past_shot_reference_reset {} {
 		espresso_elapsed1 append $::DSx_settings(DSx_past_espresso_elapsed)
 	    append st [espresso_elapsed1 range end end]
 		set ::DSx_settings(DSx_left_shot_time) "[round_to_one_digits [expr ($st+0.05)]] sec"
-
 	}
 	DSx_past_espresso_pressure append $::DSx_settings(DSx_past_espresso_pressure)
-	if {$::DSx_settings(show_history_temperature) == on} {
-	    DSx_past_espresso_temperature_basket append  $::DSx_settings(DSx_past_espresso_temperature_basket)
-	}
+	DSx_past_espresso_temperature_basket append  $::DSx_settings(DSx_past_espresso_temperature_basket)
 	DSx_past_espresso_temperature_mix append  $::DSx_settings(DSx_past_espresso_temperature_mix)
 	if {$::DSx_settings(DSx_past_espresso_flow) != {} } {
 		DSx_past_espresso_flow append $::DSx_settings(DSx_past_espresso_flow)
 		foreach flow $::DSx_settings(DSx_past_espresso_flow) pressure1 $::DSx_settings(DSx_past_espresso_pressure) {
-			if {$::DSx_settings(flow_correction) != on} {
-			    DSx_past_espresso_flow_2x append [expr {2.0 * $flow}]
-			    } else {
-			    DSx_past_espresso_flow_2x append [expr { (2.0 * $flow) - (pow(($pressure1 - 3.5),3) / (140))}]
-			}
+			DSx_past_espresso_flow_2x append [expr {2.0 * $flow}]
 		}
 	}
-    if {$::DSx_settings(show_history_resistance) == on} {
-
-        foreach a $::DSx_settings(DSx_past_espresso_pressure) b $::DSx_settings(DSx_past_espresso_weight) c $::DSx_settings(DSx_past_espresso_flow) {
-            set y 0
-            catch {
-                #set y [expr {((($a/(($c*$c)+($a*0.9)))-2)*5)+11}]
-                #set y [expr {$a/($c*$c)}]
-                set y [expr {$a/$c}]
-                #set y [expr {($a/$b)+3}]
-            }
-            DSx_past_espresso_resistance append $y
+    foreach a $::DSx_settings(DSx_past_espresso_pressure) b $::DSx_settings(DSx_past_espresso_weight) c $::DSx_settings(DSx_past_espresso_flow) {
+        set y 0
+        catch {
+            #set y [expr {$a/($c*$c)}]
+            set y [expr {$a/$c}]
         }
+        DSx_past_espresso_resistance append $y
     }
 	if {$::DSx_settings(DSx_past_espresso_flow_weight) != {} } {
 		DSx_past_espresso_flow_weight append $::DSx_settings(DSx_past_espresso_flow_weight)
@@ -2101,47 +2083,35 @@ proc DSx_past_shot_reference_reset {} {
 	}
     if {[info exists ::DSx_settings(DSx_past_espresso_pressure_goal)] == 1} {
         DSx_past_espresso_pressure_goal length 0
-        if {$::DSx_settings(show_history_goal) == on} {
-            DSx_past_espresso_pressure_goal append $::DSx_settings(DSx_past_espresso_pressure_goal)
-            }
-        }
+        DSx_past_espresso_pressure_goal append $::DSx_settings(DSx_past_espresso_pressure_goal)
+    }
     if {[info exists ::DSx_settings(DSx_past_espresso_flow_goal)] == 1} {
         DSx_past_espresso_flow_goal length 0
         DSx_past_espresso_flow_goal_2x length 0
-        if {$::DSx_settings(show_history_goal) == on} {
-            DSx_past_espresso_flow_goal append $::DSx_settings(DSx_past_espresso_flow_goal)
-            foreach flow_goal $::DSx_settings(DSx_past_espresso_flow_goal) {
-                DSx_past_espresso_flow_goal_2x append [expr {2.0 * $flow_goal}]
-                }
-            }
+        DSx_past_espresso_flow_goal append $::DSx_settings(DSx_past_espresso_flow_goal)
+        foreach flow_goal $::DSx_settings(DSx_past_espresso_flow_goal) {
+            DSx_past_espresso_flow_goal_2x append [expr {2.0 * $flow_goal}]
         }
+    }
     if {[info exists ::DSx_settings(DSx_past_espresso_temperature_goal)] == 1} {
         DSx_past_espresso_temperature_goal length 0
         DSx_past_espresso_temperature_goal_01 length 0
-        if {$::DSx_settings(show_history_goal) == on && $::DSx_settings(show_history_temperature) == on} {
-            DSx_past_espresso_temperature_goal append $::DSx_settings(DSx_past_espresso_temperature_goal)
-            foreach temperature_goal $::DSx_settings(DSx_past_espresso_temperature_goal) {
-                DSx_past_espresso_temperature_goal_01 append [expr {$::c_f_adjust * $temperature_goal}]
-                }
-            }
+        DSx_past_espresso_temperature_goal append $::DSx_settings(DSx_past_espresso_temperature_goal)
+        foreach temperature_goal $::DSx_settings(DSx_past_espresso_temperature_goal) {
+            DSx_past_espresso_temperature_goal_01 append [expr {$::c_f_adjust * $temperature_goal}]
         }
+    }
     if {[info exists ::DSx_settings(DSx_past_espresso_temperature_basket)] == 1} {
         DSx_past_espresso_temperature_basket length 0
         DSx_past_espresso_temperature_basket_01 length 0
-            if {$::DSx_settings(show_history_temperature) == on} {
-            DSx_past_espresso_temperature_basket append $::DSx_settings(DSx_past_espresso_temperature_basket)
-            foreach temperature_basket $::DSx_settings(DSx_past_espresso_temperature_basket) {
-                DSx_past_espresso_temperature_basket_01 append [expr {$::c_f_adjust * $temperature_basket}]
-            }
+        DSx_past_espresso_temperature_basket append $::DSx_settings(DSx_past_espresso_temperature_basket)
+        foreach temperature_basket $::DSx_settings(DSx_past_espresso_temperature_basket) {
+            DSx_past_espresso_temperature_basket_01 append [expr {$::c_f_adjust * $temperature_basket}]
         }
 	}
 	if {[info exists ::DSx_settings(DSx_past_espresso_state_change)] == 1} {
 		DSx_past_espresso_state_change length 0
-        if {$::DSx_settings(show_history_goal) == on} {
-            DSx_past_espresso_state_change append $::DSx_settings(DSx_past_espresso_state_change)
-        } else {
-            DSx_past_espresso_state_change length 0
-        }
+        DSx_past_espresso_state_change append $::DSx_settings(DSx_past_espresso_state_change)
 	}
 }
 
@@ -2154,9 +2124,7 @@ proc DSx_past2_shot_reference_reset {} {
 	DSx_past2_espresso_flow_2x length 0
 	DSx_past2_espresso_flow_weight_2x length 0
     DSx_past2_espresso_resistance length 0
-
     DSx_past2_espresso_state_change length 0
-
     DSx_past2_steam_pressure length 0
     DSx_past2_steam_flow length 0
     DSx_past2_steam_temperature length 0
@@ -2181,32 +2149,21 @@ proc DSx_past2_shot_reference_reset {} {
 		set ::DSx_settings(DSx_right_shot_time) "[round_to_one_digits [expr ($st+0.05)]]s"
 	}
 	DSx_past2_espresso_pressure append $::DSx_settings(DSx_past2_espresso_pressure)
-	if {$::DSx_settings(show_history_temperature) == on} {
-    	DSx_past2_espresso_temperature_basket append $::DSx_settings(DSx_past2_espresso_temperature_basket)
-    }
+	DSx_past2_espresso_temperature_basket append $::DSx_settings(DSx_past2_espresso_temperature_basket)
 	DSx_past2_espresso_temperature_mix append $::DSx_settings(DSx_past2_espresso_temperature_mix)
 	if {$::DSx_settings(DSx_past2_espresso_flow) != {} } {
 		DSx_past2_espresso_flow append $::DSx_settings(DSx_past2_espresso_flow)
 		foreach flow $::DSx_settings(DSx_past2_espresso_flow) pressure1 $::DSx_settings(DSx_past2_espresso_pressure) {
-            if {$::DSx_settings(flow_correction) != on} {
-			    DSx_past2_espresso_flow_2x append [expr {2.0 * $flow}]
-			    } else {
-			    DSx_past2_espresso_flow_2x append [expr { (2.0 * $flow) - (pow(($pressure1 - 3.5),3) / (140))}]
-			}
+		    DSx_past2_espresso_flow_2x append [expr {2.0 * $flow}]
 		}
 	}
-
-	if {$::DSx_settings(show_history_resistance) == on} {
-
-        foreach a $::DSx_settings(DSx_past2_espresso_pressure) b $::DSx_settings(DSx_past2_espresso_weight) c $::DSx_settings(DSx_past2_espresso_flow) {
-            set y 0
-            catch {
-                #set y [expr {((($a/(($c*$c)+($a*0.9)))-2)*5)+11}]
-                #set y [expr {$a/($c*$c)}]
-                set y [expr {$a/$c}]
-            }
-            DSx_past2_espresso_resistance append $y
+    foreach a $::DSx_settings(DSx_past2_espresso_pressure) b $::DSx_settings(DSx_past2_espresso_weight) c $::DSx_settings(DSx_past2_espresso_flow) {
+        set y 0
+        catch {
+            #set y [expr {$a/($c*$c)}]
+            set y [expr {$a/$c}]
         }
+        DSx_past2_espresso_resistance append $y
     }
 	if {$::DSx_settings(DSx_past2_espresso_flow_weight) != {} } {
 		DSx_past2_espresso_flow_weight append $::DSx_settings(DSx_past2_espresso_flow_weight)
@@ -2216,45 +2173,35 @@ proc DSx_past2_shot_reference_reset {} {
 	}
     if {[info exists ::DSx_settings(DSx_past2_espresso_pressure_goal)] == 1} {
         DSx_past2_espresso_pressure_goal length 0
-        if {$::DSx_settings(show_history_goal) == on} {
-            DSx_past2_espresso_pressure_goal append $::DSx_settings(DSx_past2_espresso_pressure_goal)
-            }
-        }
+        DSx_past2_espresso_pressure_goal append $::DSx_settings(DSx_past2_espresso_pressure_goal)
+    }
     if {[info exists ::DSx_settings(DSx_past2_espresso_flow_goal)] == 1} {
         DSx_past2_espresso_flow_goal length 0
         DSx_past2_espresso_flow_goal_2x length 0
-        if {$::DSx_settings(show_history_goal) == on} {
-            DSx_past2_espresso_flow_goal append $::DSx_settings(DSx_past2_espresso_flow_goal)
-            foreach flow_goal2 $::DSx_settings(DSx_past2_espresso_flow_goal) {
-                DSx_past2_espresso_flow_goal_2x append [expr {2.0 * $flow_goal2}]
-                }
-            }
+        DSx_past2_espresso_flow_goal append $::DSx_settings(DSx_past2_espresso_flow_goal)
+        foreach flow_goal2 $::DSx_settings(DSx_past2_espresso_flow_goal) {
+            DSx_past2_espresso_flow_goal_2x append [expr {2.0 * $flow_goal2}]
         }
+    }
     if {[info exists ::DSx_settings(DSx_past2_espresso_temperature_goal)] == 1} {
         DSx_past2_espresso_temperature_goal length 0
         DSx_past2_espresso_temperature_goal_01 length 0
-        if {$::DSx_settings(show_history_goal) == on && $::DSx_settings(show_history_temperature) == on} {
-            DSx_past2_espresso_temperature_goal append $::DSx_settings(DSx_past2_espresso_temperature_goal)
-            foreach temperature_goal2 $::DSx_settings(DSx_past2_espresso_temperature_goal) {
-                DSx_past2_espresso_temperature_goal_01 append [expr {$::c_f_adjust * $temperature_goal2}]
-                }
-            }
+        DSx_past2_espresso_temperature_goal append $::DSx_settings(DSx_past2_espresso_temperature_goal)
+        foreach temperature_goal2 $::DSx_settings(DSx_past2_espresso_temperature_goal) {
+            DSx_past2_espresso_temperature_goal_01 append [expr {$::c_f_adjust * $temperature_goal2}]
         }
+    }
     if {[info exists ::DSx_settings(DSx_past2_espresso_temperature_basket)] == 1} {
         DSx_past2_espresso_temperature_basket length 0
         DSx_past2_espresso_temperature_basket_01 length 0
-            if {$::DSx_settings(show_history_temperature) == on} {
-            DSx_past2_espresso_temperature_basket append $::DSx_settings(DSx_past2_espresso_temperature_basket)
-            foreach temperature_basket2 $::DSx_settings(DSx_past2_espresso_temperature_basket) {
-                DSx_past2_espresso_temperature_basket_01 append [expr {$::c_f_adjust * $temperature_basket2}]
-            }
+        DSx_past2_espresso_temperature_basket append $::DSx_settings(DSx_past2_espresso_temperature_basket)
+        foreach temperature_basket2 $::DSx_settings(DSx_past2_espresso_temperature_basket) {
+            DSx_past2_espresso_temperature_basket_01 append [expr {$::c_f_adjust * $temperature_basket2}]
         }
 	}
 	if {[info exists ::DSx_settings(DSx_past2_espresso_state_change)] == 1} {
 		DSx_past2_espresso_state_change length 0
-        if {$::DSx_settings(show_history_goal) == on} {
-            DSx_past2_espresso_state_change append $::DSx_settings(DSx_past2_espresso_state_change)
-        }
+        DSx_past2_espresso_state_change append $::DSx_settings(DSx_past2_espresso_state_change)
 	}
 }
 
@@ -2305,76 +2252,90 @@ proc DSx_past2_config {} {
     }
 }
 
-
 proc history_graph_temperature {} {
     if {$::DSx_settings(show_history_temperature) == "on"} {
-    set ::DSx_settings(show_history_temperature)  off
-    set ::DSx_settings(hist_temp_key) ""
-    fill_DSx_past_shots_listbox;
-    load_DSx_past_shot;
-    fill_DSx_past2_shots_listbox;
-    load_DSx_past2_shot;
+        set ::DSx_settings(show_history_temperature)  off
+        set ::DSx_settings(hist_temp_key) ""
+        set ::DSx_settings(hist_temp_curve) 0
+        set ::DSx_settings(hist_temp_goal_curve) 0
     } else {
-    set ::DSx_settings(show_history_temperature) on
-    if {$::settings(enable_fahrenheit) == 1} {
-        set ::DSx_settings(hist_temp_key) {Temperature (x20)°F}
-        } else {
-        set ::DSx_settings(hist_temp_key) {Temperature (x10)°C}
+        set ::DSx_settings(show_history_temperature) on
+        if {$::settings(enable_fahrenheit) == 1} {
+            set ::DSx_settings(hist_temp_key) {Temperature (x20)°F}
+            } else {
+            set ::DSx_settings(hist_temp_key) {Temperature (x10)°C}
+        }
+        set ::DSx_settings(hist_temp_curve) 3
+        if {$::DSx_settings(show_history_goal) == "on"} {
+            set ::DSx_settings(hist_temp_goal_curve) 3
+        }
     }
-    fill_DSx_past_shots_listbox;
-    load_DSx_past_shot;
-    fill_DSx_past2_shots_listbox;
-    load_DSx_past2_shot;
-    }
+    $::DSx_history_left_graph element configure DSx_past_line_espresso_temperature_basket_01 -linewidth $::DSx_settings(hist_temp_curve)
+    $::DSx_history_left_graph element configure DSx_past_line_espresso_temperature_goal_01 -linewidth $::DSx_settings(hist_temp_goal_curve)
+    $::DSx_history_right_graph element configure DSx_past2_line_espresso_temperature_basket_01 -linewidth $::DSx_settings(hist_temp_curve)
+    $::DSx_history_right_graph element configure DSx_past2_line_espresso_temperature_goal_01 -linewidth $::DSx_settings(hist_temp_goal_curve)
+    $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_temperature_basket_01 -linewidth $::DSx_settings(hist_temp_curve)
+    $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_temperature_goal_01 -linewidth $::DSx_settings(hist_temp_goal_curve)
+    $::DSx_history_right_zoomed_graph element configure DSx_past2_line_espresso_temperature_basket_01 -linewidth $::DSx_settings(hist_temp_curve)
+    $::DSx_history_right_zoomed_graph element configure DSx_past2_line_espresso_temperature_goal_01 -linewidth $::DSx_settings(hist_temp_goal_curve)
+    $::DSx_history_left_graph axis configure y -min 0.0
+    $::DSx_history_right_graph axis configure y -min 0.0
+    $::DSx_history_left_zoomed_graph axis configure y -min 0.0
+    $::DSx_history_right_zoomed_graph axis configure y -min 0.0
 }
 
 proc history_graph_goal {} {
     if {$::DSx_settings(show_history_goal) == "on"} {
-    set ::DSx_settings(show_history_goal)  off
-    fill_DSx_past_shots_listbox;
-    load_DSx_past_shot;
-    fill_DSx_past2_shots_listbox;
-    load_DSx_past2_shot;
+        set ::DSx_settings(show_history_goal)  off
+        set ::DSx_settings(hist_goal_curve) 0
+        set ::DSx_settings(hist_temp_goal_curve) 0
     } else {
-    set ::DSx_settings(show_history_goal) on
-    fill_DSx_past_shots_listbox;
-    load_DSx_past_shot;
-    fill_DSx_past2_shots_listbox;
-    load_DSx_past2_shot;
+        set ::DSx_settings(show_history_goal) on
+        set ::DSx_settings(hist_goal_curve) 3
+        if {$::DSx_settings(show_history_temperature) == "on"} {
+            set ::DSx_settings(hist_temp_goal_curve) 3
+        }
     }
-}
-proc history_graph_resistance {} {
-    if {$::DSx_settings(show_history_resistance) == "on"} {
-    set ::DSx_settings(show_history_resistance)  off
-    set ::DSx_settings(hist_resistance_key) ""
-    fill_DSx_past_shots_listbox;
-    load_DSx_past_shot;
-    fill_DSx_past2_shots_listbox;
-    load_DSx_past2_shot;
-    } else {
-    set ::DSx_settings(show_history_resistance) on
-    set ::DSx_settings(hist_resistance_key) "Resistance"
-    fill_DSx_past_shots_listbox;
-    load_DSx_past_shot;
-    fill_DSx_past2_shots_listbox;
-    load_DSx_past2_shot;
-    }
+    $::DSx_history_left_graph element configure DSx_past_line_espresso_pressure_goal -linewidth $::DSx_settings(hist_goal_curve)
+    $::DSx_history_left_graph element configure DSx_past_line_espresso_flow_goal_2x -linewidth $::DSx_settings(hist_goal_curve)
+    $::DSx_history_left_graph element configure DSx_past_line_espresso_temperature_goal_01 -linewidth $::DSx_settings(hist_temp_goal_curve)
+    $::DSx_history_left_graph element configure DSx_past_line_espresso_state_change_1 -linewidth $::DSx_settings(hist_goal_curve)
+    $::DSx_history_right_graph element configure DSx_past2_line_espresso_pressure_goal -linewidth $::DSx_settings(hist_goal_curve)
+    $::DSx_history_right_graph element configure DSx_past2_line_espresso_flow_goal_2x -linewidth $::DSx_settings(hist_goal_curve)
+    $::DSx_history_right_graph element configure DSx_past2_line_espresso_temperature_goal_01 -linewidth $::DSx_settings(hist_temp_goal_curve)
+    $::DSx_history_right_graph element configure DSx_past2_line_espresso_state_change_1 -linewidth $::DSx_settings(hist_goal_curve)
+    $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_pressure_goal -linewidth $::DSx_settings(hist_goal_curve)
+    $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_flow_goal_2x -linewidth $::DSx_settings(hist_goal_curve)
+    $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_temperature_goal_01 -linewidth $::DSx_settings(hist_temp_goal_curve)
+    $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_state_change_1 -linewidth $::DSx_settings(hist_goal_curve)
+    $::DSx_history_right_zoomed_graph element configure DSx_past2_line_espresso_pressure_goal -linewidth $::DSx_settings(hist_goal_curve)
+    $::DSx_history_right_zoomed_graph element configure DSx_past2_line_espresso_flow_goal_2x -linewidth $::DSx_settings(hist_goal_curve)
+    $::DSx_history_right_zoomed_graph element configure DSx_past2_line_espresso_temperature_goal_01 -linewidth $::DSx_settings(hist_temp_goal_curve)
+    $::DSx_history_right_zoomed_graph element configure DSx_past2_line_espresso_state_change_1 -linewidth $::DSx_settings(hist_goal_curve)
+    $::DSx_history_left_graph axis configure y -min 0.0
+    $::DSx_history_right_graph axis configure y -min 0.0
+    $::DSx_history_left_zoomed_graph axis configure y -min 0.0
+    $::DSx_history_right_zoomed_graph axis configure y -min 0.0
 }
 
-proc history_flow_correction {} {
-    if {$::DSx_settings(flow_correction) == "on"} {
-    set ::DSx_settings(flow_correction)  off
-    fill_DSx_past_shots_listbox;
-    load_DSx_past_shot;
-    fill_DSx_past2_shots_listbox;
-    load_DSx_past2_shot;
+proc history_graph_resistance {} {
+    if {$::DSx_settings(show_history_resistance) == "on"} {
+        set ::DSx_settings(show_history_resistance)  off
+        set ::DSx_settings(hist_resistance_key) ""
+        set ::DSx_settings(hist_resistance_curve) 0
     } else {
-    set ::DSx_settings(flow_correction) on
-    fill_DSx_past_shots_listbox;
-    load_DSx_past_shot;
-    fill_DSx_past2_shots_listbox;
-    load_DSx_past2_shot;
+        set ::DSx_settings(show_history_resistance) on
+        set ::DSx_settings(hist_resistance_key) "Resistance"
+        set ::DSx_settings(hist_resistance_curve) 2
     }
+    $::DSx_history_left_graph element configure DSx_past_line_espresso_resistance -linewidth $::DSx_settings(hist_resistance_curve)
+    $::DSx_history_right_graph element configure DSx_past2_line_espresso_resistance -linewidth $::DSx_settings(hist_resistance_curve)
+    $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_resistance -linewidth $::DSx_settings(hist_resistance_curve)
+    $::DSx_history_right_zoomed_graph element configure DSx_past2_line_espresso_resistance -linewidth $::DSx_settings(hist_resistance_curve)
+    $::DSx_history_left_graph axis configure y -min 0.0
+    $::DSx_history_right_graph axis configure y -min 0.0
+    $::DSx_history_left_zoomed_graph axis configure y -min 0.0
+    $::DSx_history_right_zoomed_graph axis configure y -min 0.0
 }
 
 proc clear_graph {} {
@@ -2393,7 +2354,6 @@ proc clear_graph {} {
     set ::DSx_settings(DSx_past2_espresso_pressure_goal) {0.0}
     set ::DSx_settings(DSx_past2_espresso_temperature_goal) {0.0}
     set ::DSx_settings(DSx_past2_espresso_state_change) {0.0}
-
     set ::DSx_settings(past_sav_all) 0
     set ::DSx_settings(past_sav_drops) 0
     set ::DSx_settings(past_sav_out) 0
@@ -2402,7 +2362,6 @@ proc clear_graph {} {
     set DSx_pastprops2(name) ""
     set ::DSx_settings(DSx_past2_espresso_name) ""
     set ::DSx_settings(past_shot_desc2) {}
-
     set ::DSx_settings(DSx_past2_steam_pressure) {0.0}
     set ::DSx_settings(DSx_past2_steam_flow) {0.0}
     set ::DSx_settings(DSx_past2_steam_temperature) {0.0}
@@ -2535,12 +2494,8 @@ proc load_DSx_past_shot { {force 0} } {
     ###
 	array unset -nocomplain DSx_pastprops
 	array set DSx_pastprops [encoding convertfrom utf-8 [read_binary_file $fn]]
-
-
     set ::DSx_settings(DSx_past_espresso_pressure) $DSx_pastprops(espresso_pressure)
-    if {$::DSx_settings(show_history_temperature) == on} {
-        set ::DSx_settings(DSx_past_espresso_temperature_basket) $DSx_pastprops(espresso_temperature_basket)
-        }
+    set ::DSx_settings(DSx_past_espresso_temperature_basket) $DSx_pastprops(espresso_temperature_basket)
     set ::DSx_settings(DSx_past_espresso_temperature_mix) $DSx_pastprops(espresso_temperature_mix)
     set ::DSx_settings(DSx_past_espresso_flow_weight) $DSx_pastprops(espresso_flow_weight)
     set ::DSx_settings(DSx_past_espresso_flow) $DSx_pastprops(espresso_flow)
@@ -2549,16 +2504,12 @@ proc load_DSx_past_shot { {force 0} } {
     	set ::DSx_settings(DSx_past_espresso_elapsed) $DSx_pastprops(espresso_elapsed)
     }
     if {[info exists DSx_pastprops(espresso_temperature_goal)] == 1} {
-        if {$::DSx_settings(show_history_goal) == on} {
-            set ::DSx_settings(DSx_past_espresso_pressure_goal) $DSx_pastprops(espresso_pressure_goal)
-            set ::DSx_settings(DSx_past_espresso_flow_goal) $DSx_pastprops(espresso_flow_goal)
-            if {$::DSx_settings(show_history_temperature) == on} {
-                set ::DSx_settings(DSx_past_espresso_temperature_goal) $DSx_pastprops(espresso_temperature_goal)
-            }
-            set ::DSx_settings(DSx_past_espresso_state_change) {0.0}
-            if {[info exists DSx_pastprops(espresso_state_change)] == 1} {
-                set ::DSx_settings(DSx_past_espresso_state_change) $DSx_pastprops(espresso_state_change)
-            }
+        set ::DSx_settings(DSx_past_espresso_pressure_goal) $DSx_pastprops(espresso_pressure_goal)
+        set ::DSx_settings(DSx_past_espresso_flow_goal) $DSx_pastprops(espresso_flow_goal)
+        set ::DSx_settings(DSx_past_espresso_temperature_goal) $DSx_pastprops(espresso_temperature_goal)
+        set ::DSx_settings(DSx_past_espresso_state_change) {0.0}
+        if {[info exists DSx_pastprops(espresso_state_change)] == 1} {
+            set ::DSx_settings(DSx_past_espresso_state_change) $DSx_pastprops(espresso_state_change)
         }
     } else {
         set ::DSx_settings(DSx_past_espresso_pressure_goal) {0.0}
@@ -2568,7 +2519,6 @@ proc load_DSx_past_shot { {force 0} } {
     }
     array set DSx_past_sets $DSx_pastprops(settings)
     set ::DSx_settings(drink_weight) $DSx_past_sets(drink_weight)
-
     if {[info exists DSx_past_sets(grinder_dose_weight)] == 0} {
         set DSx_past_sets(grinder_dose_weight) 0
         if {[info exists DSx_past_sets(DSx_bean_weight)] == 1} {
@@ -2599,7 +2549,6 @@ proc load_DSx_past_shot { {force 0} } {
             }
         }
     }
-
     set ::DSx_settings(past_bean_weight) [round_to_one_digits $DSx_past_sets(grinder_dose_weight)]
     set ::DSx_settings(past_profile_title) $DSx_past_sets(profile_title)
     set ::DSx_settings(shot_date_time) [clock format $DSx_pastprops(clock) -format {%a, %d %b %Y   %I:%M%p}]
@@ -2613,11 +2562,8 @@ proc load_DSx_past_shot { {force 0} } {
 		} else {
 			set ::DSx_settings(past_$field_name) {}
 		}
-	}	
-	
-	
+	}
 ### end of addition
-
 
     if {[info exists DSx_past_sets(DSx_sav_out)] == 1} {
             set ::DSx_settings(past_sav_all) $DSx_past_sets(DSx_sav_all)
@@ -2634,8 +2580,6 @@ proc load_DSx_past_shot { {force 0} } {
         } else {
             set ::DSx_settings(past_volume1) 0
     }
-
-
     save_DSx_settings
     reset_messages
     DSx_past_shot_reference_reset
@@ -2685,9 +2629,7 @@ proc load_DSx_past2_shot { {force 0} } {
 
     } else {
         set ::DSx_settings(DSx_past2_espresso_pressure) $DSx_pastprops2(espresso_pressure)
-            if {$::DSx_settings(show_history_temperature) == on} {
-                set ::DSx_settings(DSx_past2_espresso_temperature_basket) $DSx_pastprops2(espresso_temperature_basket)
-            }
+        set ::DSx_settings(DSx_past2_espresso_temperature_basket) $DSx_pastprops2(espresso_temperature_basket)
         set ::DSx_settings(DSx_past2_espresso_temperature_mix) $DSx_pastprops2(espresso_temperature_mix)
         set ::DSx_settings(DSx_past2_espresso_flow_weight) $DSx_pastprops2(espresso_flow_weight)
         set ::DSx_settings(DSx_past2_espresso_flow) $DSx_pastprops2(espresso_flow)
@@ -2696,18 +2638,13 @@ proc load_DSx_past2_shot { {force 0} } {
             set ::DSx_settings(DSx_past2_espresso_elapsed) $DSx_pastprops2(espresso_elapsed)
         }
         if {[info exists DSx_pastprops2(espresso_temperature_goal)] == 1} {
-            if {$::DSx_settings(show_history_goal) == on} {
-                set ::DSx_settings(DSx_past2_espresso_pressure_goal) $DSx_pastprops2(espresso_pressure_goal)
-                set ::DSx_settings(DSx_past2_espresso_flow_goal) $DSx_pastprops2(espresso_flow_goal)
-                if {$::DSx_settings(show_history_temperature) == on} {
-                    set ::DSx_settings(DSx_past2_espresso_temperature_goal) $DSx_pastprops2(espresso_temperature_goal)
-                }
-                set ::DSx_settings(DSx_past_espresso_state_change) {0.0}
-                if {[info exists DSx_pastprops2(espresso_state_change)] == 1} {
-                    set ::DSx_settings(DSx_past2_espresso_state_change) $DSx_pastprops2(espresso_state_change)
-                }
+            set ::DSx_settings(DSx_past2_espresso_pressure_goal) $DSx_pastprops2(espresso_pressure_goal)
+            set ::DSx_settings(DSx_past2_espresso_flow_goal) $DSx_pastprops2(espresso_flow_goal)
+            set ::DSx_settings(DSx_past2_espresso_temperature_goal) $DSx_pastprops2(espresso_temperature_goal)
+            set ::DSx_settings(DSx_past_espresso_state_change) {0.0}
+            if {[info exists DSx_pastprops2(espresso_state_change)] == 1} {
+                set ::DSx_settings(DSx_past2_espresso_state_change) $DSx_pastprops2(espresso_state_change)
             }
-
         } else {
             set ::DSx_settings(DSx_past2_espresso_pressure_goal) {0.0}
             set ::DSx_settings(DSx_past2_espresso_flow_goal) {0.0}
@@ -2718,7 +2655,6 @@ proc load_DSx_past2_shot { {force 0} } {
         if {[info exists DSx_pastprops2(settings)] == 1} {
             array set DSx_past_sets2 $DSx_pastprops2(settings)
             set ::DSx_settings(drink_weight2) $DSx_past_sets2(drink_weight)
-
             if {[info exists DSx_past_sets2(grinder_dose_weight)] == 0} {
                 set DSx_past_sets2(grinder_dose_weight) 0
                 if {[info exists DSx_past_sets2(DSx_bean_weight)] == 1} {
@@ -2749,7 +2685,6 @@ proc load_DSx_past2_shot { {force 0} } {
                     }
                 }
             }
-
             set ::DSx_settings(past_bean_weight2) [round_to_one_digits $DSx_past_sets2(grinder_dose_weight)]
             set ::DSx_settings(past_profile_title2) $DSx_past_sets2(profile_title)
             array set DSx_past_mach2 $DSx_pastprops2(machine)
@@ -2758,7 +2693,6 @@ proc load_DSx_past2_shot { {force 0} } {
             } else {
                 set ::DSx_settings(past_volume2) 0
             }
-
         } else {
             if {[info exists DSx_pastprops2(drink_weight)] == 1} {
                 set ::DSx_settings(drink_weight2) $DSx_pastprops2(drink_weight)
@@ -2796,30 +2730,26 @@ proc load_DSx_past2_shot { {force 0} } {
                     }
                 }
             }
-
             set ::DSx_settings(past_bean_weight2) [round_to_one_digits $DSx_pastprops2(grinder_dose_weight)]
-
             if {[info exists DSx_pastprops2(profile_title)] == 1} {
                 set ::DSx_settings(past_profile_title2) $DSx_pastprops2(profile_title)
             } else {
                 set ::DSx_settings(past_profile_title2) ""
             }
         }
-
         set ::DSx_settings(shot_date_time2) [clock format $DSx_pastprops2(clock) -format {%a, %d %b %Y   %I:%M%p}]
 
-    ### setup additional history data from "Your setup & This espresso". Added by Enrique ###
-    set ::DSx_settings(past_shot_file2) $fn2
-	set ::DSx_settings(past_clock2) $DSx_pastprops2(clock)
-	foreach field_name $::DSx_settings(extra_past_shot_fields) {
-		if { [info exists DSx_past_sets2($field_name)] } {
-			set ::DSx_settings(past_${field_name}2) $DSx_past_sets2($field_name)
-		} else {
-			set ::DSx_settings(past_${field_name}2) {}
-		}
-	}			
-    ### end of addition
-
+        ### setup additional history data from "Your setup & This espresso". Added by Enrique ###
+        set ::DSx_settings(past_shot_file2) $fn2
+        set ::DSx_settings(past_clock2) $DSx_pastprops2(clock)
+        foreach field_name $::DSx_settings(extra_past_shot_fields) {
+            if { [info exists DSx_past_sets2($field_name)] } {
+                set ::DSx_settings(past_${field_name}2) $DSx_past_sets2($field_name)
+            } else {
+                set ::DSx_settings(past_${field_name}2) {}
+            }
+        }
+        ### end of addition
     }
     save_DSx_settings
     reset_messages
@@ -2951,8 +2881,6 @@ proc history_vars {} {
         set ::DSx_settings(past_profile_title2) { }
         set ::DSx_settings(shot_date_time) {choose a file from the list}
         set ::DSx_settings(shot_date_time2) { }
-        set ::DSx_settings(show_history_temperature) off
-        set ::DSx_settings(show_history_goal) off
         set ::DSx_settings(drink_weight) 0
         set ::DSx_settings(drink_weight2) 0
     }
@@ -2994,6 +2922,29 @@ proc history_vars {} {
     if {[info exists ::DSx_settings(past_shot_desc)] != 1} {
         set ::DSx_settings(past_shot_desc) {}
         set ::DSx_settings(past_shot_desc2) {}
+    }
+    if {[info exists ::DSx_settings(show_history_resistance)] == 0 } {
+        set ::DSx_settings(show_history_resistance) off
+        set ::DSx_settings(hist_resistance_key) ""
+    }
+    if {[info exists ::DSx_settings(show_history_temperature)] == 0 } {
+        set ::DSx_settings(show_history_temperature)  off
+        set ::DSx_settings(hist_temp_key) ""
+    }
+    if {[info exists ::DSx_settings(show_history_goal)] == 0 } {
+        set ::DSx_settings(show_history_goal)  off
+    }
+    if {[info exists ::DSx_settings(hist_goal_curve)] != 1} {
+        set ::DSx_settings(hist_goal_curve) 0
+    }
+    if {[info exists ::DSx_settings(hist_temp_curve)] != 1} {
+        set ::DSx_settings(hist_temp_curve) 0
+    }
+    if {[info exists ::DSx_settings(hist_temp_goal_curve)] != 1} {
+        set ::DSx_settings(hist_temp_goal_curve) 0
+    }
+    if {[info exists ::DSx_settings(hist_resistance_curve)] != 1} {
+        set ::DSx_settings(hist_resistance_curve) 0
     }
     save_DSx_settings
     save_settings
@@ -4073,9 +4024,7 @@ proc no_save_DSx_coffee args {
 	}
 }
 
-
 ##### DSx Admin
-
 
 proc DSx_app_update {} {
     if {$::DSx_settings(backup_b4_update) == 1} {
