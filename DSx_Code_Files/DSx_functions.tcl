@@ -57,7 +57,6 @@ proc DSx_final_prep {} {
     delete_old_variables
     startup_fav_check
     saw_switch
-    DSx_add_profiles
     fill_DSx_past_shots_listbox
     DSx_graph_restore
     focus .can
@@ -481,37 +480,6 @@ proc set_other_variables {} {
         } else {
         set ::c_f_adjust 0.1
     }
-}
-proc DSx_add_profiles {} {
-    set DSx_profile {Damian's LRv2.tcl}
-    if {[file exists [homedir]/profiles/${DSx_profile}] != 1 && [file exists [homedir]/skins/DSx/DSx_Code_Files/${DSx_profile}] == 1} {
-        file copy -force [homedir]/skins/DSx/DSx_Code_Files/${DSx_profile} [homedir]/profiles/${DSx_profile}
-        fill_profiles_listbox
-    }
-    if {[file exists [homedir]/profiles/Damians-LRv2.tcl] == 1} {
-        file delete -force [homedir]/profiles/Damians-LRv2.tcl
-        fill_profiles_listbox
-    }
-    set DSx_profile2 {Damian's LRv3.tcl}
-    if {[file exists [homedir]/profiles/${DSx_profile2}] != 1 && [file exists [homedir]/skins/DSx/DSx_Code_Files/${DSx_profile2}] == 1} {
-        file copy -force [homedir]/skins/DSx/DSx_Code_Files/${DSx_profile2} [homedir]/profiles/${DSx_profile2}
-        fill_profiles_listbox
-    }
-    if {[file exists [homedir]/profiles/Damians-LRv4.tcl] == 1} {
-        file delete -force [homedir]/profiles/Damians-LRv3.tcl
-        fill_profiles_listbox
-    }
-
-    set DSx_profile3 {Damian's LM Leva.tcl}
-    if {[file exists [homedir]/profiles/${DSx_profile3}] != 1 && [file exists [homedir]/skins/DSx/DSx_Code_Files/${DSx_profile3}] == 1} {
-        file copy -force [homedir]/skins/DSx/DSx_Code_Files/${DSx_profile3} [homedir]/profiles/${DSx_profile3}
-        fill_profiles_listbox
-    }
-    if {[file exists [homedir]/profiles/Damians-LM-Leva.tcl] == 1} {
-        file delete -force [homedir]/profiles/Damians-LM-Leva.tcl
-        fill_profiles_listbox
-    }
-
 }
 
 proc check_MySaver_exists {} {
