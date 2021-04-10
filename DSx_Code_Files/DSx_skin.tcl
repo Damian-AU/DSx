@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 4.50
+set ::DSx_settings(version) 4.51
 
 package provide DSx_skin 1.0
 
@@ -1431,36 +1431,35 @@ proc DSx_add_to_profile_settings_ok_button_leave {} {
     saw_switch
 }
 
-
 add_de1_button "settings_1 settings_2 settings_2a settings_2b settings_2c settings_2czoom settings_2c2 settings_3 settings_4" {save_settings_to_de1; set_alarms_for_de1_wake_sleep; say [translate {save}] $::settings(sound_button_in); save_settings; profile_has_changed_set_colors;
     DSx_add_to_profile_settings_ok_button_enter
     if {[ifexists ::profiles_hide_mode] == 1} {
-        unset -nocomplain ::profiles_hide_mode
-        fill_profiles_listbox
-    }
-    if {[array_item_difference ::settings ::settings_backup "steam_temperature steam_flow water_refill_point fan_threshold"] == 1} {
-        # resend the calibration settings if they were changed
-        de1_send_steam_hotwater_settings
-        de1_send_waterlevel_settings
-        set_fan_temperature_threshold $::settings(fan_threshold)
-        de1_enable_water_level_notifications
-    }
-    if {[array_item_difference ::settings ::settings_backup "enable_fahrenheit saver_brightness log_enabled hot_water_idle_temp espresso_warmup_timeout scale_bluetooth_address language skin waterlevel_indicator_on default_font_calibration waterlevel_indicator_blink display_rate_espresso display_espresso_water_delta_number display_group_head_delta_number display_pressure_delta_line display_flow_delta_line display_weight_delta_line allow_unheated_water display_time_in_screen_saver enabled_plugins"] == 1  || [ifexists ::app_has_updated] == 1} {
-        # changes that effect the skin require an app restart
-        .can itemconfigure $::message_label -text [translate "Please quit and restart this app to apply your changes."]
-        .can itemconfigure $::message_button_label -text [translate "Wait"]
+		unset -nocomplain ::profiles_hide_mode
+		fill_profiles_listbox
+	}
+	if {[array_item_difference ::settings ::settings_backup "steam_temperature calibration_flow_multiplier steam_flow water_refill_point fan_threshold"] == 1} {
+		# resend the calibration settings if they were changed
+		de1_send_steam_hotwater_settings
+		de1_send_waterlevel_settings
+		set_calibration_flow_multiplier $::settings(calibration_flow_multiplier)
+		set_fan_temperature_threshold $::settings(fan_threshold)
+		de1_enable_water_level_notifications
+	}
+	if {[array_item_difference ::settings ::settings_backup "enable_fahrenheit saver_brightness use_finger_down_for_tap log_enabled hot_water_idle_temp espresso_warmup_timeout scale_bluetooth_address language skin waterlevel_indicator_on default_font_calibration waterlevel_indicator_blink display_rate_espresso display_espresso_water_delta_number display_group_head_delta_number display_pressure_delta_line display_flow_delta_line display_weight_delta_line allow_unheated_water display_time_in_screen_saver enabled_plugins plugin_tabs"] == 1  || [ifexists ::app_has_updated] == 1} {
+		# changes that effect the skin require an app restart
+		.can itemconfigure $::message_label -text [translate "Please quit and restart this app to apply your changes."]
+		.can itemconfigure $::message_button_label -text [translate "Wait"]
 
-        set_next_page off message; page_show message
-        after 200 app_exit
-    } else {
+		set_next_page off message; page_show message
+		after 200 app_exit
+	} else {
 
-        if {[ifexists ::settings(settings_profile_type)] == "settings_2c2"} {
-            # if they were on the LIMITS tab of the Advanced profiles, reset the ui back to the main tab
-            set ::settings(settings_profile_type) "settings_2c"
-        }
-
-        #set_next_page off off; page_show off
-        DSx_add_to_profile_settings_ok_button_leave
+		if {[ifexists ::settings(settings_profile_type)] == "settings_2c2"} {
+			# if they were on the LIMITS tab of the Advanced profiles, reset the ui back to the main tab
+			set ::settings(settings_profile_type) "settings_2c"
+		}
+    	#set_next_page off off; page_show off
+    	DSx_add_to_profile_settings_ok_button_leave
     }
 } 2016 1430 2560 1600
 
