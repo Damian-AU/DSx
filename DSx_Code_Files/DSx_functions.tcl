@@ -34,7 +34,6 @@ namespace eval ::skin::dsx {
 }
 
 proc DSx_startup {} {
-    check_for_new_icons
     load_DSx_settings
     check_DSx_variables
     check_settings_for_DSx_added_variables
@@ -43,6 +42,7 @@ proc DSx_startup {} {
     load_theme
     source "[homedir]/skins/default/standard_includes.tcl"
     set ::skindebug $::DSx_skindebug
+    check_DSx_User_Set_exists
     check_MySaver_exists
     join_DSx_plugins
     no_machine_prep
@@ -66,11 +66,20 @@ proc DSx_final_prep {} {
     refresh_DSx_temperature
 }
 
+proc check_DSx_User_Set_exists {} {
+    if {[info exists [skin_directory]/DSx_User_Set] != 1} {
+        set path [skin_directory]/DSx_User_Set
+        file mkdir $path
+        file attributes $path
+    }
+}
+
 proc plugins_run_after_startup {} {
     foreach k $::run_after_startup {
 	$k
     }
 }
+
 proc DSx_active_plugins {} {
 	set files [lsort -dictionary [glob -nocomplain -tails -directory "[homedir]/skins/DSx/DSx_Plugins/" *.dsx]]
     set files [lsearch -inline -all -not -exact $files DSx_admin.dsx]
@@ -99,6 +108,7 @@ proc list_all_package_versions {} {
     }
     return $list
 }
+
 proc join_DSx_plugins {} {
     set plugin_file [lsort -dictionary [glob -nocomplain -tails -directory "./skins/DSx/DSx_Plugins/" *.dsx]]
     foreach pf $plugin_file {
@@ -114,31 +124,6 @@ proc join_DSx_plugins {} {
         package require $pf
     }
     set ::DSx_other_pages $::DSx_page_name
-}
-
-proc check_for_new_icons {} {
-    if {[file exists "[skin_directory]/DSx_Code_files/png/"] == 1} {
-        if {[file exists "[skin_directory]/1280x800/icons/niche.png"] == 0 && [file exists "[skin_directory]/1280x800"] == 1} {
-            file copy -force [skin_directory]/DSx_Code_files/png/click_no_box1280.png [skin_directory]/1280x800/icons/click_no_box.png
-            file copy -force [skin_directory]/DSx_Code_files/png/store_button1280.png [skin_directory]/1280x800/icons/store_button.png
-            file copy -force [skin_directory]/DSx_Code_files/png/people1280.png [skin_directory]/1280x800/icons/people.png
-            file copy -force [skin_directory]/DSx_Code_files/png/niche1280.png [skin_directory]/1280x800/icons/niche.png
-        }
-
-        if {[file exists "[skin_directory]/1920x1200/icons/niche.png"] == 0 && [file exists "[skin_directory]/1920x1200"] == 1} {
-            file copy -force [skin_directory]/DSx_Code_files/png/click_no_box1920.png [skin_directory]/1920x1200/icons/click_no_box.png
-            file copy -force [skin_directory]/DSx_Code_files/png/store_button1920.png [skin_directory]/1920x1200/icons/store_button.png
-            file copy -force [skin_directory]/DSx_Code_files/png/people1920.png [skin_directory]/1920x1200/icons/people.png
-            file copy -force [skin_directory]/DSx_Code_files/png/niche1920.png [skin_directory]/1920x1200/icons/niche.png
-        }
-
-        if {[file exists "[skin_directory]/2560x1600/icons/niche.png"] == 0 && [file exists "[skin_directory]/2560x1600"] == 1} {
-            file copy -force [skin_directory]/DSx_Code_files/png/click_no_box2560.png [skin_directory]/2560x1600/icons/click_no_box.png
-            file copy -force [skin_directory]/DSx_Code_files/png/store_button2560.png [skin_directory]/2560x1600/icons/store_button.png
-            file copy -force [skin_directory]/DSx_Code_files/png/people2560.png [skin_directory]/2560x1600/icons/people.png
-            file copy -force [skin_directory]/DSx_Code_files/png/niche2560.png [skin_directory]/2560x1600/icons/niche.png
-        }
-    }
 }
 
 proc no_machine_prep {} {
@@ -420,7 +405,6 @@ proc set_colour {} {
     $::DSx_6_theme_icons_radiobutton1 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
     $::DSx_6_theme_icons_radiobutton2 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
     $::DSx_6_theme_checkbutton_1 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
-    #$::DSx_6_theme_checkbutton_2 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
     $::DSx_6_theme_checkbutton_3 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
     $::DSx_6_theme_checkbutton_4 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font "$::DSx_settings(clock_font)" 8]"
     .can itemconfigure $::DSx_clock_font_var_1 -font "[DSx_font "$::DSx_settings(clock_font)" 14.5]"
@@ -576,7 +560,6 @@ proc window_expand {} {
 }
 
 proc first_page_from_saver {} {
-    #set pages [lsort -dictionary $::DSx_page_name]
     load_test
     if {[lsearch -exact $::DSx_page_name $::DSx_settings(first_page_from_saver)] >= 0} {
         page_show $::DSx_settings(first_page_from_saver)
@@ -986,7 +969,6 @@ proc DSx_update_saw {} {
 
 }
 proc DSx_volume {} {
-    #set ::settings(DSx_volume) [round_to_integer [expr {$::de1(preinfusion_volume) + $::de1(pour_volume)}]]
     set ::settings(DSx_volume) [expr {[round_to_integer $::de1(preinfusion_volume)] + [round_to_integer $::de1(pour_volume)]}]]
     set a [watervolume_text]
     return $a
@@ -1000,8 +982,6 @@ proc save_DSx_flush_time_to_settings {} {
 
 proc save_dose {unused_old_state unused_new_state} {
     set ::settings(grinder_dose_weight) [round_to_one_digits $::DSx_settings(bean_weight)]
-    #save_settings
-    #save_DSx_settings
 }
 
 proc DSx_set_dose {} {
@@ -1013,10 +993,7 @@ proc DSx_set_dose {} {
     } else {
        set ::DSx_settings(bean_weight) $::de1(scale_sensor_weight)
     }
-    #set ::settings(grinder_dose_weight) [round_to_one_digits $::DSx_settings(bean_weight)]
     save_DSx_settings
-    #save_settings
-    #de1_send_steam_hotwater_settings
 }
 
 proc jug_toggle {} {
@@ -1280,7 +1257,6 @@ proc save_pinkcup {} {
         foreach k $settings_vars {
 		if {[info exists ::settings($k)] == 1} {
 			set v $::settings($k)
-			#append pinkcup_data "[list $k] [list $v]\n"
 			append pinkcup_data [subst {\t[list $k] [list $v]\n}]
 		}
 	}
@@ -1312,7 +1288,6 @@ proc save_bluecup {} {
         foreach k $settings_vars {
 		if {[info exists ::settings($k)] == 1} {
 			set v $::settings($k)
-			#append bluecup_data "[list $k] [list $v]\n"
 			append bluecup_data [subst {\t[list $k] [list $v]\n}]
 		}
 	}
@@ -1344,7 +1319,6 @@ proc save_orangecup {} {
         foreach k $settings_vars {
 		if {[info exists ::settings($k)] == 1} {
 			set v $::settings($k)
-			#append orangecup_data "[list $k] [list $v]\n"
 			append orangecup_data [subst {\t[list $k] [list $v]\n}]
 		}
 	}
@@ -1392,7 +1366,6 @@ proc load_pinkcup {} {
         set ::DSx_settings(wsaw) $::settings(DSx_wsaw)
         set ::DSx_settings(jug_size) $::settings(DSx_jug_size)
         set ::DSx_settings(flush_time) $::settings(DSx_flush_time)
-        #set ::settings(grinder_dose_weight) $::DSx_settings(bean_weight)
         set_jug
         check_steam_on
         set ::DSx_settings(pink_cup_indicator) "."
@@ -1435,7 +1408,6 @@ proc load_bluecup {} {
         set ::DSx_settings(wsaw) $::settings(DSx_wsaw)
         set ::DSx_settings(jug_size) $::settings(DSx_jug_size)
         set ::DSx_settings(flush_time) $::settings(DSx_flush_time)
-        #set ::settings(grinder_dose_weight) $::DSx_settings(bean_weight)
         set_jug
         check_steam_on
         set ::DSx_settings(pink_cup_indicator) { }
@@ -1478,7 +1450,6 @@ proc load_orangecup {} {
         set ::DSx_settings(wsaw) $::settings(DSx_wsaw)
         set ::DSx_settings(jug_size) $::settings(DSx_jug_size)
         set ::DSx_settings(flush_time) $::settings(DSx_flush_time)
-        #set ::settings(grinder_dose_weight) $::DSx_settings(bean_weight)
         set_jug
         check_steam_on
         set ::DSx_settings(pink_cup_indicator) { }
@@ -2009,7 +1980,6 @@ proc past_steam_settings_data {} {
 }
 proc past_shot_data_right {} {
     if {$::DSx_settings(history_godshots) == "DSx_steam_history"} {
-        #DAMIAN
         return ""
     } else {
         return "$::DSx_settings(DSx_right_shot_time)    $::DSx_settings(past_bean_weight2)g : $::DSx_settings(drink_weight2)g (1:[round_to_one_digits [expr (0.01 + $::DSx_settings(drink_weight2))/$::DSx_settings(past_bean_weight2)]])"
@@ -2484,8 +2454,7 @@ proc load_DSx_past_shot { {force 0} } {
 	if {$stepnum == ""} {
 		return
 	}
-	#set fn "[homedir]/history/$f"
-    ### add archive files for Enrique's plugin
+    ### modefied archive files for Enrique's plugin
 	if { [file exists "[homedir]/history/$f"] } {
         set fn "[homedir]/history/$f"
     } elseif { [file exists "[homedir]/history_archive/$f"] } {
@@ -2602,7 +2571,6 @@ proc load_DSx_past2_shot { {force 0} } {
 	if {$stepnum == ""} {
 		return
 	}
-	#set fn2 "[homedir]/$::DSx_settings(history_godshots)/$f2"
 	### add archive files for Enrique's plugin
 	if { [file exists "[homedir]/$::DSx_settings(history_godshots)/$f2"] } {
         set fn2 "[homedir]/$::DSx_settings(history_godshots)/$f2"
@@ -2614,19 +2582,16 @@ proc load_DSx_past2_shot { {force 0} } {
 	array set DSx_pastprops2 [encoding convertfrom utf-8 [read_binary_file $fn2]]
 
     if {$::DSx_settings(history_godshots) == "DSx_steam_history"} {
-        #set ::DSx_settings(DSx_past2_name) $DSx_pastprops2(name)
         set ::DSx_settings(DSx_past2_espresso_elapsed) $DSx_pastprops2(steam_elapsed)
         set ::DSx_settings(DSx_past2_steam_pressure) $DSx_pastprops2(steam_pressure)
         set ::DSx_settings(DSx_past2_steam_flow) $DSx_pastprops2(steam_flow)
         set ::DSx_settings(DSx_past2_steam_temperature) $DSx_pastprops2(steam_temperature)
-
         set ::DSx_settings(DSx_past2_steam_temperature_setting) $DSx_pastprops2(steam_temperature_setting)
         set ::DSx_settings(DSx_past2_steaming_count_setting) $DSx_pastprops2(steaming_count_setting)
         set ::DSx_settings(DSx_past2_steam_timeout_setting) $DSx_pastprops2(steam_timeout_setting)
         set ::DSx_settings(DSx_past2_steam_flow_setting) $DSx_pastprops2(steam_flow_setting)
         set ::DSx_settings(DSx_past2_steam_highflow_start_setting) $DSx_pastprops2(steam_highflow_start_setting)
         set ::DSx_settings(shot_date_time2) [clock format $DSx_pastprops2(clock) -format {%a, %d %b %Y   %I:%M%p}]
-
     } else {
         set ::DSx_settings(DSx_past2_espresso_pressure) $DSx_pastprops2(espresso_pressure)
         set ::DSx_settings(DSx_past2_espresso_temperature_basket) $DSx_pastprops2(espresso_temperature_basket)
@@ -2651,7 +2616,6 @@ proc load_DSx_past2_shot { {force 0} } {
             set ::DSx_settings(DSx_past2_espresso_temperature_goal) {0.0}
             set ::DSx_settings(DSx_past2_espresso_state_change) {0.0}
         }
-
         if {[info exists DSx_pastprops2(settings)] == 1} {
             array set DSx_past_sets2 $DSx_pastprops2(settings)
             set ::DSx_settings(drink_weight2) $DSx_past_sets2(drink_weight)
@@ -2833,7 +2797,6 @@ proc history_vars {} {
     ### added by Enrique ### CHANGE LINE 2807 ADD "$"
 	set ::DSx_settings(past_shot_file) {}
 	set ::DSx_settings(past_shot_file2) {}	
-
 	foreach field_name $::DSx_settings(extra_past_shot_fields) {
 		if {[info exists ::DSx_settings(past_$field_name)] } {
 			set ::DSx_settings(past_$field_name) {}
@@ -2843,7 +2806,6 @@ proc history_vars {} {
 		}		
 	}
     ### end addition ###
-
     if {[info exists ::DSx_settings(home_show_history)] != 1} {
         set ::DSx_settings(home_show_history) {1}
     }
@@ -3030,7 +2992,6 @@ proc DSx_water {} {
         if {$::settings(scale_bluetooth_address) != ""} {
             set ::wsaw_run 0;
             skale_tare;
-            #page_show water;
             after 600 {set_next_page water water; start_water; set ::wsaw_run 1};
         } else {
             set_next_page water water
@@ -3067,7 +3028,6 @@ proc DSx_loop {} {
 	}
     if {$::flush_run == 1 && $::de1_num_state($::de1(state)) == "HotWaterRinse"} {
         if {$::DSx_settings(flush_time) + [DSx_flush_time] <= $::DSx_settings(flush_time)} {
-            #set ::flush_run 0
             DSx_stop
         }
     }
@@ -3116,7 +3076,6 @@ proc wsaw {} {
     if {$::wsaw_run == 1 && $::settings(scale_bluetooth_address) != "" && ($::DSx_settings(wsaw) - $::DSx_settings(wsaw_cal)) > 1} {
         if {$::de1(scale_sensor_weight) > ($::DSx_settings(wsaw) - $::DSx_settings(wsaw_cal))} {
             set ::wsaw_run 0
-            #wsaw_stop_water
             DSx_stop
         }
     }
@@ -3245,10 +3204,7 @@ proc DSx_font {font_name size} {
     set font_key "$font_name $size DSx"
     set font_index [lsearch $::skin_fonts $font_key]
     if {$font_index == -1} {
-
         # support for both OTF and TTF files
-
-
         if {[file exists "$::DSx_settings(font_dir)/$font_name.otf"] == 1} {
             DSx_load_font $font_key "$::DSx_settings(font_dir)/$font_name.otf" $size
             lappend ::skin_fonts $font_key
@@ -3359,9 +3315,6 @@ proc backup_DSx_steam_graph {} {
 
 proc restore_DSx_steam_graph {} {
 	set last_elapsed_time_index [expr {[espresso_elapsed length] - 1}]
-	if {$last_elapsed_time_index > 1} {
-	   # return
-	}
 	foreach sg [DSx_steam_graph_list] {
 		$sg length 0
 		if {[info exists ::DSx_settings(steam_graph_$sg)] == 1} {
@@ -3787,8 +3740,6 @@ proc DSx_tap_multiplier {} {
 
 ######## DSx coffee profile
 
-
-
 proc DSx_coffee_temperature_adjust  {} {
     if {$::settings(settings_profile_type) == "settings_2c" || $::settings(settings_profile_type) == "settings_2c2"} {
         set ::tempsl {}
@@ -4061,7 +4012,6 @@ proc DSx_done_button {} {
     set_alarms_for_de1_wake_sleep
     say [translate {Done}] $::settings(sound_button_in)
     save_settings
-    #profile_has_changed_set_colors
     de1_send_steam_hotwater_settings
     de1_send_waterlevel_settings
     set_fan_temperature_threshold $::settings(fan_threshold)
@@ -4072,7 +4022,6 @@ proc DSx_done_button {} {
 
 
 proc DSx_fill_skin_listbox {} {
-	#puts "DSx_fill_skin_listbox $widget"
 	set widget $::globals(DSx_tablet_styles_listbox)
 	$widget delete 0 99999
 
@@ -4086,24 +4035,15 @@ proc DSx_fill_skin_listbox {} {
 		if {$::settings(skin) == $d} {
 			set ::current_skin_number $cnt
 		}
-
-		#puts "d: $d"
 		if {[ifexists ::de1plus_skins($d)] == 1} {
 			# mark skins that require the DE1PLUS model with a different color to highlight them
-			#puts "de1plus skin: $d"
 			$widget itemconfigure $cnt -background #F0F0FF
 		}
 		incr cnt
 
 	}
-
-	#$widget itemconfigure $current_skin_number -foreground blue
-
 	$widget selection set $::current_skin_number
-
 	make_current_listbox_item_blue $widget
-	#puts "current_skin_number: $::current_skin_number"
-
 	DSx_preview_tablet_skin
 	$widget yview $::current_skin_number
 
@@ -4130,7 +4070,6 @@ proc DSx_preview_tablet_skin {} {
 		puts "creating $fn"
         set rescale_images_x_ratio [expr {$::screen_size_height / 1600.0}]
         set rescale_images_y_ratio [expr {$::screen_size_width / 2560.0}]
-
 		set src "[homedir]/skins/$skindir/2560x1600/icon.jpg"
 		catch {
 			$::DSx_table_style_preview_image read $src
@@ -4162,7 +4101,6 @@ proc load_DSx_language {} {
 	} else {
 		set ::settings(language) [lindex [translation_langs_array] [expr {($stepnum * 2) - 2}] ]
 	}
-	#make_current_listbox_item_blue $::DSx_languages_widget
 	DSx_current_listbox_item $::DSx_languages_widget
 }
 
@@ -4181,7 +4119,6 @@ proc fill_DSx_languages_listbox {} {
 	set current 0
 
 	foreach {code desc} [translation_langs_array] {
-        #puts "$code $desc"
 
 		if {$::settings(language) == $code} {
 			set current $cnt
@@ -4197,7 +4134,6 @@ proc fill_DSx_languages_listbox {} {
 }
 
 proc set_DSx_languages_scrollbar_dimensions {} {
-    # set the height of the scrollbar to be the same as the listbox
     $::DSx_languages_scrollbar configure -length [winfo height $::DSx_languages_widget]
     set coords [.can coords $::DSx_languages_widget ]
     set newx [expr {[winfo width $::DSx_languages_widget] + [lindex $coords 0]}]

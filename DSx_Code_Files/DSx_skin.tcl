@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 4.51
+set ::DSx_settings(version) 4.52
 
 package provide DSx_skin 1.0
 
@@ -519,7 +519,6 @@ if {[file exists "[skin_directory]/DSx_Home_Page/DSx_home.page"] == 1} {
         $widget element create line_steam_pressure -xdata steam_elapsed -ydata steam_pressure -symbol none -label "" -linewidth [rescale_x_skin 10] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
         $widget element create line_steam_flow -xdata steam_elapsed -ydata steam_flow -symbol none -label "" -linewidth [rescale_x_skin 10] -color #4e85f4  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
         $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -linewidth [rescale_x_skin 2]
-        #$widget axis configure y -color #008c4c -tickfont [DSx_font font 6] -min 0.0 -max [expr {$::settings(max_steam_pressure) + 0.01}] -subdivisions 5 -majorticks {0.25 0.5 0.75 1 1.25 1.5 1.75 2 2.25 2.5 2.75 3}
         $widget axis configure y -color #008c4c -tickfont [DSx_font font 6] -min 0.0;
         $widget grid configure -color $::DSx_settings(grid_colour)
     } -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 2490] -height [rescale_y_skin 800] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
@@ -621,19 +620,6 @@ set DSx_past_shots_listbox_height 9
 set DSx_past2_shots_listbox_height 9
 set ::DSx_message2 ""
 
-# ORIGINAL: ##############################
-#add_de1_widget "DSx_past" listbox 40 1000 {
-#	set ::globals(DSx_past_shots_widget) $widget
-#	fill_DSx_past_shots_listbox
-#	bind $widget <<ListboxSelect>> ::load_DSx_past_shot; set ::time_line $::DSx_settings(DSx_past_espresso_elapsed); save_DSx_settings;
-#} -background $::DSx_settings(bg_colour) -yscrollcommand {scale_scroll ::DSx_past_slider} -font [DSx_font font 8] -bd 0 -height $DSx_past_shots_listbox_height -width 16 -foreground $::DSx_settings(font_colour) -borderwidth 0 -selectborderwidth 0  -relief flat -highlightthickness 0 -selectmode single  -selectbackground $::DSx_settings(font_colour)
-#
-#add_de1_widget "DSx_past" listbox 1940 1000 {
-#	set ::globals(DSx_past2_shots_widget) $widget
-#	fill_DSx_past2_shots_listbox
-#	bind $widget <<ListboxSelect>> ::load_DSx_past2_shot;
-#} -background $::DSx_settings(bg_colour) -yscrollcommand {scale_scroll ::DSx_past2_slider} -font [DSx_font font 8] -bd 0 -height $DSx_past2_shots_listbox_height -width 16 -foreground $::DSx_settings(font_colour) -borderwidth 0 -selectborderwidth 0  -relief flat -highlightthickness 0 -selectmode single  -selectbackground $::DSx_settings(font_colour)
-
 # EB VERSION: ##############################
 add_de1_widget "DSx_past" listbox 40 1000 {
 	set ::globals(DSx_past_shots_widget) $widget
@@ -651,10 +637,6 @@ add_de1_widget "DSx_past" listbox 1940 1000 {
 set ::DSx_past_slider 0
 set ::DSx_past2_slider 0
 # draw the scrollbar off screen so that it gets resized and moved to the right place on the first draw
-
-# ORIGINAL: ##############################
-#set ::DSx_past_shots_scrollbar [add_de1_widget "DSx_past" scale 1000 1000 {} -from 0 -to .50 -bigincrement 0.2 -background $::DSx_settings(font_colour) -borderwidth 1 -showvalue 0 -resolution .01 -length [rescale_x_skin 400] -width [rescale_y_skin 150] -variable ::advsteps -font [DSx_font font 10] -sliderlength [rescale_x_skin 125] -relief flat -command {listbox_moveto $::globals(DSx_past_shots_widget) $::DSx_past_slider}  -foreground #FFFFFF -troughcolor $::DSx_settings(bg_colour) -borderwidth 0  -highlightthickness 0]
-#set ::DSx_past2_shots_scrollbar [add_de1_widget "DSx_past" scale 1000 1000 {} -from 0 -to .50 -bigincrement 0.2 -background $::DSx_settings(font_colour) -borderwidth 1 -showvalue 0 -resolution .01 -length [rescale_x_skin 400] -width [rescale_y_skin 150] -variable ::advsteps2 -font [DSx_font font 10] -sliderlength [rescale_x_skin 125] -relief flat -command {listbox_moveto $::globals(DSx_past2_shots_widget) $::DSx_past2_slider}  -foreground #FFFFFF -troughcolor $::DSx_settings(bg_colour) -borderwidth 0  -highlightthickness 0]
 
 # EB VERSION: ##############################
 set ::DSx_past_shots_scrollbar [add_de1_widget "DSx_past" scale 1000 1000 {} -from 0 -to 1.0 -bigincrement 0.2 -background $::DSx_settings(font_colour) -borderwidth 1 -showvalue 0 -resolution .01 -length [rescale_x_skin 400] -width [rescale_y_skin 150] -variable ::DSx_past_slider -font [DSx_font font 10] -sliderlength [rescale_x_skin 125] -relief flat -command {listbox_moveto $::globals(DSx_past_shots_widget) $::DSx_past_slider}  -foreground #FFFFFF -troughcolor $::DSx_settings(bg_colour) -borderwidth 0  -highlightthickness 0]
@@ -901,7 +883,6 @@ add_de1_variable "DSx_past" 640 56 -text "" -font [DSx_font font 8] -fill $::DSx
 add_de1_variable "DSx_past" 40 800 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor "nw" -justify left -width [rescale_x_skin  800] -textvariable {$::DSx_settings(past_profile_title)}
 add_de1_variable "DSx_past" 1260 800 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor "ne" -justify right -textvariable {$::DSx_settings(DSx_left_shot_time)    $::DSx_settings(past_bean_weight)g : $::DSx_settings(drink_weight)g (1:[round_to_one_digits [expr (0.01 + $::DSx_settings(drink_weight))/$::DSx_settings(past_bean_weight)]])}
 add_de1_variable "DSx_past" 1260 850 -text "" -font [DSx_font font 7] -fill "#206ad4" -anchor "ne" -justify right -textvariable {[round_to_integer $::DSx_settings(past_volume1)]mL}
-#add_de1_variable "DSx_past" 880 800 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor "ne" -justify right -textvariable {$::DSx_settings(DSx_left_shot_time)}
 add_de1_variable "DSx_past" 1900 56 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor center -justify center -textvariable {$::DSx_settings(shot_date_time2)}
 
 add_de1_variable "DSx_past" 1300 800 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor "nw" -justify left -textvariable {[past_steam_settings_data]}
@@ -909,7 +890,6 @@ add_de1_variable "DSx_past" 1300 800 -text "" -font [DSx_font font 7] -fill $::D
 add_de1_variable "DSx_past" 2520 800 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor "ne" -justify right -textvariable {[past_shot_data_right]}
 add_de1_variable "DSx_past" 2520 850 -text "" -font [DSx_font font 7] -fill "#206ad4" -anchor "ne" -justify right -textvariable {[past_shot_volume_right]}
 
-#add_de1_variable "DSx_past" 2140 800 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor "ne" -justify right -textvariable {$::DSx_settings(DSx_right_shot_time)}
 ## zoomed shot data
 add_de1_variable "DSx_past_zoomed" 2510 1460 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor "e" -justify left -textvariable {$::DSx_settings(shot_date_time)}
 add_de1_variable "DSx_past_zoomed" 50 1460 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor "w" -justify left -width [rescale_x_skin  500] -textvariable {$::DSx_settings(past_profile_title)}
@@ -942,7 +922,6 @@ add_de1_variable "DSx_4_workflow" 1280 60 -font [DSx_font font 10] -fill $::DSx_
 add_de1_image "DSx_4_workflow" 100 154 "[skin_directory_graphics]/icons/bean.png"
 add_de1_image "DSx_4_workflow" 100 340 "[skin_directory_graphics]/icons/click.png"
 add_de1_variable "DSx_4_workflow" 500 440 -justify center -anchor center -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {[round_to_one_digits $::DSx_settings(bean_weight)]g}
-#add_de1_button "DSx_4_workflow" {say "" $::settings(sound_button_in); horizontal_clicker 1 0.1 ::DSx_settings(bean_weight) 1 40 %x %y %x0 %y0 %x1 %y1; save_dose; clear_bean_font;} 100 340 900 540 ""
 add_de1_button "DSx_4_workflow" {say "" $::settings(sound_button_in); horizontal_clicker 1 0.1 ::DSx_settings(bean_weight) 1 40 %x %y %x0 %y0 %x1 %y1; save_DSx_settings; clear_bean_font;} 100 340 900 540 ""
 # saw
 add_de1_image "DSx_4_workflow" 2260 134 "[skin_directory_graphics]/icons/espresso.png"
@@ -1386,7 +1365,6 @@ add_de1_variable "DSx_3_coffee" 1135 1280 -justify center -anchor center -font [
 add_de1_button "DSx_3_coffee" {say "" $::settings(sound_button_in); load_DSx_coffee_mocha; DSx_update_saw; clear_saw_font;} 1030 1210 1250 1350 ""
 add_de1_variable "settings_2c" 1280 730 -text [translate ""] -font Helv_16_bold -fill $::DSx_settings(red) -justify "center" -anchor "n" -textvariable {[donotedit]}
 
-
 rename ::save_profile ::skin::dsx::save_profile_orig
 msg -INFO "DSx: rename ::save_profile ::skin::dsx::save_profile_orig"
 
@@ -1395,7 +1373,6 @@ proc ::save_profile {args} {
 	no_save_DSx_coffee
 	::skin::dsx::save_profile_orig {*}$args
 }
-
 
 ###########################################################################################################################################
 
