@@ -1,0 +1,29 @@
+set version 1.0
+### By Damian ###
+
+
+
+if {[info exists [homedir]/history_trash] != 1} {
+    set path [homedir]/history_trash
+    file mkdir $path
+    file attributes $path
+}
+proc history_delete {} {
+    add_de1_variable "DSx_past" 320 1530 -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -justify "center" -anchor "center" -textvariable {delete selected}
+    add_DSx_button "DSx_past" {say "" $::settings(sound_button_in); DSx_delete_history_file} 170 1490 470 1570
+}
+
+lappend ::run_after_startup history_delete
+
+proc DSx_delete_history_file {} {
+    if {[file exists [homedir]/history/$::DSx_settings(DSx_past_espresso_name).shot] != 1} {
+        set ::DSx_message2 "file $::DSx_settings(DSx_past_espresso_name) does not exist"
+        } else {
+        borg spinner on
+        file rename -force [homedir]/history/$::DSx_settings(DSx_past_espresso_name).shot [homedir]/history_trash/$::DSx_settings(DSx_past_espresso_name).shot
+        borg spinner off
+        borg systemui $::android_full_screen_flags
+        fill_DSx_past_shots_listbox
+        fill_DSx_past2_shots_listbox
+    }
+}

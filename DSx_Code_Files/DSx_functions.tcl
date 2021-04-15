@@ -2489,7 +2489,11 @@ proc load_DSx_past_shot { {force 0} } {
     set ::DSx_settings(past_bean_weight) [round_to_one_digits $DSx_past_sets(grinder_dose_weight)]
     set ::DSx_settings(past_profile_title) $DSx_past_sets(profile_title)
     set ::DSx_settings(shot_date_time) [clock format $DSx_pastprops(clock) -format {%a, %d %b %Y   %I:%M%p}]
-
+    if {[info exists DSx_past_sets(calibration_flow_multiplier)] == 1} {
+        set ::DSx_settings(past_calibration_flow_multiplier) $DSx_past_sets(calibration_flow_multiplier)
+    } else {
+        set ::DSx_settings(past_calibration_flow_multiplier) "unknown"
+    }
 ### setup additional history data from "Your setup & This espresso". Added by Enrique ###	
     set ::DSx_settings(past_shot_file) $fn
 	set ::DSx_settings(past_clock) $DSx_pastprops(clock)

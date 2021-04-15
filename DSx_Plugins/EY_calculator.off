@@ -1,0 +1,115 @@
+package provide EY_calculator.dsx 1.0
+### Version 1 by Damian - basic EY calculator
+### Version 2 by Idan & Damian - added Brix
+### Version 3 - fixed TDS to Brix maths error
+
+### we add the page to the backend ###
+DSx_plugin_page_name EY_calc
+
+
+########## Now we create our page ##########
+#### EY_calculator pluging by Damian v1.00 #### this line is not required, but it can help to identify the creator and version if needed
+
+
+
+### Lets give the page a heading ###
+add_de1_variable "EY_calc" 1280 80 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {Extraction Yield Calculator}
+
+
+### Lets set some starting values ###
+set ::EY_calc_dose 18.0
+set ::EY_calc_espresso 36.0
+set ::EY_calc_tds 10.0
+set ::EY_calc_tds_brix_lable {TDS}
+set ::EY_calc_tds_brix_button_lable {Brix}
+set ::EY_calc_brix 12
+set ::EY_calc_tds_brix_factor 100
+set ::EY_calc_button_incr 0.1
+
+
+### Lets set up the Dose display items ###
+add_de1_variable "EY_calc" 700 360 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {Dose}
+add_de1_variable "EY_calc" 700 500 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {+}
+add_de1_variable "EY_calc" 700 600 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {$::EY_calc_dose g}
+add_de1_variable "EY_calc" 700 700 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {-}
+# and add the buttons #
+add_de1_button "EY_calc" {set ::EY_calc_dose [round_to_one_digits [expr {$::EY_calc_dose + $::EY_calc_button_incr}]]} 600 400 800 600
+add_de1_button "EY_calc" {set ::EY_calc_dose [round_to_one_digits [expr {$::EY_calc_dose - $::EY_calc_button_incr}]]} 600 600 800 800
+
+
+### add some decoration ###
+add_de1_variable "EY_calc" 850 600 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {x}
+
+
+### Lets set up the Espresso display items ###
+add_de1_variable "EY_calc" 1000 360 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {Espresso}
+add_de1_variable "EY_calc" 1000 500 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {+}
+add_de1_variable "EY_calc" 1000 600 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {$::EY_calc_espresso g}
+add_de1_variable "EY_calc" 1000 700 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {-}
+# and add the buttons #
+add_de1_button "EY_calc" {set ::EY_calc_espresso [round_to_one_digits [expr {$::EY_calc_espresso + $::EY_calc_button_incr}]]} 900 400 1100 600
+add_de1_button "EY_calc" {set ::EY_calc_espresso [round_to_one_digits [expr {$::EY_calc_espresso - $::EY_calc_button_incr}]]} 900 600 1100 800
+
+
+### add some decoration ###
+add_de1_variable "EY_calc" 1150 600 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {÷}
+
+
+### Lets set up the TDS display items ###
+add_de1_variable "EY_calc" 1300 360 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {$::EY_calc_tds_brix_lable}
+add_de1_variable "EY_calc" 1300 500 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {+}
+add_de1_variable "EY_calc" 1300 600 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {[round_to_one_digits [expr {($::EY_calc_tds* $::EY_calc_tds_brix_factor)/100}]] %}
+add_de1_variable "EY_calc" 1300 700 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {-}
+## and add the buttons #
+add_de1_button "EY_calc" {set ::EY_calc_tds [round_to_one_digits [expr {$::EY_calc_tds + $::EY_calc_button_incr}]]} 1200 400 1400 600
+add_de1_button "EY_calc" {set ::EY_calc_tds [round_to_one_digits [expr {$::EY_calc_tds - $::EY_calc_button_incr}]]} 1200 600 1400 800
+
+
+### add some decoration ###
+add_de1_variable "EY_calc" 1550 600 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {=}
+
+
+### Lets set up the Results display items ###
+# First we will create a proc to do the math #
+proc EY_calc_result {} {
+    set units { %}
+    return [round_to_one_digits [expr {$::EY_calc_espresso * $::EY_calc_tds / $::EY_calc_dose}]]$units
+}
+#then add the display items #
+add_de1_variable "EY_calc" 1800 400 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {Extration\rYield}
+add_de1_variable "EY_calc" 1800 600 -justify center -font [DSx_font font 12] -fill $::DSx_settings(font_colour) -textvariable {[EY_calc_result]}
+
+
+### Lets add a button to toggle between TDS and Brix ###
+add_de1_image "EY_calc" 100 400 "[skin_directory_graphics]/icons/button4.png"
+add_de1_variable "EY_calc" 210 460 -justify center -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Set to\r$::EY_calc_tds_brix_button_lable}
+add_de1_button "EY_calc" {EY_calc_toggle_tds_brix} 100 400 320 540
+
+proc EY_calc_toggle_tds_brix {} {
+    if {$::EY_calc_tds_brix_lable == {TDS}} {
+        set ::EY_calc_tds_brix_lable {Brix}
+        set ::EY_calc_tds_brix_button_lable {TDS}
+        set ::EY_calc_tds_brix_factor 118
+    } else {
+        set ::EY_calc_tds_brix_lable {TDS}
+        set ::EY_calc_tds_brix_button_lable {Brix}
+        set ::EY_calc_tds_brix_factor 100
+    }
+}
+
+
+### Lets add a button to toggle button increments ###
+add_de1_image "EY_calc" 100 600 "[skin_directory_graphics]/icons/button4.png"
+add_de1_variable "EY_calc" 210 660 -justify center -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Buttons\r- $::EY_calc_button_incr +}
+add_de1_button "EY_calc" {EY_calc_toggle_button_incr} 100 600 320 740
+
+proc EY_calc_toggle_button_incr {} {
+    if {$::EY_calc_button_incr == 0.1} {
+        set ::EY_calc_button_incr 1
+    } else {
+        set ::EY_calc_button_incr 0.1
+    }
+}
+### all done! ###
+
+

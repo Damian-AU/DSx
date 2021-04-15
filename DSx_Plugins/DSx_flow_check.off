@@ -1,0 +1,34 @@
+### DSx_flow_check By Damian ###
+set version 1.0
+
+### You can change the number of data points you want to sample by changing ::DSx_flow_cal_sample_number
+### I recommend somewhere between 5 and 50, I've set a default of 10
+
+set ::DSx_flow_cal_sample_number 10
+
+### Code ###
+if {[info exists ::DSx_settings(past_calibration_flow_multiplier)] != 1} {
+    set ::DSx_settings(past_calibration_flow_multiplier) "unknown"
+}
+proc DSx_calibrate {args} {
+    set weight_sample [lrange $::DSx_settings(DSx_past_espresso_flow_weight) end-$::DSx_flow_cal_sample_number end]
+    set ::DSx_past_weight_average [round_to_two_digits [expr ([join $weight_sample +])/[llength $weight_sample].]]
+    set flow_sample [lrange $::DSx_settings(DSx_past_espresso_flow) end-$::DSx_flow_cal_sample_number end]
+    set ::DSx_past_flow_average [round_to_two_digits [expr ([join $flow_sample +])/[llength $flow_sample].]]
+}
+proc DSx_flow_cal_suggestion {} {
+    set flow_err_factor [expr ($::DSx_past_weight_average / $::DSx_past_flow_average)]
+    if {$::DSx_settings(past_calibration_flow_multiplier) == "unknown"} {
+        set past_flow_multi 1.00
+    } else {
+        set past_flow_multi $::DSx_settings(past_calibration_flow_multiplier)
+    }
+    return [round_to_two_digits [expr ($past_flow_multi * $flow_err_factor)]]
+}
+add_de1_variable "DSx_past" 1000 900 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor "ne" -justify right -textvariable {Av. last $::DSx_flow_cal_sample_number data points}
+add_de1_variable "DSx_past" 1100 900 -text "" -font [DSx_font font 7] -fill "#4e85f4" -anchor "ne" -justify right -textvariable {$::DSx_past_flow_average}
+add_de1_variable "DSx_past" 1120 900 -text "" -font [DSx_font font 7] -fill "#a2693d" -anchor "nw" -justify left -textvariable {$::DSx_past_weight_average}
+add_de1_variable "DSx_past" 1260 940 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor "ne" -justify right -textvariable {flow multiplier > past $::DSx_settings(past_calibration_flow_multiplier) : current $::settings(calibration_flow_multiplier) : suggested [DSx_flow_cal_suggestion]}
+
+trace add execution DSx_past_shot_reference_reset enter DSx_calibrate
+
