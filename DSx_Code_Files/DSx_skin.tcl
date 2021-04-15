@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 4.53
+set ::DSx_settings(version) 4.53.1
 
 package provide DSx_skin 1.0
 
@@ -1243,10 +1243,9 @@ add_de1_variable "DSx_units" 2124 680 -text "" -font [DSx_font font 14] -fill $:
 add_de1_variable "DSx_units" 2124 810 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -justify center -anchor "center"  -textvariable {[translate "Font size editor. Default = 0.5"]}
 add_de1_button "DSx_units" {say "" $::settings(sound_button_in); horizontal_clicker 1 1 ::DSx_settings(font_size) 1 100 %x %y %x0 %y0 %x1 %y1; save_DSx_settings; DSx_font_cal;} 1880 580 2360 780 ""
 # Options
-add_de1_widget "DSx_units" checkbutton 1400 580 {} -text [translate "Fahrenheit"] -indicatoron true  -font [DSx_font font 10] -bg $::DSx_settings(bg_colour) -anchor nw -foreground $::DSx_settings(font_colour) -variable ::settings(enable_fahrenheit)  -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa
-add_de1_widget "DSx_units" checkbutton 1400 660 {} -text [translate "AM/PM"] -indicatoron true  -font [DSx_font font 10] -bg $::DSx_settings(bg_colour) -anchor nw -foreground $::DSx_settings(font_colour) -variable ::settings(enable_ampm)  -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa
-add_de1_widget "DSx_units" checkbutton 1400 740 {} -text [translate "1.234,56"] -indicatoron true  -font [DSx_font font 10] -bg $::DSx_settings(bg_colour) -anchor nw -foreground $::DSx_settings(font_colour) -variable ::settings(enable_commanumbers)  -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa
-add_de1_widget "DSx_units" checkbutton 1400 820 {} -text [translate "Record log file"] -indicatoron true  -font "[DSx_font font 10]" -bg $::DSx_settings(bg_colour) -justify left -anchor nw -foreground $::DSx_settings(font_colour) -variable ::settings(log_enabled) -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa  -relief flat -command save_settings
+add_de1_widget "DSx_units" checkbutton 1400 660 {} -text [translate "Fahrenheit"] -indicatoron true  -font [DSx_font font 10] -bg $::DSx_settings(bg_colour) -anchor nw -foreground $::DSx_settings(font_colour) -variable ::settings(enable_fahrenheit)  -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa
+add_de1_widget "DSx_units" checkbutton 1400 740 {} -text [translate "AM/PM"] -indicatoron true  -font [DSx_font font 10] -bg $::DSx_settings(bg_colour) -anchor nw -foreground $::DSx_settings(font_colour) -variable ::settings(enable_ampm)  -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa
+add_de1_widget "DSx_units" checkbutton 1400 820 {} -text [translate "1.234,56"] -indicatoron true  -font [DSx_font font 10] -bg $::DSx_settings(bg_colour) -anchor nw -foreground $::DSx_settings(font_colour) -variable ::settings(enable_commanumbers)  -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa
 add_de1_widget "DSx_units" checkbutton 1400 900 {set ::DSx_theme_checkbutton_2 $widget} -text [translate "Tare only on espresso start"] -indicatoron true  -font "[DSx_font font 10]" -bg $::DSx_settings(bg_colour) -justify left -anchor nw -foreground $::DSx_settings(font_colour) -variable ::settings(tare_only_on_espresso_start)  -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa  -relief flat -command save_settings
 add_de1_widget "DSx_units" checkbutton 1400 980 {} -text [translate "Save steam history"] -indicatoron true  -font "[DSx_font font 10]" -bg $::DSx_settings(bg_colour) -justify left -anchor nw -foreground $::DSx_settings(font_colour) -variable ::DSx_settings(save_DSx_steam_history)  -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa  -relief flat -command save_DSx_settings
 
@@ -1485,6 +1484,38 @@ proc skins_page_change_due_to_de1_state_change { textstate } {
         DSx_loop
 	}
 }
+
+### DSx Plugin UI###
+
+add_de1_variable "DSx_plugin_UI" 1280 60 -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -textvariable {DSx Plugin UI page}
+add_de1_variable "DSx_plugin_UI" 400 260 -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -textvariable {Active plugins}
+
+add_de1_widget "DSx_plugin_UI" listbox 40 330 {
+	set ::globals(DSx_active_plugin_widget) $widget
+	fill_DSx_active_plugin_listbox
+	bind $widget <<ListboxSelect>> DSx_active_plugin_rename;
+} -background $::DSx_settings(bg_colour) -yscrollcommand {scale_scroll ::DSx_active_plugin_slider} -font [DSx_font font 8] -bd 0 -height 14 -width 28 -foreground $::DSx_settings(font_colour) -borderwidth 0 -selectborderwidth 0  -relief flat -highlightthickness 0 -selectmode single  -selectbackground $::DSx_settings(font_colour)
+
+set ::DSx_active_plugin_slider 0
+set ::DSx_active_plugin_scrollbar [add_de1_widget "DSx_plugin_UI" scale 644 330 {} -from 0 -to .50 -bigincrement 0.2 -background $::DSx_settings(font_colour) -borderwidth 1 -showvalue 0 -resolution .01 -length [rescale_x_skin 800] -width [rescale_y_skin 120] -variable plugin_left -font [DSx_font font 10] -sliderlength [rescale_x_skin 125] -relief flat -command {listbox_moveto $::globals(DSx_active_plugin_widget) $::DSx_active_plugin_slider}  -foreground #FFFFFF -troughcolor $::DSx_settings(bg_colour) -borderwidth 0  -highlightthickness 0]
+
+add_de1_widget "DSx_plugin_UI" listbox 800 330 {
+	set ::globals(DSx_inactive_plugin_widget) $widget
+	fill_DSx_inactive_plugin_listbox
+	bind $widget <<ListboxSelect>> DSx_inactive_plugin_rename;
+} -background $::DSx_settings(bg_colour) -yscrollcommand {scale_scroll ::DSx_inactive_plugin_slider} -font [DSx_font font 8] -bd 0 -height 14 -width 28 -foreground $::DSx_settings(font_colour) -borderwidth 0 -selectborderwidth 0  -relief flat -highlightthickness 0 -selectmode single  -selectbackground $::DSx_settings(font_colour)
+
+set ::DSx_inactive_plugin_slider 0
+set ::DSx_inactive_plugin_scrollbar [add_de1_widget "DSx_plugin_UI" scale 1404 330 {} -from 0 -to .50 -bigincrement 0.2 -background $::DSx_settings(font_colour) -borderwidth 1 -showvalue 0 -resolution .01 -length [rescale_x_skin 800] -width [rescale_y_skin 120] -variable plugin_right -font [DSx_font font 10] -sliderlength [rescale_x_skin 125] -relief flat -command {listbox_moveto $::globals(DSx_inactive_plugin_widget) $::DSx_inactive_plugin_slider}  -foreground #FFFFFF -troughcolor $::DSx_settings(bg_colour) -borderwidth 0  -highlightthickness 0]
+
+add_de1_variable "DSx_plugin_UI" 1160 260 -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -textvariable {Available plugins}
+add_de1_variable "DSx_plugin_UI" 1200 1320 -text "" -font Helv_8 -fill #ff574a -anchor center -justify center -textvariable {$::DSx_plugin_message}
+add_de1_variable "DSx_plugin_UI" 2000 300 -text "" -font Helv_8 -fill $::DSx_settings(font_colour) -anchor center -justify center -textvariable {You can select a page to show when you tap\rthe left 1/2 of screen saver without waking\rthe machine. Allowing you to use plugins\rwhile the machine is sleeping}
+add_de1_variable "DSx_plugin_UI" 2000 700 -text "" -font Helv_7 -fill $::DSx_settings(font_colour) -anchor center -justify center -textvariable {If you have activated/deactivated plugins on the left,\rthe list may not be current, please restart to update}
+add_de1_image "DSx_plugin_UI" 1810 430 "[skin_directory_graphics]/icons/button8.png"
+add_de1_variable "DSx_plugin_UI" 2000 530 -text "" -font Helv_8 -fill $::DSx_settings(orange) -anchor center -justify center -textvariable {$::DSx_settings(first_page_from_saver)}
+add_de1_button "DSx_plugin_UI" {toggle_active_plugin_list} 1800 430 2200 630
+fill_DSx_active_plugin_listbox
 
 DSx_final_prep
 
