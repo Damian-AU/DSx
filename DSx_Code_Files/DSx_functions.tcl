@@ -2750,9 +2750,7 @@ proc DSx_archive {} {
         set ::DSx_message2 "file $::DSx_settings(DSx_past_espresso_name) does not exist"
         } else {
         borg spinner on
-        file copy -force [homedir]/history/$::DSx_settings(DSx_past_espresso_name).shot [homedir]/history_archive/$::DSx_settings(DSx_past_espresso_name).shot
-        after 1000
-        file delete -force [homedir]/history/$::DSx_settings(DSx_past_espresso_name).shot
+        file rename -force [homedir]/history/$::DSx_settings(DSx_past_espresso_name).shot [homedir]/history_archive/$::DSx_settings(DSx_past_espresso_name).shot
         borg spinner off
         borg systemui $::android_full_screen_flags
         fill_DSx_past_shots_listbox;
@@ -3309,32 +3307,35 @@ proc save_steam_history {unused_old_state unused_new_state} {
         file mkdir $path
         file attributes $path
     }
-    set clock [clock seconds]
-    set name [clock format $clock]
+    if {[catch {
+        set clock [clock seconds]
+        set name [clock format $clock]
 
-    set steam_data {}
-    append steam_data "$name\n"
-    append steam_data "clock $clock\n"
-    append steam_data "\n"
-    append steam_data "steam_elapsed {[steam_elapsed range 0 end]}\n"
-    append steam_data "steam_pressure {[steam_pressure range 0 end]}\n"
-    append steam_data "steam_flow {[steam_flow range 0 end]}\n"
-    if {$::settings(enable_fahrenheit) == 1} {
-        append steam_data "steam_temperature {[steam_temperature range 0 end]}\n"
-        } else {
-        append steam_data "steam_temperature {[steam_temperature range 0 end]}\n"
+        set steam_data {}
+        append steam_data "$name\n"
+        append steam_data "clock $clock\n"
+        append steam_data "\n"
+        append steam_data "steam_elapsed {[steam_elapsed range 0 end]}\n"
+        append steam_data "steam_pressure {[steam_pressure range 0 end]}\n"
+        append steam_data "steam_flow {[steam_flow range 0 end]}\n"
+        if {$::settings(enable_fahrenheit) == 1} {
+            append steam_data "steam_temperature {[steam_temperature range 0 end]}\n"
+            } else {
+            append steam_data "steam_temperature {[steam_temperature range 0 end]}\n"
+        }
+        append steam_data "\n"
+        append steam_data "steaming_count_setting $::settings(steaming_count)\n"
+        append steam_data "steam_timeout_setting $::settings(steam_timeout)\n"
+        append steam_data "steam_temperature_setting $::settings(steam_temperature)\n"
+        append steam_data "steam_flow_setting $::settings(steam_flow)\n"
+        append steam_data "steam_highflow_start_setting $::settings(steam_highflow_start)\n"
+    } err]} {
+        msg "Steam history not saved, $err"
+    } else {
+        set fn "[homedir]/DSx_steam_history/[clock format $clock -format "%Y%m%dT%H%M%S"].steam"
+        write_file $fn $steam_data
+        msg "Save this steam to history"
     }
-    append steam_data "\n"
-    append steam_data "steaming_count_setting $::settings(steaming_count)\n"
-    append steam_data "steam_timeout_setting $::settings(steam_timeout)\n"
-    append steam_data "steam_temperature_setting $::settings(steam_temperature)\n"
-    append steam_data "steam_flow_setting $::settings(steam_flow)\n"
-    append steam_data "steam_highflow_start_setting $::settings(steam_highflow_start)\n"
-
-    set fn "[homedir]/DSx_steam_history/[clock format $clock -format "%Y%m%dT%H%M%S"].steam"
-    write_file $fn $steam_data
-    msg "Save this steam to history"
-
 }
 
 if { $::skin::dsx::use_event_system } {
@@ -4117,6 +4118,171 @@ proc DSx_scheduler_feature_hide_show_refresh {} {
 		show_hide_from_variable $::DSx_scheduler_widgetids ::settings scheduler_enable write
 	}
 }
+
+### DSx Plugin UI###
+
+
+set ::DSx_plugin_message ""
+
+proc DSx_active_plugin_files {} {
+	set files [lsort -dictionary [glob -nocomplain -tails -directory "[homedir]/skins/DSx/DSx_Plugins/" *.dsx]]
+    set files [lsearch -inline -all -not -exact $files DSx_admin.dsx]
+    set files [lsearch -inline -all -not -exact $files DSx_backup.dsx]
+    set files [lsearch -inline -all -not -exact $files DSx_cal.dsx]
+    set files [lsearch -inline -all -not -exact $files DSx_coffee.dsx]
+    set files [lsearch -inline -all -not -exact $files DSx_theme.dsx]
+    set files [lsearch -inline -all -not -exact $files DSx_workflow.dsx]
+    set files [lsearch -inline -all -not -exact $files DSx_plugin_UI.dsx]
+	set dd {}
+	foreach f $files {
+	    set fn "[homedir]skins/DSx/DSx_Plugins/$f"
+	    set name [file rootname $f]
+	    set space { }
+	    set name $name$space[package versions $name]
+		lappend dd $name $f
+	}
+	return $dd
+}
+
+proc fill_DSx_active_plugin_listbox {} {
+	unset -nocomplain ::DSx_active_plugin_filenames
+	set widget $::globals(DSx_active_plugin_widget)
+	$widget delete 0 99999
+	set cnt 0
+	array set DSx_active_plugin_files_array [DSx_active_plugin_files]
+	foreach desc [lsort -decreasing -dictionary [array names DSx_active_plugin_files_array]] {
+		set fn $DSx_active_plugin_files_array($desc)
+		$widget insert $cnt $desc
+		set ::DSx_active_plugin_filenames($cnt) $fn
+
+		incr cnt
+	}
+}
+
+proc set_DSx_active_plugin_scrollbar_dimensions {} {
+	# set the height of the scrollbar to be the same as the listbox
+	$::DSx_active_plugin_scrollbar configure -length [winfo height $::globals(DSx_active_plugin_widget)]
+	set coords [.can coords $::globals(DSx_active_plugin_widget) ]
+	set newx [expr {[winfo width $::globals(DSx_active_plugin_widget)] + [lindex $coords 0]}]
+	.can coords $::DSx_active_plugin_scrollbar "$newx [lindex $coords 1]"
+}
+
+proc DSx_inactive_plugin_files {} {
+	set files [lsort -dictionary [glob -nocomplain -tails -directory "[homedir]/skins/DSx/DSx_Plugins/" *.off]]
+	set dd {}
+	foreach f $files {
+	    set fn "[homedir]skins/DSx/DSx_Plugins/$f"
+	    set name [file rootname $f]
+		lappend dd $name $f
+	}
+	return $dd
+}
+
+proc fill_DSx_inactive_plugin_listbox {} {
+	unset -nocomplain ::DSx_inactive_plugin_filenames
+	set widget $::globals(DSx_inactive_plugin_widget)
+	$widget delete 0 99999
+	set cnt 0
+	array set DSx_inactive_plugin_files_array [DSx_inactive_plugin_files]
+	foreach desc [lsort -decreasing -dictionary [array names DSx_inactive_plugin_files_array]] {
+		set fn $DSx_inactive_plugin_files_array($desc)
+		$widget insert $cnt $desc
+		set ::DSx_inactive_plugin_filenames($cnt) $fn
+		incr cnt
+	}
+}
+
+proc set_DSx_inactive_plugin_scrollbar_dimensions {} {
+	# set the height of the scrollbar to be the same as the listbox
+	$::DSx_inactive_plugin_scrollbar configure -length [winfo height $::globals(DSx_inactive_plugin_widget)]
+	set coords [.can coords $::globals(DSx_inactive_plugin_widget) ]
+	set newx [expr {[winfo width $::globals(DSx_inactive_plugin_widget)] + [lindex $coords 0]}]
+	.can coords $::DSx_inactive_plugin_scrollbar "$newx [lindex $coords 1]"
+}
+
+proc DSx_plugin_dir {} {
+    return [homedir]/skins/DSx/DSx_Plugins
+}
+
+proc DSx_active_plugin_rename {} {
+    catch {
+        set ::restart 1
+        set w $::globals(DSx_active_plugin_widget)
+        unset -nocomplain plugin
+        set cnt [$w curselection]
+        set plugin [file rootname $::DSx_active_plugin_filenames($cnt)]
+        set fn "[DSx_plugin_dir]/${plugin}.dsx"
+        set nfn "[DSx_plugin_dir]/${plugin}.off"
+        if {[file exists [DSx_plugin_dir]/${plugin}.off] == 1} {
+            file delete -force [DSx_plugin_dir]/${plugin}.off
+        }
+        if {[catch {file rename $fn $nfn} err] == 0} {
+            set ::DSx_plugin_message " $plugin   deactivated! \r\r When you tap the home button, you will be asked\r to exit and restart the app"
+            fill_DSx_active_plugin_listbox
+            fill_DSx_inactive_plugin_listbox
+        } else {
+            set ::DSx_plugin_message "Oops, try again"
+            fill_DSx_active_plugin_listbox
+            fill_DSx_intive_plugin_listbox
+        }
+    }
+}
+
+proc DSx_inactive_plugin_rename {} {
+    catch {
+        set ::restart 1
+        set iw $::globals(DSx_inactive_plugin_widget)
+        unset -nocomplain iplugin
+        set icnt [$iw curselection]
+        set iplugin [file rootname $::DSx_inactive_plugin_filenames($icnt)]
+        set ifn "[DSx_plugin_dir]/${iplugin}.off"
+        set infn "[DSx_plugin_dir]/${iplugin}.dsx"
+        if {[catch {file copy $ifn $infn} err] == 0} {
+            unset -nocomplain version
+
+            if {[catch {source  [file join "./skins/DSx/DSx_Plugins/" ${iplugin}.dsx]} err] == 0} {
+                page_show DSx_plugin_UI
+                if {[info exists version] != 1} {
+                    set version {1.0}
+                }
+                set ::DSx_plugin_message "$iplugin   activated! \r\r When you tap the home button, you will be asked\r to exit and restart the app"
+                fill_DSx_active_plugin_listbox
+                fill_DSx_inactive_plugin_listbox
+            } else {
+                file rename -force $infn $ifn
+                set ::DSx_plugin_message "That pluging has problems!"
+            }
+        } else {
+            set ::DSx_plugin_message "Oops, $iplugin is already active"
+            fill_DSx_inactive_plugin_listbox
+            fill_DSx_active_plugin_listbox
+        }
+    }
+}
+
+proc DSx_page_left2 {} {
+    set pages [lsort -dictionary $::DSx_page_name]
+    lappend pages {off}
+    set pages [lsearch -inline -all -not -exact $pages DSx_5_admin]
+    set pages [lsearch -inline -all -not -exact $pages DSx_7_backup]
+    set pages [lsearch -inline -all -not -exact $pages DSx_2_cal]
+    set pages [lsearch -inline -all -not -exact $pages DSx_3_coffee]
+    set pages [lsearch -inline -all -not -exact $pages DSx_6_theme]
+    set pages [lsearch -inline -all -not -exact $pages DSx_4_workflow]
+    set index [lsearch $pages $::DSx_settings(first_page_from_saver)]
+    set sl [DSx_list_rotate $pages]
+    set y [lindex $sl $index]
+    return $y
+}
+
+proc toggle_active_plugin_list {} {
+    if {[lsearch -exact $::DSx_page_name $::DSx_settings(first_page_from_saver)] == -1} {
+        set ::DSx_settings(first_page_from_saver) off
+    }
+    set ::DSx_settings(first_page_from_saver) [DSx_page_left2]
+}
+
+
 
 ##########
 

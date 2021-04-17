@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 4.53.1
+set ::DSx_settings(version) 4.54
 
 package provide DSx_skin 1.0
 
@@ -1508,7 +1508,7 @@ add_de1_widget "DSx_plugin_UI" listbox 800 330 {
 set ::DSx_inactive_plugin_slider 0
 set ::DSx_inactive_plugin_scrollbar [add_de1_widget "DSx_plugin_UI" scale 1404 330 {} -from 0 -to .50 -bigincrement 0.2 -background $::DSx_settings(font_colour) -borderwidth 1 -showvalue 0 -resolution .01 -length [rescale_x_skin 800] -width [rescale_y_skin 120] -variable plugin_right -font [DSx_font font 10] -sliderlength [rescale_x_skin 125] -relief flat -command {listbox_moveto $::globals(DSx_inactive_plugin_widget) $::DSx_inactive_plugin_slider}  -foreground #FFFFFF -troughcolor $::DSx_settings(bg_colour) -borderwidth 0  -highlightthickness 0]
 
-add_de1_variable "DSx_plugin_UI" 1160 260 -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -textvariable {Available plugins}
+add_de1_variable "DSx_plugin_UI" 1160 260 -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -textvariable {Plugins}
 add_de1_variable "DSx_plugin_UI" 1200 1320 -text "" -font Helv_8 -fill #ff574a -anchor center -justify center -textvariable {$::DSx_plugin_message}
 add_de1_variable "DSx_plugin_UI" 2000 300 -text "" -font Helv_8 -fill $::DSx_settings(font_colour) -anchor center -justify center -textvariable {You can select a page to show when you tap\rthe left 1/2 of screen saver without waking\rthe machine. Allowing you to use plugins\rwhile the machine is sleeping}
 add_de1_variable "DSx_plugin_UI" 2000 700 -text "" -font Helv_7 -fill $::DSx_settings(font_colour) -anchor center -justify center -textvariable {If you have activated/deactivated plugins on the left,\rthe list may not be current, please restart to update}
