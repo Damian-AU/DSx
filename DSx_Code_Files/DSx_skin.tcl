@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 4.54
+set ::DSx_settings(version) 4.54.1
 
 package provide DSx_skin 1.0
 

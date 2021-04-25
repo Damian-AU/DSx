@@ -1563,7 +1563,7 @@ proc DSx_bean_set_on {} {
 }
 
 proc DSx_set_on {} {
-    set ::DSx_saved_2 Saved
+    set ::DSx_saved_2 Loaded
 }
 proc DSx_set_off {} {
     set ::DSx_saved_2 {}
