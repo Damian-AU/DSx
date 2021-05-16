@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 4.54.1
+set ::DSx_settings(version) 4.55
 
 package provide DSx_skin 1.0
 
@@ -29,7 +29,8 @@ if {[file exists "[skin_directory]/DSx_Home_Page/DSx_home.page"] == 1} {
     set ::DSx_clock_font_var_2 [add_de1_variable "$::DSx_home_pages" 2450 130 -font [DSx_font "$::DSx_settings(clock_font)" 6.4] -fill #efbf63 -justify center -anchor "e" -textvariable {[DSx_date]}]
     set ::DSx_clock_font_var_3 [add_de1_variable "$::DSx_home_pages" 2420 92 -font [DSx_font "$::DSx_settings(clock_font)" 8] -fill $::DSx_settings(font_colour) -justify left -anchor "w" -textvariable { [DSx_clock_s]}]
     set ::DSx_clock_font_var_4 [add_de1_variable "$::DSx_home_pages" 2426 60 -font [DSx_font "$::DSx_settings(clock_font)" 6] -fill #efbf63 -justify left -anchor "w" -textvariable { [DSx_clock_ap]}]
-    set listbox_font "Helv_8"
+    set listbox_font [DSx_font font 8]
+    #set listbox_font "Helv_8"
     ### Right side
     # Data
     add_de1_variable "$::DSx_standby_pages steam preheat_2 water" 1840 325 -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -width [rescale_x_skin 720] -textvariable {$::DSx_settings(live_graph_profile)}
@@ -67,7 +68,7 @@ if {[file exists "[skin_directory]/DSx_Home_Page/DSx_home.page"] == 1} {
     set ::DSx_steam_name [add_de1_variable "$::DSx_home_pages" 320 924 -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {*}]
     set ::DSx_water_name [add_de1_variable "$::DSx_home_pages" 320 974 -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {*}]
     set ::DSx_wsaw_name [add_de1_variable "$::DSx_home_pages" 320 1024 -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {[wsaw_fav_indicator]}]
-    set ::DSx_jug_name [add_de1_variable "$::DSx_home_pages" 190 850 -justify center -anchor "n" -text "" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {$::DSx_settings(jug_size)}]
+    set ::DSx_jug_name [add_de1_variable "$::DSx_home_pages" 190 850 -justify center -anchor "n" -text "" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {[DSx_jug_label]}]
     add_de1_variable "$::DSx_home_pages" 350 720 -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Beans - [round_to_one_digits $::DSx_settings(bean_weight)]g}
     add_de1_variable "$::DSx_home_pages" 350 770 -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Shot - (1:[round_to_one_digits [expr (0.01 + $::DSx_settings(saw))/$::DSx_settings(bean_weight)]])  $::DSx_settings(saw)g}
     add_de1_variable "$::DSx_home_pages" 350 820 -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {[DSx_profile_type] [DSx_sav]}
@@ -936,7 +937,7 @@ add_de1_variable "DSx_4_workflow" 700 780 -justify center -anchor center -font [
 add_de1_button "DSx_4_workflow" {say "" $::settings(sound_button_in); horizontal_clicker_int 10 1 ::settings(steam_timeout) 0 250 %x %y %x0 %y0 %x1 %y1; check_steam_on;} 300 680 1100 880 ""
 # Jug
 add_de1_image "DSx_4_workflow" 1110 674 "[skin_directory_graphics]/icons/jug.png"
-add_de1_variable "DSx_4_workflow" 1200 750 -justify center -anchor "n" -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {$::DSx_settings(jug_size)}
+add_de1_variable "DSx_4_workflow" 1200 750 -justify center -anchor "n" -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {[DSx_jug_label]}
 add_de1_button "DSx_4_workflow" {say "" $::settings(sound_button_in); jug_toggle;} 1110 680 1320 880
 # flush
 add_de1_image "DSx_4_workflow" 100 904 "[skin_directory_graphics]/icons/flush.png"
@@ -1041,6 +1042,8 @@ add_de1_widget "DSx_6_theme" checkbutton 1920 1040 {set ::DSx_6_theme_checkbutto
 set ::DSx_6_theme_var_9_1 [add_de1_variable "DSx_6_theme" 1000 1540 -text "" -font [DSx_font font 9] -fill $::DSx_settings(orange) -justify center -anchor "center"  -textvariable {[translate "Note: options in Orange require an app restart"]}]
 
 ###### DSx cal ########################################################################################
+add_de1_widget "DSx_2_cal" checkbutton 920 500 {set ::DSx_6_theme_checkbutton_1 $widget} -text [translate "Select if you\rprefer to tare\rwith the empty\rjug before weighing\rwith milk"] -indicatoron true  -font "[DSx_font font 8]" -bg $::DSx_settings(bg_colour) -justify left -anchor nw -foreground $::DSx_settings(orange) -variable ::DSx_settings(pre_tare) -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground $::DSx_settings(orange) -relief flat -command save_DSx_settings;
+
 set ::cal_instructions "Tare the scale with your empty jug, add some milk and record its weight, steam to your desired temperature and record the time. \rSet the weight for your empty jug/s and you're set to go! "
 add_de1_variable "DSx_2_cal" 1920 840 -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor "center" -width [rescale_x_skin 1100] -textvariable {$::cal_instructions}
 add_de1_variable "DSx_2_cal" 1280 60 -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -textvariable {Steam by Weight Setup Page}
@@ -1200,12 +1203,12 @@ add_de1_widget "DSx_5_admin settings_4" listbox 55 1150 {
     set ::ble_listbox_widget $widget
     bind $::ble_listbox_widget <<ListboxSelect>> ::change_bluetooth_device
     fill_ble_listbox
-} -background #fbfaff -font Helv_9 -bd 0 -height 3 -width 15 -foreground #d3dbf3 -borderwidth 0 -selectborderwidth 0  -relief flat -highlightthickness 0 -selectmode single -selectbackground #c0c4e1 -yscrollcommand {scale_scroll_new $::ble_listbox_widget ::ble_slider}
+} -background #fbfaff -font [DSx_font font 9] -bd 0 -height 3 -width 15 -foreground #d3dbf3 -borderwidth 0 -selectborderwidth 0  -relief flat -highlightthickness 0 -selectmode single -selectbackground #c0c4e1 -yscrollcommand {scale_scroll_new $::ble_listbox_widget ::ble_slider}
 add_de1_widget "DSx_5_admin settings_4" listbox 670 1150 {
     set ::ble_scale_listbox_widget $widget
     bind $widget <<ListboxSelect>> ::change_scale_bluetooth_device
     fill_ble_scale_listbox
-} -background #fbfaff -font Helv_9 -bd 0 -height 3 -width 15  -foreground #d3dbf3 -borderwidth 0 -selectborderwidth 0  -relief flat -highlightthickness 0 -selectmode single -selectbackground #c0c4e1 -yscrollcommand {scale_scroll_new $::ble_scale_listbox_widget ::ble_scale_slider}
+} -background #fbfaff -font [DSx_font font 9] -bd 0 -height 3 -width 15  -foreground #d3dbf3 -borderwidth 0 -selectborderwidth 0  -relief flat -highlightthickness 0 -selectmode single -selectbackground #c0c4e1 -yscrollcommand {scale_scroll_new $::ble_scale_listbox_widget ::ble_scale_slider}
 
 ###### Sub Pages ######
 # "done" button for all these sub-pages.
@@ -1347,7 +1350,7 @@ add_de1_button "DSx_3_coffee" {say "" $::settings(sound_button_in); horizontal_c
 add_de1_button "DSx_3_coffee" {say "" $::settings(sound_button_in); horizontal_clicker_fast_tap 1 0.1 ::DSx_settings(extracting_weight) 0 50 %x %y %x0 %y0 %x1 %y1; DSx_update_saw; clear_saw_font;} 880 830 1350 1030 ""
 add_de1_variable "DSx_3_coffee" 1950 220 -text "" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center" -width [rescale_x_skin 510] -textvariable {$::settings(profile_title)}
 add_de1_button "DSx_3_coffee" {say [translate {}] $::settings(sound_button_in); set ::DSx_coffee_to_settings_1 1; show_settings; after 500 update_de1_explanation_chart; say [translate {settings}] $::settings(sound_button_in); set_next_page off settings_1; page_show off; set ::settings(active_settings_tab) settings_1; set_profiles_scrollbar_dimensions} 1710 140 2210 300
-add_de1_variable "DSx_3_coffee" 1880 650 -text "" -font Helv_8 -fill #ccc -anchor "nw" -justify left -textvariable {$::DSx_steps_output}
+add_de1_variable "DSx_3_coffee" 1880 650 -text "" -font [DSx_font font 8] -fill #ccc -anchor "nw" -justify left -textvariable {$::DSx_steps_output}
 add_de1_variable "DSx_3_coffee" 2120 380 -justify center -anchor center -font [DSx_font font 9] -fill $::DSx_settings(font_colour) -textvariable {Temperature shift}
 add_de1_image "DSx_3_coffee" 1880 410 "[skin_directory_graphics]/icons/click1.png"
 add_de1_variable "DSx_3_coffee" 2130 510 -justify center -anchor center -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {$::Dsx_temperature_shift_amount[DSx_temp_steps]}
@@ -1362,7 +1365,7 @@ add_de1_button "DSx_3_coffee" {say "" $::settings(sound_button_in); load_DSx_cof
 add_de1_image "DSx_3_coffee" 1030 1210 "[skin_directory_graphics]/icons/button4.png"
 add_de1_variable "DSx_3_coffee" 1135 1280 -justify center -anchor center -font [DSx_font font 9] -fill $::DSx_settings(font_colour) -textvariable {Mocha}
 add_de1_button "DSx_3_coffee" {say "" $::settings(sound_button_in); load_DSx_coffee_mocha; DSx_update_saw; clear_saw_font;} 1030 1210 1250 1350 ""
-add_de1_variable "settings_2c" 1280 730 -text [translate ""] -font Helv_16_bold -fill $::DSx_settings(red) -justify "center" -anchor "n" -textvariable {[donotedit]}
+add_de1_variable "settings_2c" 1280 730 -text [translate ""] -font [DSx_font font 16] -fill $::DSx_settings(red) -justify "center" -anchor "n" -textvariable {[donotedit]}
 
 rename ::save_profile ::skin::dsx::save_profile_orig
 msg -INFO "DSx: rename ::save_profile ::skin::dsx::save_profile_orig"
@@ -1448,13 +1451,13 @@ add_de1_widget "settings_1" graph 1330 300 {
     $::DSx_preview_graph_advanced element create DSx_preview_line_espresso_flow_2x  -xdata DSx_espresso_elapsed_preview -ydata DSx_espresso_flow_preview_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $::DSx_preview_graph_advanced element create DSx_preview_line_espresso_flow_weight_2x  -xdata DSx_espresso_elapsed_preview -ydata DSx_espresso_flow_weight_preview_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $::DSx_preview_graph_advanced element create DSx_preview_line2_espresso_pressure -xdata DSx_espresso_elapsed_preview -ydata DSx_espresso_pressure_preview -symbol none -label "" -linewidth [rescale_x_skin 8] -color #008c4c  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
-    $::DSx_preview_graph_advanced axis configure x -color #5a5d75 -tickfont Helv_6 ;
-    $::DSx_preview_graph_advanced axis configure y -color #5a5d75 -tickfont Helv_6 -min 0.0 -max 14 -stepsize 2 -majorticks {0 2 4 6 8 10 12 14} -title [translate "pressure"] -titlefont Helv_8 -titlecolor #5a5d75;
-    $::DSx_preview_graph_advanced axis configure y2 -color #5a5d75 -tickfont Helv_6 -min 0.0 -max 7 -stepsize 2 -majorticks {0 1 2 3 4 5 6 7} -title [translate "flow"] -titlefont Helv_8 -titlecolor #5a5d75  -hide 0;
+    $::DSx_preview_graph_advanced axis configure x -color #5a5d75 -tickfont [DSx_font font 6] ;
+    $::DSx_preview_graph_advanced axis configure y -color #5a5d75 -tickfont [DSx_font font 6] -min 0.0 -max 14 -stepsize 2 -majorticks {0 2 4 6 8 10 12 14} -title [translate "pressure"] -titlefont [DSx_font font 8] -titlecolor #5a5d75;
+    $::DSx_preview_graph_advanced axis configure y2 -color #5a5d75 -tickfont [DSx_font font 6] -min 0.0 -max 7 -stepsize 2 -majorticks {0 1 2 3 4 5 6 7} -title [translate "flow"] -titlefont [DSx_font font 8] -titlecolor #5a5d75  -hide 0;
     bind $::DSx_preview_graph_advanced [platform_button_press] { after 500 update_de1_explanation_chart; say [translate {settings}] $::settings(sound_button_in); set_next_page off $::settings(settings_profile_type); page_show off; set ::settings(active_settings_tab) $::settings(settings_profile_type); fill_advanced_profile_steps_listbox }
 } -plotbackground #F8F8F8 -width [rescale_x_skin 1050] -height [rescale_y_skin 450] -borderwidth 1 -background #FFFFFF -plotrelief raised
 
-add_de1_variable "settings_1" 1560 230 -text [translate "Load a preset"] -font Helv_10_bold -fill "#7f879a" -justify "left" -anchor "nw" -textvariable {[LRv2_preview_text]}
+add_de1_variable "settings_1" 1560 230 -text [translate "Load a preset"] -font [DSx_font font 10] -fill "#7f879a" -justify "left" -anchor "nw" -textvariable {[LRv2_preview_text]}
 
 ###########################################################################################################################################
 
@@ -1509,11 +1512,11 @@ set ::DSx_inactive_plugin_slider 0
 set ::DSx_inactive_plugin_scrollbar [add_de1_widget "DSx_plugin_UI" scale 1404 330 {} -from 0 -to .50 -bigincrement 0.2 -background $::DSx_settings(font_colour) -borderwidth 1 -showvalue 0 -resolution .01 -length [rescale_x_skin 800] -width [rescale_y_skin 120] -variable plugin_right -font [DSx_font font 10] -sliderlength [rescale_x_skin 125] -relief flat -command {listbox_moveto $::globals(DSx_inactive_plugin_widget) $::DSx_inactive_plugin_slider}  -foreground #FFFFFF -troughcolor $::DSx_settings(bg_colour) -borderwidth 0  -highlightthickness 0]
 
 add_de1_variable "DSx_plugin_UI" 1160 260 -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -textvariable {Plugins}
-add_de1_variable "DSx_plugin_UI" 1200 1320 -text "" -font Helv_8 -fill #ff574a -anchor center -justify center -textvariable {$::DSx_plugin_message}
-add_de1_variable "DSx_plugin_UI" 2000 300 -text "" -font Helv_8 -fill $::DSx_settings(font_colour) -anchor center -justify center -textvariable {You can select a page to show when you tap\rthe left 1/2 of screen saver without waking\rthe machine. Allowing you to use plugins\rwhile the machine is sleeping}
-add_de1_variable "DSx_plugin_UI" 2000 700 -text "" -font Helv_7 -fill $::DSx_settings(font_colour) -anchor center -justify center -textvariable {If you have activated/deactivated plugins on the left,\rthe list may not be current, please restart to update}
+add_de1_variable "DSx_plugin_UI" 1200 1320 -text "" -font [DSx_font font 8] -fill #ff574a -anchor center -justify center -textvariable {$::DSx_plugin_message}
+add_de1_variable "DSx_plugin_UI" 2000 300 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor center -justify center -textvariable {You can select a page to show when you tap\rthe left 1/2 of screen saver without waking\rthe machine. Allowing you to use plugins\rwhile the machine is sleeping}
+add_de1_variable "DSx_plugin_UI" 2000 700 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor center -justify center -textvariable {If you have activated/deactivated plugins on the left,\rthe list may not be current, please restart to update}
 add_de1_image "DSx_plugin_UI" 1810 430 "[skin_directory_graphics]/icons/button8.png"
-add_de1_variable "DSx_plugin_UI" 2000 530 -text "" -font Helv_8 -fill $::DSx_settings(orange) -anchor center -justify center -textvariable {$::DSx_settings(first_page_from_saver)}
+add_de1_variable "DSx_plugin_UI" 2000 530 -text "" -font [DSx_font font 8] -fill $::DSx_settings(orange) -anchor center -justify center -textvariable {$::DSx_settings(first_page_from_saver)}
 add_de1_button "DSx_plugin_UI" {toggle_active_plugin_list} 1800 430 2200 630
 fill_DSx_active_plugin_listbox
 

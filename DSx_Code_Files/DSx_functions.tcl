@@ -52,19 +52,30 @@ proc DSx_startup {} {
 }
 
 proc DSx_final_prep {} {
+    preload_history_page
     set space { }
     set ::settings(skin_version) $::DSx_home_page_version[package version DSx]$space$space[DSx_active_plugins]
     delete_old_variables
     startup_fav_check
     saw_switch
-    fill_DSx_past_shots_listbox
     DSx_graph_restore
     focus .can
     bind Canvas <KeyPress> {handle_keypress %k}
     plugins_run_after_startup
     refresh_DSx_temperature
+    DSx_reset_graphs
+
 }
 
+proc preload_history_page {} {
+    after 1 {
+        borg spinner on
+        page_show DSx_past
+        after 100 page_show off
+        borg spinner off
+        borg systemui $::android_full_screen_flags
+    }
+}
 proc check_DSx_User_Set_exists {} {
     if {[info exists [skin_directory]/DSx_User_Set] != 1} {
         set path [skin_directory]/DSx_User_Set
@@ -965,48 +976,50 @@ proc DSx_set_dose {} {
 }
 
 proc jug_toggle {} {
-    if {$::DSx_settings(jug_size) == "S"} {
-        if {$::DSx_settings(jug_m) > 0} {
-            set ::DSx_settings(jug_size) M
-            set ::DSx_settings(jug_g) $::DSx_settings(jug_m)
-            clear_jug_font
-            off_cup
-        } elseif {$::DSx_settings(jug_l) > 0} {
-            set ::DSx_settings(jug_size) L
-            set ::DSx_settings(jug_g) $::DSx_settings(jug_l)
-            clear_jug_font
-            off_cup
+    if {$::DSx_settings(pre_tare) != 1} {
+        if {$::DSx_settings(jug_size) == "S"} {
+            if {$::DSx_settings(jug_m) > 0} {
+                set ::DSx_settings(jug_size) M
+                set ::DSx_settings(jug_g) $::DSx_settings(jug_m)
+                clear_jug_font
+                off_cup
+            } elseif {$::DSx_settings(jug_l) > 0} {
+                set ::DSx_settings(jug_size) L
+                set ::DSx_settings(jug_g) $::DSx_settings(jug_l)
+                clear_jug_font
+                off_cup
+            }
+        } elseif {$::DSx_settings(jug_size) == "M"} {
+            if {$::DSx_settings(jug_l) > 0} {
+                set ::DSx_settings(jug_size) L
+                set ::DSx_settings(jug_g) $::DSx_settings(jug_l)
+                clear_jug_font
+                off_cup
+            } elseif {$::DSx_settings(jug_s) > 0} {
+                set ::DSx_settings(jug_size) S
+                set ::DSx_settings(jug_g) $::DSx_settings(jug_s)
+                clear_jug_font
+                off_cup
+            }
+        } elseif {$::DSx_settings(jug_size) == "L"} {
+            if {$::DSx_settings(jug_s) > 0} {
+                set ::DSx_settings(jug_size) S
+                set ::DSx_settings(jug_g) $::DSx_settings(jug_s)
+                clear_jug_font
+                off_cup
+            } elseif {$::DSx_settings(jug_m) > 0} {
+                set ::DSx_settings(jug_size) M
+                set ::DSx_settings(jug_g) $::DSx_settings(jug_m)
+                clear_jug_font
+                off_cup
+            }
+        } else {
+            load_test
+            page_show DSx_2_cal
         }
-    } elseif {$::DSx_settings(jug_size) == "M"} {
-        if {$::DSx_settings(jug_l) > 0} {
-            set ::DSx_settings(jug_size) L
-            set ::DSx_settings(jug_g) $::DSx_settings(jug_l)
-            clear_jug_font
-            off_cup
-        } elseif {$::DSx_settings(jug_s) > 0} {
-            set ::DSx_settings(jug_size) S
-            set ::DSx_settings(jug_g) $::DSx_settings(jug_s)
-            clear_jug_font
-            off_cup
-        }
-    } elseif {$::DSx_settings(jug_size) == "L"} {
-        if {$::DSx_settings(jug_s) > 0} {
-            set ::DSx_settings(jug_size) S
-            set ::DSx_settings(jug_g) $::DSx_settings(jug_s)
-            clear_jug_font
-            off_cup
-        } elseif {$::DSx_settings(jug_m) > 0} {
-            set ::DSx_settings(jug_size) M
-            set ::DSx_settings(jug_g) $::DSx_settings(jug_m)
-            clear_jug_font
-            off_cup
-        }
-    } else {
-        load_test
-        page_show DSx_2_cal
+        set ::settings(DSx_jug_size) $::DSx_settings(jug_size)
+        save_DSx_settings
     }
-    set ::settings(DSx_jug_size) $::DSx_settings(jug_size)
-    save_DSx_settings
 }
 
 proc set_jug {} {
@@ -1040,21 +1053,27 @@ proc set_jug {} {
 }
 
 proc jug_s_cal_text {} {
-    if {$::DSx_settings(jug_s) > 0} {
+    if {$::DSx_settings(pre_tare) == 1} {
+        return "off"
+    } elseif {$::DSx_settings(jug_s) > 0} {
         return "[round_to_integer $::DSx_settings(jug_s)]g"
     } else {
         return "off"
     }
 }
 proc jug_m_cal_text {} {
-    if {$::DSx_settings(jug_m) > 0} {
+    if {$::DSx_settings(pre_tare) == 1} {
+        return "off"
+    } elseif {$::DSx_settings(jug_m) > 0} {
         return "[round_to_integer $::DSx_settings(jug_m)]g"
     } else {
         return "off"
     }
 }
 proc jug_l_cal_text {} {
-    if {$::DSx_settings(jug_l) > 0} {
+    if {$::DSx_settings(pre_tare) == 1} {
+        return "off"
+    } elseif {$::DSx_settings(jug_l) > 0} {
         return "[round_to_integer $::DSx_settings(jug_l)]g"
     } else {
         return "off"
@@ -1069,13 +1088,30 @@ proc bean_offset_text {} {
 }
 
 proc steam_time_calc {} {
-    if {$::DSx_settings(jug_g) == { } || $::DSx_settings(jug_g) < 2 || $::DSx_settings(milk_g) < 2 || $::DSx_settings(milk_g) == { } || $::DSx_settings(milk_s) < 2 || $::DSx_settings(milk_s) == { }} {
-        load_test
-        page_show DSx_2_cal
+    if {$::DSx_settings(pre_tare) != 1} {
+        if {$::DSx_settings(jug_g) == { } || $::DSx_settings(jug_g) < 2 || $::DSx_settings(milk_g) < 2 || $::DSx_settings(milk_g) == { } || $::DSx_settings(milk_s) < 2 || $::DSx_settings(milk_s) == { }} {
+            load_test
+            page_show DSx_2_cal
+        } else {
+            set t [expr {$::DSx_settings(milk_s)*1000}]
+            set m $::DSx_settings(milk_g)
+            set j $::DSx_settings(jug_g)
+            set s $::de1(scale_sensor_weight)
+            set a [expr {($t/$m*($s-$j))/1000}]
+            set ::DSx_settings(steam_calc) [round_to_integer $a]
+            if {[expr ($::DSx_settings(steam_calc) > 0)]} {
+                if {$::settings(steam_temperature) < 130} {
+                    set ::settings(steam_temperature) $::DSx_settings(steam_temperature_backup)
+                }
+                set ::settings(steam_timeout) $::DSx_settings(steam_calc)
+                save_settings
+                de1_send_steam_hotwater_settings
+            }
+        }
     } else {
-        set t [expr {$::DSx_settings(milk_s)*1000}]
+    set t [expr {$::DSx_settings(milk_s)*1000}]
         set m $::DSx_settings(milk_g)
-        set j $::DSx_settings(jug_g)
+        set j 0
         set s $::de1(scale_sensor_weight)
         set a [expr {($t/$m*($s-$j))/1000}]
         set ::DSx_settings(steam_calc) [round_to_integer $a]
@@ -1089,6 +1125,15 @@ proc steam_time_calc {} {
         }
     }
 }
+
+proc DSx_jug_label {} {
+    if {$::DSx_settings(pre_tare) == 1} {
+        return ""
+    } else {
+        return $::DSx_settings(jug_size)
+    }
+}
+
 proc set_jug_s {} {
     set ::DSx_settings(jug_s) [round_to_one_digits $::de1(scale_sensor_weight)]
     if {$::DSx_settings(jug_s) > 20} {
@@ -1137,7 +1182,7 @@ proc clear_bean_offset {} {
 }
 
 proc round_to_milk {in} {
-	if {[expr ($::de1(scale_sensor_weight) > $::DSx_settings(jug_g))] && $::DSx_settings(jug_g) > 20} {
+	if {[expr ($::de1(scale_sensor_weight) > $::DSx_settings(jug_g))] && $::DSx_settings(jug_g) > 20 && $::DSx_settings(pre_tare) != 1} {
         set g g
         set x 0
         catch {
