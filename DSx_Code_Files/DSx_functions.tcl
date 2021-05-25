@@ -1601,7 +1601,7 @@ proc dial_config_start {} {
 }
 proc DSx_bean_set_on {} {
     if {$::DSx_settings(bean_weight) >= 0 && $::DSx_settings(bean_weight) < 34} {
-        set ::DSx_saved_2 Saved
+        set ::DSx_saved_2 Loaded
     } else {
         set ::DSx_saved_2 {WARNING - please check your settings!}
     }
@@ -3382,7 +3382,7 @@ proc save_steam_history {unused_old_state unused_new_state} {
         msg "Save this steam to history"
     }
 }
-
+### DAMIAN
 if { $::skin::dsx::use_event_system } {
 	::de1::event::listener::on_major_state_change_add [lambda {event_dict} {
 		set ps [dict get $event_dict previous_state]
