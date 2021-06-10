@@ -46,13 +46,13 @@ proc DSx_startup {} {
     check_MySaver_exists
     join_DSx_plugins
     no_machine_prep
-    history_vars
+    #history_vars
     save_DSx_settings
     save_settings
 }
 
 proc DSx_final_prep {} {
-    preload_history_page
+    #preload_history_page
     set space { }
     set ::settings(skin_version) $::DSx_home_page_version[package version DSx]$space$space[DSx_active_plugins]
     delete_old_variables
@@ -64,7 +64,6 @@ proc DSx_final_prep {} {
     plugins_run_after_startup
     refresh_DSx_temperature
     DSx_reset_graphs
-
 }
 
 proc preload_history_page {} {
@@ -76,6 +75,7 @@ proc preload_history_page {} {
         borg systemui $::android_full_screen_flags
     }
 }
+
 proc check_DSx_User_Set_exists {} {
     if {[info exists [skin_directory]/DSx_User_Set] != 1} {
         set path [skin_directory]/DSx_User_Set
@@ -179,16 +179,6 @@ proc add_DSx_button {pages code x1 y1 x2 y2 {options {}}} {
 
 proc DSx_plugin_page_name {page_name} {
     lappend ::DSx_page_name $page_name
-    set ::plug($page_name) [add_de1_image $page_name 0 0 ]
-    set fn "[skin_directory_graphics]/background/$::DSx_settings(bg_name)"
-	$::plug($page_name) read $fn
-}
-
-proc DSx_plug_bg {} {
-    set fn "[skin_directory_graphics]/background/$::DSx_settings(bg_name)"
-	foreach k $::DSx_page_name {
-	    $::plug($k) read $fn
-	}
 }
 
 proc delete_old_variables {} {
@@ -360,7 +350,6 @@ proc DSx_pages {} {
     set ::DSx_active_pages {espresso steam preheat_2 water}
     set ::DSx_zoomed_pages {off_zoomed steam_1_zoomed flush_1_zoomed water_1_zoomed espresso_zoomed}
     set ::DSx_steam_zoomed_pages {off_steam_zoomed steam_1_steam_zoomed flush_1_steam_zoomed water_1_steam_zoomed steam_steam_zoomed}
-    #set ::DSx_other_pages {DSx_6_theme DSx_2_cal DSx_7_backup DSx_4_workflow DSx_5_admin DSx_3_coffee}
     set ::DSx_other_pages2 {3}
     set ::DSx_blank_pages {DSx_demo_graph message DSx_past DSx_h2g DSx_past_zoomed DSx_past2_zoomed DSx_past3_zoomed}
     set ::DSx_home_pages "$::DSx_standby_pages $::DSx_active_pages"
@@ -368,14 +357,11 @@ proc DSx_pages {} {
     add_de1_page "DSx_power" "poweroff.png"
     add_de1_page "DSx_travel_prepare" "travel_prepare.jpg" "default"
     add_de1_page "DSx_descale_prepare" "descale_prepare.jpg" "default"
-    set ::theme_bg [add_de1_image $::DSx_all_pages 0 0 ]
 }
 set_next_page "hotwaterrinse" "preheat_2"
 
 proc load_theme {} {
 	borg spinner on
-    set fn "[skin_directory_graphics]/background/$::DSx_settings(bg_name)"
-	$::theme_bg read $fn
 	if {$::DSx_settings(bg_name) == "bg1.jpg"} {
         set ::DSx_settings(bg_colour) #000000
     } elseif {$::DSx_settings(bg_name) == "bg2.jpg"} {
@@ -387,11 +373,16 @@ proc load_theme {} {
     } else {
         set ::DSx_settings(bg_colour) #3d3c36
     }
+    .can configure -bg $::DSx_settings(bg_colour)
 	borg spinner off
 	borg systemui $::android_full_screen_flags
 }
 
+proc DSx_home_page_theme_update {} {
+}
+
 proc set_colour {} {
+    DSx_home_page_theme_update
     $::DSx_heading_entry configure -bg $::DSx_settings(bg_colour) -font "[DSx_font font 30]"
     $::DSx_home_espresso_graph_1 configure -plotbackground $::DSx_settings(bg_colour) -background $::DSx_settings(bg_colour)
 	$::DSx_home_espresso_graph_2 configure -plotbackground $::DSx_settings(bg_colour) -background $::DSx_settings(bg_colour)
@@ -414,9 +405,14 @@ proc set_colour {} {
     $::DSx_6_theme_dial_radiobutton3 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
     $::DSx_6_theme_icons_radiobutton1 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
     $::DSx_6_theme_icons_radiobutton2 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
+    $::DSx_5_admin_version_radiobutton1 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
+    $::DSx_5_admin_version_radiobutton2 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
+    $::DSx_5_admin_version_radiobutton3 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
     $::DSx_6_theme_checkbutton_1 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
+    $::DSx_6_theme_checkbutton_2 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font "$::DSx_settings(clock_font)" 8]"
     $::DSx_6_theme_checkbutton_3 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
-    $::DSx_6_theme_checkbutton_4 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font "$::DSx_settings(clock_font)" 8]"
+    $::DSx_2_cal_checkbutton_1 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
+    $::DSx_5_admin_checkbutton_1 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
     .can itemconfigure $::DSx_clock_font_var_1 -font "[DSx_font "$::DSx_settings(clock_font)" 14.5]"
     .can itemconfigure $::DSx_clock_font_var_2 -font "[DSx_font "$::DSx_settings(clock_font)" 6.4]"
     .can itemconfigure $::DSx_clock_font_var_3 -font "[DSx_font "$::DSx_settings(clock_font)" 8]"
@@ -443,12 +439,17 @@ proc set_colour {} {
     $::DSx_history_left_zoomed_graph configure -plotbackground $::DSx_settings(bg_colour) -background $::DSx_settings(bg_colour)
     $::DSx_history_right_zoomed_graph configure -plotbackground $::DSx_settings(bg_colour) -background $::DSx_settings(bg_colour)
     $::DSx_history_icon_zoomed_graph configure -plotbackground $::DSx_settings(bg_colour) -background $::DSx_settings(bg_colour)
+
+    $::globals(DSx_active_plugin_widget) configure -background $::DSx_settings(bg_colour) -foreground $::DSx_settings(font_colour) -selectbackground $::DSx_settings(font_colour)
+    $::globals(DSx_inactive_plugin_widget) configure -background $::DSx_settings(bg_colour) -foreground $::DSx_settings(font_colour) -selectbackground $::DSx_settings(font_colour)
+    $::DSx_active_plugin_scrollbar configure -troughcolor $::DSx_settings(bg_colour) -background $::DSx_settings(font_colour)
+    $::DSx_inactive_plugin_scrollbar configure -troughcolor $::DSx_settings(bg_colour) -background $::DSx_settings(font_colour)
+
 }
 
 proc theme_change {} {
     load_theme
     set_colour
-    DSx_plug_bg
     dial_config_start
 }
 
@@ -1501,23 +1502,7 @@ proc saw_switch {} {
 }
 ############################
 
-proc icon_bg_changer {} {
-    if {$::DSx_settings(bg_name) == "bg1.jpg"} {
-    set ::icon_bg bg1.png
-    } elseif {$::DSx_settings(bg_name) == "bg2.jpg"} {
-    set ::icon_bg bg2.png
-    } elseif {$::DSx_settings(bg_name) == "bg3.jpg"} {
-    set ::icon_bg bg3.png
-    } elseif {$::DSx_settings(bg_name) == "bg4.jpg"} {
-    set ::icon_bg bg4.png
-    } else {
-    set ::icon_bg bg5.png
-    }
-}
-
 proc dial_config {} {
-    icon_bg_changer
-    $::dial read "[skin_directory_graphics]/dial/$::icon_bg"
     if {$::DSx_settings(bezel) == 2 && $::DSx_settings(icons) == 1 && $::DSx_settings(dial) == 1} {
         $::dial read "[skin_directory_graphics]/dial/cdsvdsv.png"
     } elseif {$::DSx_settings(bezel) == 3 && $::DSx_settings(icons) == 1 && $::DSx_settings(dial) == 1} {
@@ -1559,8 +1544,6 @@ proc dial_config {} {
 }
 
 proc dial_config_start {} {
-    icon_bg_changer
-    $::dial read "[skin_directory_graphics]/dial/$::icon_bg"
     if {$::DSx_settings(bezel) == 2 && $::DSx_settings(icons) == 1 && $::DSx_settings(dial) == 1} {
         $::dial read "[skin_directory_graphics]/dial/cdsvdsv.png"
     } elseif {$::DSx_settings(bezel) == 3 && $::DSx_settings(icons) == 1 && $::DSx_settings(dial) == 1} {
