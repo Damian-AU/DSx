@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 4.60
+set ::DSx_settings(version) 4.61
 
 package provide DSx_skin 1.0
 
@@ -232,6 +232,22 @@ if {[file exists "[skin_directory]/DSx_Home_Page/DSx_home.page"] == 1} {
         add_de1_button "off" {say [translate {steam}] $::settings(sound_button_in); DSx_steam} 1440 540 1730 860
         add_de1_button "off" {say [translate {Hot water}] $::settings(sound_button_in); DSx_water;} 830 540 1120 860
     }
+
+    ## move on buttons
+    if {$::DSx_settings(dial) == 3} {
+        add_de1_variable "espresso" 1200 980 -justify center -anchor e -font [DSx_font font 8] -fill $::DSx_settings(green) -textvariable {tap to >>>}
+        add_de1_variable "espresso" 1360 980 -justify center -anchor w -font [DSx_font font 8] -fill $::DSx_settings(green) -textvariable {<<< move on}
+        add_de1_button "espresso" {DSx_next_step} 1000 880 1560 1140
+    } else {
+        add_de1_variable "espresso" 1200 410 -justify center -anchor e -font [DSx_font font 8] -fill $::DSx_settings(green) -textvariable {tap to >>>}
+        add_de1_variable "espresso" 1360 410 -justify center -anchor w -font [DSx_font font 8] -fill $::DSx_settings(green) -textvariable {<<< move on}
+        add_de1_button "espresso" {DSx_next_step} 1000 270 1560 530
+    }
+    dui add dbutton "espresso_zoomed" 1900 1280 \
+    -bwidth 300 -bheight 300 -tags graph_shift_button \
+    -labelvariable {\uf051} -label_font [DSx_font {Font Awesome 5 Pro-Regular-400} 10] -label_fill $::DSx_settings(green) -label_pos {0.5 0.5} \
+    -command {DSx_next_step}
+
     ## scale
     if {$::DSx_settings(no_scale) == 1} {
         add_de1_image "$::DSx_home_pages" 880 1200 "[skin_directory_graphics]/big_scale1.png"
