@@ -1,0 +1,1217 @@
+### Home page for DSx by Damian ###
+set ::DSx_home_page_version {2021 v3.5}
+
+set listbox_font [DSx_font font 8]
+set ::DSx_settings(next_shot_DSx_home_coords) {500 974}
+set ::DSx_settings(last_shot_DSx_home_coords) {2060 974}
+### Heading
+set ::DSx_heading [add_de1_variable "$::DSx_home_pages" 1280 100 -font [DSx_font font 30] -fill $::DSx_settings(heading_colour) -anchor "center" -textvariable {$::DSx_settings(heading)}]
+
+#Clock
+set ::DSx_clock_font_var_1 [add_de1_variable "$::DSx_home_pages" 2420 80 -font [DSx_font "$::DSx_settings(clock_font)" 14.5] -fill $::DSx_settings(font_colour) -justify right -anchor "e" -textvariable {[DSx_clock]}]
+set ::DSx_clock_font_var_2 [add_de1_variable "$::DSx_home_pages" 2450 130 -font [DSx_font "$::DSx_settings(clock_font)" 6.4] -fill #efbf63 -justify center -anchor "e" -textvariable {[DSx_date]}]
+set ::DSx_clock_font_var_3 [add_de1_variable "$::DSx_home_pages" 2420 92 -font [DSx_font "$::DSx_settings(clock_font)" 8] -fill $::DSx_settings(font_colour) -justify left -anchor "w" -textvariable { [DSx_clock_s]}]
+set ::DSx_clock_font_var_4 [add_de1_variable "$::DSx_home_pages" 2426 60 -font [DSx_font "$::DSx_settings(clock_font)" 6] -fill #efbf63 -justify left -anchor "w" -textvariable { [DSx_clock_ap]}]
+add_de1_variable "$::DSx_home_pages" 2466 126 -font [DSx_font {Font Awesome 5 Pro-Regular-400} 10] -fill $::DSx_settings(font_colour) -justify center -anchor "w" -textvariable {\uf011}
+add_de1_button "$::DSx_standby_pages" {say [translate {sleep}] $::settings(sound_button_in); set ::current_espresso_page "off"; off_timer; set ::DSx_heating_flag 1} 2160 0 2560 280
+
+# Graph Data
+add_de1_variable "$::DSx_standby_pages preheat_2 water" 1700 270 -justify "center" -anchor "center" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {$::DSx_settings(live_graph_profile)   [last_shot_date]}
+add_de1_variable "steam" 1700 270 -justify "center" -anchor "center" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {[pressure_text]                                       [waterflow_text]}
+add_de1_variable "$::DSx_standby_pages" 2300 902 -justify "right" -anchor "e" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -textvariable {[DSx_live_graph_data_timer]s   [DSx_live_graph_data_water]mL   Ratio [round_to_one_digits $::DSx_settings(live_graph_beans)]g : $::DSx_settings(live_graph_weight)g ([last_extraction_ratio])}
+add_de1_variable "espresso" 2300 902 -justify right -anchor "e" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -textvariable {[DSx_espresso_elapsed_timer]s   [DSx_water_data]mL   Ratio [round_to_one_digits $::settings(grinder_dose_weight)]g : [round_to_one_digits $::de1(scale_sensor_weight)]g ([live_extraction_ratio])}
+add_de1_variable "espresso" 1120 270 -justify right -anchor "w" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {[pressure_text]}
+add_de1_variable "espresso" 1800 270 -justify center -anchor "center" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {[waterflow_text]}
+add_de1_variable "espresso" 2260 270 -justify left -anchor "e" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {[waterweight_text]}
+
+# machine data
+add_de1_variable "$::DSx_home_pages" 40 40 -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Group [group_head_heater_temperature_text]}
+add_de1_variable "$::DSx_home_pages" 40 80 -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Steam [steamtemp_text]}
+add_de1_variable "$::DSx_home_pages" 40 120 -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Tank [DSx_low_water]}
+add_de1_variable "$::DSx_home_pages" 160 160 -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(red) -textvariable {[DSx_preheat_status]}
+add_de1_button "$::DSx_standby_pages" { say [translate {settings}] $::settings(sound_button_in); set ::current_espresso_page "off"; show_settings;} 30 30 400 280
+
+# setup data
+set ::DSx_data_x 0
+set ::DSx_data_y -260
+set ::DSx_profile_name [add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 480}] [expr {$::DSx_data_y + 640}] -text "" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center" -width [rescale_x_skin 600] -textvariable {$::settings(profile_title)}]
+set ::DSx_bean_name [add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 320}] [expr {$::DSx_data_y + 724}] -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {*}]
+set ::DSx_saw_name [add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 320}] [expr {$::DSx_data_y + 774}] -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {*}]
+set ::DSx_sav_name [add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 320}] [expr {$::DSx_data_y + 824}] -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {*}]
+set ::DSx_flush_name [add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 320}] [expr {$::DSx_data_y + 874}] -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {*}]
+set ::DSx_steam_name [add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 320}] [expr {$::DSx_data_y + 924}] -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {*}]
+set ::DSx_water_name [dui add variable "$::DSx_home_pages" [expr {$::DSx_data_x + 320}] [expr {$::DSx_data_y + 974}] -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -tags DSx_water_fav_indicator -textvariable {*}]
+set ::DSx_wsaw_name [dui add variable "$::DSx_home_pages" [expr {$::DSx_data_x + 320}] [expr {$::DSx_data_y + 1024}] -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -tags DSx_wsaw_fav_indicator -textvariable {[wsaw_fav_indicator]}]
+set ::DSx_jug_name [add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 190}] [expr {$::DSx_data_y + 850}] -justify center -anchor "n" -text "" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {}]
+add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 720}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Beans - [round_to_one_digits $::DSx_settings(bean_weight)]g}
+add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 770}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Shot - (1:[round_to_one_digits [expr (0.01 + $::DSx_settings(saw))/$::DSx_settings(bean_weight)]])  $::DSx_settings(saw)g}
+add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 820}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {[DSx_profile_type] [DSx_sav]}
+add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 870}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Flush - [round_to_integer $::DSx_settings(flush_time)][translate "s"]}
+add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 920}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Steam - [DSx_jug_label] - [DSx_steam_time_text]}
+dui add variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 970}] -tags DSx_data_water_text -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -initial_state show -textvariable {Water - [return_liquid_measurement $::settings(water_volume)] [return_temperature_measurement $::settings(water_temperature)]}
+dui add variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 1020}] -tags DSx_data_wsaw_text -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -initial_state show -textvariable {[wsaw_text]}
+add_de1_button "$::DSx_standby_pages" {say [translate {}] $::settings(sound_button_in); show_settings; after 500 update_de1_explanation_chart; say [translate {settings}] $::settings(sound_button_in); set_next_page off settings_1; page_show off; set ::settings(active_settings_tab) settings_1; set_profiles_scrollbar_dimensions;}  [expr {$::DSx_data_x + 100}] [expr {$::DSx_data_y + 550}] [expr {$::DSx_data_x + 800}] [expr {$::DSx_data_y + 720}]
+add_de1_button "$::DSx_standby_pages" {say [translate {}] $::settings(sound_button_in); load_test; set_next_page off DSx_4_workflow; start_idle} [expr {$::DSx_data_x + 100}] [expr {$::DSx_data_y + 730}] [expr {$::DSx_data_x + 800}] [expr {$::DSx_data_y + 1040}]
+
+# favourites
+set ::DSx_lower_y 0
+set ::DSx_loaded_message [add_de1_variable "$::DSx_standby_pages" 470 900 -text [translate ""] -font [DSx_font font 20] -fill $::DSx_settings(font_colour) -anchor "center"  -textvariable {$::DSx_saved_2}]
+proc DSx_load_fav { colour } {
+    .can itemconfigure $::DSx_loaded_message -fill $::DSx_settings($colour)
+    load_${colour}cup
+    DSx_set_on
+    after 1200 DSx_set_off
+}
+dui add image $::DSx_standby_pages 100 [expr {$::DSx_lower_y + 1070}] "[skin_directory_graphics]/icons/bluecup.png" -tags bluecup_img
+dui add dbutton $::DSx_standby_pages 90 [expr {$::DSx_lower_y + 1050}] -tags bluecup_button \
+    -bwidth 220 -bheight 250 \
+    -labelvariable {$::DSx_settings(blue_cup_indicator)} -label_font [DSx_font notosansuiregular 24] -label_fill $::DSx_settings(blue) -label_pos {0.5 0.5} \
+    -command {DSx_load_fav blue}
+
+dui add image $::DSx_standby_pages 320 [expr {$::DSx_lower_y + 1070}] "[skin_directory_graphics]/icons/pinkcup.png" -tags pinkcup_img
+dui add dbutton $::DSx_standby_pages 310 [expr {$::DSx_lower_y + 1050}] -tags pinkcup_button \
+    -bwidth 220 -bheight 250 \
+    -labelvariable {$::DSx_settings(pink_cup_indicator)} -label_font [DSx_font notosansuiregular 24] -label_fill $::DSx_settings(pink) -label_pos {0.5 0.5} \
+    -command {DSx_load_fav pink}
+
+dui add image $::DSx_standby_pages 540 [expr {$::DSx_lower_y + 1070}] "[skin_directory_graphics]/icons/orangecup.png" -tags orangecup_img
+dui add dbutton $::DSx_standby_pages 530 [expr {$::DSx_lower_y + 1050}] -tags orangecup_button \
+    -bwidth 220 -bheight 250 \
+    -labelvariable {$::DSx_settings(orange_cup_indicator)} -label_font [DSx_font notosansuiregular 24] -label_fill $::DSx_settings(orange) -label_pos {0.5 0.5} \
+    -command {DSx_load_fav orange}
+
+## scale
+set ::DSx_scale_x 0
+set ::DSx_scale_y -200
+
+if {$::android != 1} {
+    set ::de1(scale_sensor_weight) 18
+    } else {
+    set ::de1(scale_weight_rate) -1
+}
+set ::show_net_weight " "
+if {$::de1(scale_sensor_weight) <= $::show_net_weight || $::DSx_settings(jug_g) < 20} {
+    set ::show_net_weight " "
+    } else {
+    set ::show_net_weight [round_to_milk [expr ($::de1(scale_sensor_weight) - $::DSx_settings(jug_g))]]g
+}
+dui add image "$::DSx_home_pages" [expr {$::DSx_scale_x + 880}] [expr {$::DSx_scale_y + 1200}] "[skin_directory_graphics]/big_scale1.png" -tags scale_img
+dui add variable "$::DSx_standby_pages" [expr {$::DSx_scale_x + 980}] [expr {$::DSx_scale_y + 1270}] -justify right -anchor "nw" -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -tags scale_dose_var -textvariable {[round_to_bean [expr ($::de1(scale_sensor_weight) - $::DSx_settings(bean_offset))]]}
+dui add variable "$::DSx_standby_pages espresso water" [expr {$::DSx_scale_x + 1290}] [expr {$::DSx_scale_y + 1340}] -justify center -anchor "n" -text "" -font [DSx_font font 13] -fill $::DSx_settings(font_colour) -tags scale_var -textvariable {[round_to_one_digits $::de1(scale_sensor_weight)]g}
+dui add variable "$::DSx_standby_pages" [expr {$::DSx_scale_x + 1580}] [expr {$::DSx_scale_y + 1270}] -justify left -anchor "ne" -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -tags scale_steam_var -textvariable {[round_to_milk [expr ($::de1(scale_sensor_weight) - $::DSx_settings(jug_g))]]}
+# skale ble reconnection button
+dui add dbutton "$::DSx_standby_pages" [expr {$::DSx_scale_x + 930}] [expr {$::DSx_scale_y + 1250}] -bwidth 220 -bheight 250 -command {say "" $::settings(sound_button_in); clear_bean_font; DSx_set_dose; DSx_bean_set_on; after 1500 DSx_set_off;} -tags scale_dose_button
+dui add dbutton "$::DSx_standby_pages" [expr {$::DSx_scale_x + 1400}] [expr {$::DSx_scale_y + 1250}] -bwidth 220 -bheight 250 -command {clear_steam_font; steam_time_calc; DSx_set_on; after 1200 DSx_set_off;} -tags scale_steam_button
+if {$::DSx_settings(no_scale) == 1} {
+    dui add dclicker "$::DSx_standby_pages" [expr {$::DSx_scale_x + 1150}] [expr {$::DSx_scale_y + 1250}] [expr {$::DSx_scale_x + 1400}] [expr {$::DSx_scale_y + 1500}] \
+        -labelvariable { +} -label_pos {0.5 0.2} -label_font [DSx_font font 10] -label_justify center -label_anchor center -label_fill $::DSx_settings(font_colour) \
+        -label1variable {-} -label1_pos {0.5 0.65} -label1_font [DSx_font font 10] -label_justify center -label_anchor center -label1_fill $::DSx_settings(font_colour) \
+        -tags scale_dclicker -orient vertical -min 10 -max 750 -use_biginc false -smallincrement 5 -variable ::de1(scale_sensor_weight)
+} else {
+    dui add dbutton "$::DSx_home_pages" [expr {$::DSx_scale_x + 1150}] [expr {$::DSx_scale_y + 1250}] -bwidth 250 -bheight 250 -command {say [translate {connect}] $::settings(sound_button_in); scale_tare; catch {ble_connect_to_scale}} -tags scale_tare_button
+}
+
+
+dui add variable "$::DSx_home_pages" [expr {$::DSx_scale_x + 1280}] [expr {$::DSx_scale_y + 1410}] -justify center -anchor "n" -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -tags scale_disc_var -textvariable {[DSx_scale_disconnected]}
+# Count down timer
+dui add variable "steam" [expr {$::DSx_scale_x + 1290}] [expr {$::DSx_scale_y + 1340}] -text "" -font [DSx_font font 13] -fill $::DSx_settings(font_colour) -anchor "n" -justify center -tags flush_timer -textvariable {[DSx_steam_time]s}
+dui add variable "preheat_2" [expr {$::DSx_scale_x + 1290}] [expr {$::DSx_scale_y + 1340}] -text "" -font [DSx_font font 13] -fill $::DSx_settings(font_colour) -anchor "n" -justify center -tags steam_timer -textvariable {[DSx_flush_time_display]s}
+
+
+#Function Info
+add_de1_variable "espresso" 1280 950 -text "" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center" -textvariable {$::settings(current_frame_description)}
+add_de1_variable "preheat_2" 1280 950 -text "" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center" -textvariable {flushing HOT water}
+
+add_de1_variable "steam" 1280 950 -text "" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center" -textvariable {[DSx_steam_info]}
+add_de1_variable "water" 1280 950 -text "" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center" -textvariable {pouring HOT water}
+
+# Ready / heating
+add_de1_variable "$::DSx_standby_pages" 1280 950 -text [translate "START"] -font [DSx_font font 14] -fill $::DSx_settings(green) -anchor "center" -textvariable {[start_button_ready]}
+dui add variable "$::DSx_home_pages" 2070 [expr {$::DSx_lower_y + 1160}] -tags heating_icon1 -justify center -anchor center -font [DSx_font {Font Awesome 5 Pro-Regular-400} 30] -fill $::DSx_settings(red) -textvariable {[DSx_heating_icon]}
+dui add variable "$::DSx_home_pages" 2050 [expr {$::DSx_lower_y + 1144}] -tags heating_icon2 -justify center -anchor center -font [DSx_font font 8] -fill $::DSx_settings(red) -textvariable {[DSx_heating_percentage]}
+
+# For testing purposes
+if {$::android == 0} {
+    set ::DSx_heating_hold 0
+    set ::testing_temp 141
+    dui add dbutton "off" 0 400 100 800 -initial_state show -command {
+        set ::testing_temp 170
+    }
+    proc steamtemp {} {
+        set a $::testing_temp
+        return $a
+    }
+    dui add dclicker "$::DSx_standby_pages" [expr {$::DSx_scale_x + 1150}] [expr {$::DSx_scale_y + 1250}] [expr {$::DSx_scale_x + 1400}] [expr {$::DSx_scale_y + 1500}] \
+        -tags scale_dclicker -orient vertical -min 10 -max 750 -use_biginc false -smallincrement 5 -variable ::de1(scale_sensor_weight)
+}
+
+# Heating info
+set ::DSx_heating_hold 0
+set ::DSx_heating_flag 1
+
+proc DSx_heating_icon {} {
+    if {$::DSx_heating_flag == 1} {
+        set ::DSx_start_button_x 2160
+        dui item moveto $::DSx_standby_pages DSx_espresso_icon [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_flush_icon [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_steam_icon [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_water_icon [expr {$::DSx_start_button_x + 1050}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_espresso_button* [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_flush_button* [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_steam_button* [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_water_button* [expr {$::DSx_start_button_x + 1060}] $::DSx_start_button_y
+        dui item moveto preheat_2 DSx_flush_icon_extend [expr {1400 + 620}] $::DSx_start_button_y
+        dui item moveto "preheat_2" flush_extend_info [expr {1400 + 720}] [expr {$::DSx_start_button_y + 82}]
+        dui item moveto "preheat_2" DSx_flush_extend_button* [expr {1400 + 620}] [expr {$::DSx_start_button_y + 0}]
+        dui item hide $::DSx_standby_pages DSx_water_icon -initial yes
+        dui item disable $::DSx_standby_pages DSx_water_button*
+        dui item config $::DSx_standby_pages DSx_water_button* -initial_state hidden
+        set ::DSx_start_buttons_shift_button ""
+        dui item hide $::DSx_standby_pages DSx_data_water_text
+        dui item hide $::DSx_standby_pages DSx_data_wsaw_text
+        dui item hide $::DSx_standby_pages DSx_wsaw_fav_indicator
+        dui item hide $::DSx_standby_pages DSx_water_fav_indicator
+        set ::DSx_heating_flag 2
+    }
+    if {[start_button_ready] != [translate "WAIT"] && $::DSx_heating_flag == 2 } {
+        DSx_show_start_buttons
+        set ::DSx_heating_flag 0
+    }
+    if {[start_button_ready] == [translate "WAIT"] && $::DSx_heating_flag != 0} {
+        if {$::DSx_heating_hold != 1} {
+            set ::DSx_his [clock milliseconds]
+            set ::DSx_heating_hold 1
+        }
+        set a \uf2cb
+        if {$::DSx_his < [expr {[clock milliseconds] - 100}] && [steamtemp] > 20} {
+            set a \uf2ca
+        }
+        if {$::DSx_his < [expr {[clock milliseconds] - 200}] && [steamtemp] > 60} {
+            set a \uf2c9
+        }
+        if {$::DSx_his < [expr {[clock milliseconds] - 300}] && [steamtemp] > 100} {
+            set a \uf2c8
+        }
+        if {$::DSx_his < [expr {[clock milliseconds] - 400}] && [steamtemp] > 140} {
+            set a \uf2c7
+        }
+        if {$::DSx_his < [expr {[clock milliseconds] - 1000}]} {
+            set ::DSx_heating_hold 0
+        }
+        return $a
+    } else {
+        return ""
+    }
+}
+
+proc DSx_heating_percentage {} {
+    if {$::DSx_heating_flag != 0} {
+        set a "Heating          [round_to_one_digits [expr ((1000 / $::settings(steam_temperature) * [steamtemp]) * 0.1)]]%"
+        return $a
+    }
+}
+
+# DE1 connection and substate info
+add_de1_variable "$::DSx_standby_pages" 1280 990 -justify center -anchor "center" -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -textvariable {[de1_connected_state_DSx]}
+add_de1_variable "$::DSx_standby_pages" 1280 990 -justify center -anchor "center" -text "" -font [DSx_font font 8] -fill $::DSx_settings(red) -textvariable {$::steam_off_message}
+
+# operation start buttons
+set ::DSx_start_button_x 1260
+set ::DSx_start_button_y 1080
+dui add image "$::DSx_standby_pages" [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y "[skin_directory_graphics]/icons/espresso.png" -tags DSx_espresso_icon
+dui add image "$::DSx_standby_pages" [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y "[skin_directory_graphics]/icons/flush.png" -tags DSx_flush_icon
+dui add image "preheat_2" [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y "[skin_directory_graphics]/icons/flush.png" -tags DSx_flush_icon_extend
+dui add image "$::DSx_standby_pages" [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y "[skin_directory_graphics]/icons/steam.png" -tags DSx_steam_icon
+dui add image "$::DSx_standby_pages" [expr {$::DSx_start_button_x + 1060}] $::DSx_start_button_y "[skin_directory_graphics]/icons/water.png" -tags DSx_water_icon -initial_state hidden
+dui add dbutton "off" [expr {$::DSx_start_button_x + 400}] [expr {$::DSx_start_button_y + 0}] [expr {$::DSx_start_button_x + 620}] [expr {$::DSx_start_button_y + 200}] -tags DSx_espresso_button -initial_state normal -command {say [translate {espresso}] $::settings(sound_button_in); DSx_reset_graphs; DSx_espresso;}
+dui add dbutton "off" [expr {$::DSx_start_button_x + 620}] [expr {$::DSx_start_button_y + 0}] [expr {$::DSx_start_button_x + 840}] [expr {$::DSx_start_button_y + 200}] -tags DSx_flush_button -initial_state normal -command {say [translate {flush}] $::settings(sound_button_in); DSx_flush;}
+dui add dbutton "off" [expr {$::DSx_start_button_x + 840}] [expr {$::DSx_start_button_y + 0}] [expr {$::DSx_start_button_x + 1060}] [expr {$::DSx_start_button_y + 200}] -tags DSx_steam_button -initial_state normal -command {say [translate {steam}] $::settings(sound_button_in); DSx_steam;}
+dui add dbutton "off" [expr {$::DSx_start_button_x + 1060}] [expr {$::DSx_start_button_y + 0}] [expr {$::DSx_start_button_x + 1280}] [expr {$::DSx_start_button_y + 200}] -tags DSx_water_button -initial_state normal -command {say [translate {Hot water}] $::settings(sound_button_in); DSx_water;}
+
+# operation stop button
+add_de1_image "espresso steam preheat_2 water" 1680 940 "[skin_directory_graphics]/icons/stop.png"
+add_de1_button "espresso steam preheat_2 water" {say [translate {stop}] $::settings(sound_button_in); DSx_stop} 1440 880 2040 1280
+
+# flush extention timer
+dui add variable "preheat_2" [expr {$::DSx_start_button_x + 720}] [expr {$::DSx_start_button_y + 82}] -text "" -font [DSx_font font 8] -fill #8efba2 -anchor "center" -justify "center" -tags flush_extend_info -textvariable {[DSx_add_flush_time_extend_text]}
+dui add dbutton "preheat_2" [expr {$::DSx_start_button_x + 620}] [expr {$::DSx_start_button_y + 0}] -bwidth 220 -bheight 220 -tags DSx_flush_extend_button -initial_state show -command {say [translate {flush2}] $::settings(sound_button_in); DSx_flush_extend}
+
+# movetonext
+dui add image "espresso" 2100 $::DSx_start_button_y "[skin_directory_graphics]/icons/espresso.png" -tags DSx_espresso_icon
+dui add variable "espresso" 2140 1160 -justify center -anchor e -font [DSx_font font 8] -fill $::DSx_settings(green) -textvariable {tap to >>>}
+dui add variable "espresso" 2260 1160 -justify center -anchor w -font [DSx_font font 8] -fill $::DSx_settings(green) -textvariable {<<< move on}
+dui add dbutton "espresso" 2100 1080 2300 1280 -tags DSx_espresso__movetonext_button -initial_state show -command {DSx_next_step}
+dui add dbutton "espresso_zoomed" 1900 1280 \
+    -bwidth 300 -bheight 300 -tags graph_shift_button \
+    -labelvariable {\uf051} -label_font [DSx_font {Font Awesome 5 Pro-Regular-400} 10] -label_fill $::DSx_settings(green) -label_pos {0.5 0.5} \
+    -command {DSx_next_step}
+
+# Moving the start buttons
+set ::DSx_start_buttons_shift_button "\uf0d9"
+dui add dbutton "$::DSx_standby_pages" 2450 [expr {$::DSx_lower_y + 900}] \
+    -bwidth 110 -bheight 150 -tags start_buttons_shift_button \
+    -labelvariable {$::DSx_start_buttons_shift_button} -label_font [DSx_font {Font Awesome 5 Pro-Regular-400} 10] -label_fill #777 -label_pos {0.8 0.5} \
+    -command {toggle_DSx_water}
+
+# Moving the graphs buttons
+set ::DSx_graph_shift_button "\uf0dd"
+dui add dbutton "$::DSx_standby_pages" 0 [expr {$::DSx_lower_y + 900}] \
+    -bwidth 110 -bheight 150 -tags graph_shift_button \
+    -labelvariable {$::DSx_graph_shift_button} -label_font [DSx_font {Font Awesome 5 Pro-Regular-400} 10] -label_fill #777 -label_pos {0.2 0.5} \
+    -command {toggle_DSx_graphs}
+
+proc start_buttons_move_left { x_pos } {
+    dui item show $::DSx_standby_pages DSx_water_icon -initial yes
+    set ::DSx_start_button_x [expr {$::DSx_start_button_x - 2}]
+    dui item moveto $::DSx_standby_pages DSx_espresso_icon [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_flush_icon [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_steam_icon [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_water_icon [expr {$::DSx_start_button_x + 1060}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_espresso_button* [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_flush_button* [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_steam_button* [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_water_button* [expr {$::DSx_start_button_x + 1060}] $::DSx_start_button_y
+    if {$::DSx_start_button_x > $x_pos} {
+        after 1 start_buttons_move_left $x_pos
+    } else {
+    dui item enable $::DSx_standby_pages DSx_water_button*
+    dui item config $::DSx_standby_pages DSx_water_button* -initial_state normal
+    set ::DSx_start_buttons_shift_button "\uf0da"
+    dui item moveto preheat_2 DSx_flush_icon_extend [expr {1400 + 620}] $::DSx_start_button_y
+    dui item moveto "preheat_2" flush_extend_info [expr {1400 + 720}] [expr {$::DSx_start_button_y + 82}]
+    dui item moveto "preheat_2" DSx_flush_extend_button* [expr {1400 + 620}] [expr {$::DSx_start_button_y + 0}]
+    dui item show $::DSx_standby_pages DSx_data_water_text
+    dui item show $::DSx_standby_pages DSx_data_wsaw_text
+    dui item show $::DSx_standby_pages DSx_wsaw_fav_indicator
+    dui item show $::DSx_standby_pages DSx_water_fav_indicator
+    }
+}
+
+proc start_buttons_move_right { x_pos } {
+    set ::DSx_start_button_x [expr {$::DSx_start_button_x + 2}]
+    dui item moveto $::DSx_standby_pages DSx_espresso_icon [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_flush_icon [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_steam_icon [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_water_icon [expr {$::DSx_start_button_x + 1050}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_espresso_button* [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_flush_button* [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_steam_button* [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_water_button* [expr {$::DSx_start_button_x + 1060}] $::DSx_start_button_y
+    if {$::DSx_start_button_x < $x_pos} {
+        after 1 start_buttons_move_right $x_pos
+    } else {
+        dui item moveto preheat_2 DSx_flush_icon_extend [expr {1400 + 620}] $::DSx_start_button_y
+        dui item moveto "preheat_2" flush_extend_info [expr {1400 + 720}] [expr {$::DSx_start_button_y + 82}]
+        dui item moveto "preheat_2" DSx_flush_extend_button* [expr {1400 + 620}] [expr {$::DSx_start_button_y + 0}]
+        dui item hide $::DSx_standby_pages DSx_water_icon -initial yes
+        dui item disable $::DSx_standby_pages DSx_water_button*
+        dui item config $::DSx_standby_pages DSx_water_button* -initial_state hidden
+        if {$::DSx_settings(hide_water) == 2} {
+            set ::DSx_start_buttons_shift_button "\uf0d9"
+        }
+        if {$::DSx_settings(hide_water) == 1} {
+            dui item hide $::DSx_standby_pages DSx_data_water_text
+            dui item hide $::DSx_standby_pages DSx_data_wsaw_text
+            dui item hide $::DSx_standby_pages DSx_wsaw_fav_indicator
+            dui item hide $::DSx_standby_pages DSx_water_fav_indicator
+        }
+    }
+}
+set ::DSx_startup_data_show 0
+
+proc DSx_show_start_buttons {} {
+    if {[info exists ::DSx_settings(hide_water)] != 1} {
+        set ::DSx_settings(hide_water) 1
+    }
+    if {$::DSx_settings(hide_water) != 1 && $::DSx_startup_data_show == 0} {
+        dui item show $::DSx_standby_pages DSx_wsaw_fav_indicator
+        dui item show $::DSx_standby_pages DSx_water_fav_indicator
+        dui item show $::DSx_standby_pages DSx_data_water_text
+        dui item show $::DSx_standby_pages DSx_data_wsaw_text
+        set ::DSx_startup_data_show 1
+    }
+    if {$::DSx_settings(hide_water) == 2 } {
+        set ::DSx_start_buttons_shift_button "\uf0d9"
+        dui item moveto "preheat_2" DSx_flush_icon [expr {1400 + 620}] $::DSx_start_button_y
+        dui item moveto "preheat_2" flush_extend_info [expr {1400 + 720}] [expr {$::DSx_start_button_y + 82}]
+        dui item moveto "preheat_2" DSx_flush_extend_button* [expr {1400 + 620}] [expr {$::DSx_start_button_y + 0}]
+
+    } elseif {$::DSx_settings(hide_water) == 1 } {
+        set ::DSx_settings(hide_water) 1
+        set ::DSx_start_buttons_shift_button "\uf0da"
+        set ::DSx_start_button_x [expr {$::DSx_start_button_x - 2}]
+
+        dui item moveto $::DSx_standby_pages DSx_espresso_icon [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_flush_icon [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_steam_icon [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_water_icon [expr {$::DSx_start_button_x + 1050}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_espresso_button* [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_flush_button* [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_steam_button* [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_water_button* [expr {$::DSx_start_button_x + 1060}] $::DSx_start_button_y
+        dui item moveto preheat_2 DSx_flush_icon_extend [expr {1400 + 620}] $::DSx_start_button_y
+        dui item moveto "preheat_2" flush_extend_info [expr {1400 + 720}] [expr {$::DSx_start_button_y + 82}]
+        dui item moveto "preheat_2" DSx_flush_extend_button* [expr {1400 + 620}] [expr {$::DSx_start_button_y + 0}]
+        if {$::DSx_start_button_x > 1400} {
+            after 1 DSx_show_start_buttons
+        }
+        dui item disable $::DSx_standby_pages DSx_water_button*
+        dui item config $::DSx_standby_pages DSx_water_button* -initial_state hidden
+    } else {
+        set ::DSx_start_button_x [expr {$::DSx_start_button_x - 2}]
+        dui item moveto $::DSx_standby_pages DSx_espresso_icon [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_flush_icon [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_steam_icon [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_water_icon [expr {$::DSx_start_button_x + 1050}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_espresso_button* [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_flush_button* [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_steam_button* [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y
+        dui item moveto $::DSx_standby_pages DSx_water_button* [expr {$::DSx_start_button_x + 1060}] $::DSx_start_button_y
+        if {$::DSx_start_button_x > 1260} {
+            after 1 DSx_show_start_buttons
+        }
+        set ::DSx_settings(hide_water) 0
+        set ::DSx_start_buttons_shift_button "\uf0da"
+        dui item moveto preheat_2 DSx_flush_icon_extend [expr {1400 + 620}] $::DSx_start_button_y
+        dui item moveto "preheat_2" flush_extend_info [expr {1400 + 720}] [expr {$::DSx_start_button_y + 82}]
+        dui item moveto "preheat_2" DSx_flush_extend_button* [expr {1400 + 620}] [expr {$::DSx_start_button_y + 0}]
+        dui item show $::DSx_standby_pages DSx_water_icon -initial yes
+        dui item enable $::DSx_standby_pages DSx_water_button*
+        dui item config $::DSx_standby_pages DSx_water_button* -initial_state normal
+    }
+
+}
+##x_pos
+proc toggle_DSx_water {} {
+    if {$::DSx_settings(hide_water) == 0 } {
+        start_buttons_move_right 1400
+        set ::DSx_settings(hide_water) 1
+    } elseif {$::DSx_settings(hide_water) == 1 } {
+        start_buttons_move_right 2160
+        set ::DSx_settings(hide_water) 2
+        dui item show $::DSx_standby_pages DSx_data_water_text
+        dui item show $::DSx_standby_pages DSx_data_wsaw_text
+        dui item show $::DSx_standby_pages DSx_wsaw_fav_indicator
+        dui item show $::DSx_standby_pages DSx_water_fav_indicator
+    } else {
+        start_buttons_move_left 1260
+        set ::DSx_settings(hide_water) 0
+    }
+    save_DSx_settings
+}
+
+# History button
+dui add dbutton $::DSx_standby_pages 2320 1400 -tags history_button \
+    -bwidth 220 -bheight 250 \
+    -labelvariable {\uf1da} -label_font [DSx_font {Font Awesome 5 Pro-Regular-400} 10] -label_fill $::DSx_settings(font_colour) -label_pos {0.5 0.5} \
+    -command {history_prep}
+
+set ::DSx_show_cache_graphs 1
+proc DSx_hide_graphs {} {
+    if {$::DSx_show_cache_graphs == 1} {
+        set ::DSx_show_cache_graphs 0
+        $::DSx_home_espresso_graph_1a configure -width 0 -height 0
+        $::DSx_home_espresso_graph_1b configure -width 0 -height 0
+        $::DSx_home_espresso_graph_1c configure -width 0 -height 0
+        $::DSx_home_steam_graph_1 configure -width 0 -height 0
+        $::DSx_home_steam_graph_2 configure -width 0 -height 0
+        dui item hide $::DSx_standby_pages cga_p
+        dui item config $::DSx_standby_pages cga_p -initial_state hidden
+        dui item hide $::DSx_standby_pages cga_d
+        dui item config $::DSx_standby_pages cga_d -initial_state hidden
+        dui item hide $::DSx_standby_pages cgb_p
+        dui item config $::DSx_standby_pages cgb_p -initial_state hidden
+        dui item hide $::DSx_standby_pages cgb_d
+        dui item config $::DSx_standby_pages cgb_d -initial_state hidden
+        dui item hide $::DSx_standby_pages cgc_p
+        dui item config $::DSx_standby_pages cgc_p -initial_state hidden
+        dui item hide $::DSx_standby_pages cgc_d
+        dui item config $::DSx_standby_pages cgc_d -initial_state hidden
+    }
+    set ::DSx_lower_y [expr {$::DSx_lower_y + 2}]
+    dui item moveto $::DSx_standby_pages bluecup_img 100 [expr {$::DSx_lower_y + 1070}]
+    dui item moveto $::DSx_standby_pages bluecup_button* 90 [expr {$::DSx_lower_y + 1050}]
+    dui item moveto $::DSx_standby_pages pinkcup_img 320 [expr {$::DSx_lower_y + 1070}]
+    dui item moveto $::DSx_standby_pages pinkcup_button* 310 [expr {$::DSx_lower_y + 1050}]
+    dui item moveto $::DSx_standby_pages orangecup_img 540 [expr {$::DSx_lower_y + 1070}]
+    dui item moveto $::DSx_standby_pages orangecup_button* 530 [expr {$::DSx_lower_y + 1050}]
+
+    dui item moveto $::DSx_home_pages heating_icon1 2070 [expr {$::DSx_lower_y + 1160}]
+    dui item moveto $::DSx_home_pages heating_icon2 2050 [expr {$::DSx_lower_y + 1144}]
+
+    set ::DSx_scale_y [expr {$::DSx_scale_y + 2}]
+    dui item moveto "$::DSx_home_pages" scale_img [expr {$::DSx_scale_x + 880}] [expr {$::DSx_scale_y + 1200}]
+    dui item moveto "$::DSx_standby_pages" scale_dose_var [expr {$::DSx_scale_x + 980}] [expr {$::DSx_scale_y + 1270}]
+    dui item moveto "$::DSx_standby_pages" scale_var [expr {$::DSx_scale_x + 1290}] [expr {$::DSx_scale_y + 1340}]
+    dui item moveto "$::DSx_standby_pages" scale_steam_var [expr {$::DSx_scale_x + 1580}] [expr {$::DSx_scale_y + 1270}]
+    dui item moveto "$::DSx_home_pages" scale_tare_button* [expr {$::DSx_scale_x + 1150}] [expr {$::DSx_scale_y + 1250}]
+    dui item moveto "$::DSx_home_pages" scale_dclicker* [expr {$::DSx_scale_x + 1150}] [expr {$::DSx_scale_y + 1250}]
+    dui item moveto "$::DSx_standby_pages" scale_dose_button* [expr {$::DSx_scale_x + 930}] [expr {$::DSx_scale_y + 1250}]
+    dui item moveto "$::DSx_standby_pages" scale_steam_button* [expr {$::DSx_scale_x + 1400}] [expr {$::DSx_scale_y + 1250}]
+
+    set ::DSx_start_button_y [expr {$::DSx_start_button_y + 2}]
+    dui item moveto $::DSx_standby_pages DSx_espresso_icon [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_flush_icon [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_steam_icon [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_water_icon [expr {$::DSx_start_button_x + 1050}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_espresso_button* [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_flush_button* [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_steam_button* [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_water_button* [expr {$::DSx_start_button_x + 1060}] $::DSx_start_button_y
+
+    dui item moveto "$::DSx_standby_pages" start_buttons_shift_button* 2450 [expr {$::DSx_lower_y + 900}]
+    dui item moveto "$::DSx_standby_pages" graph_shift_button* 0 [expr {$::DSx_lower_y + 900}]
+
+    dui item moveto "$::DSx_home_pages" scale_disc_var [expr {$::DSx_scale_x + 1280}] [expr {$::DSx_scale_y + 1410}]
+    dui item moveto "steam"  flush_timer [expr {$::DSx_scale_x + 1290}] [expr {$::DSx_scale_y + 1340}]
+    dui item moveto "preheat_2" steam_timer [expr {$::DSx_scale_x + 1290}] [expr {$::DSx_scale_y + 1340}]
+    dui item moveto preheat_2 DSx_flush_icon_extend [expr {1400 + 620}] $::DSx_start_button_y
+    dui item moveto "preheat_2" flush_extend_info [expr {1400 + 720}] [expr {$::DSx_start_button_y + 82}]
+    dui item moveto "preheat_2" DSx_flush_extend_button* [expr {1400 + 620}] [expr {$::DSx_start_button_y + 0}]
+
+
+    if {$::DSx_lower_y < 120} {
+        after 1 DSx_hide_graphs
+    }
+    set ::DSx_show_cache_graphs 0
+    if {$::DSx_lower_y > 119} {
+        dui item show $::DSx_standby_pages history_button*
+    }
+}
+
+proc DSx_show_graphs {} {
+    set ::DSx_lower_y [expr {$::DSx_lower_y - 2}]
+    dui item moveto $::DSx_standby_pages bluecup_img 100 [expr {$::DSx_lower_y + 1070}]
+    dui item moveto $::DSx_standby_pages bluecup_button* 90 [expr {$::DSx_lower_y + 1050}]
+    dui item moveto $::DSx_standby_pages pinkcup_img 320 [expr {$::DSx_lower_y + 1070}]
+    dui item moveto $::DSx_standby_pages pinkcup_button* 310 [expr {$::DSx_lower_y + 1050}]
+    dui item moveto $::DSx_standby_pages orangecup_img 540 [expr {$::DSx_lower_y + 1070}]
+    dui item moveto $::DSx_standby_pages orangecup_button* 530 [expr {$::DSx_lower_y + 1050}]
+
+    set ::DSx_scale_y [expr {$::DSx_scale_y - 2}]
+    dui item moveto "$::DSx_home_pages" scale_img [expr {$::DSx_scale_x + 880}] [expr {$::DSx_scale_y + 1200}]
+    dui item moveto "$::DSx_standby_pages" scale_dose_var [expr {$::DSx_scale_x + 980}] [expr {$::DSx_scale_y + 1270}]
+    dui item moveto "$::DSx_standby_pages" scale_var [expr {$::DSx_scale_x + 1290}] [expr {$::DSx_scale_y + 1340}]
+    dui item moveto "$::DSx_standby_pages" scale_steam_var [expr {$::DSx_scale_x + 1580}] [expr {$::DSx_scale_y + 1270}]
+    dui item moveto "$::DSx_home_pages" scale_tare_button* [expr {$::DSx_scale_x + 1150}] [expr {$::DSx_scale_y + 1250}]
+    dui item moveto "$::DSx_home_pages" scale_dclicker* [expr {$::DSx_scale_x + 1150}] [expr {$::DSx_scale_y + 1250}]
+    dui item moveto "$::DSx_standby_pages" scale_dose_button* [expr {$::DSx_scale_x + 930}] [expr {$::DSx_scale_y + 1250}]
+    dui item moveto "$::DSx_standby_pages" scale_steam_button* [expr {$::DSx_scale_x + 1400}] [expr {$::DSx_scale_y + 1250}]
+
+    dui item moveto $::DSx_home_pages heating_icon1 2070 [expr {$::DSx_lower_y + 1160}]
+    dui item moveto $::DSx_home_pages heating_icon2 2050 [expr {$::DSx_lower_y + 1144}]
+
+    set ::DSx_start_button_y [expr {$::DSx_start_button_y - 2}]
+    dui item moveto $::DSx_standby_pages DSx_espresso_icon [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_flush_icon [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_steam_icon [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_water_icon [expr {$::DSx_start_button_x + 1050}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_espresso_button* [expr {$::DSx_start_button_x + 400}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_flush_button* [expr {$::DSx_start_button_x + 620}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_steam_button* [expr {$::DSx_start_button_x + 840}] $::DSx_start_button_y
+    dui item moveto $::DSx_standby_pages DSx_water_button* [expr {$::DSx_start_button_x + 1060}] $::DSx_start_button_y
+
+    dui item moveto "$::DSx_standby_pages" start_buttons_shift_button* 2450 [expr {$::DSx_lower_y + 900}]
+    dui item moveto "$::DSx_standby_pages" graph_shift_button* 0 [expr {$::DSx_lower_y + 900}]
+
+    dui item moveto "$::DSx_home_pages" scale_disc_var [expr {$::DSx_scale_x + 1280}] [expr {$::DSx_scale_y + 1410}]
+    dui item moveto "steam"  flush_timer [expr {$::DSx_scale_x + 1290}] [expr {$::DSx_scale_y + 1340}]
+    dui item moveto "preheat_2" steam_timer [expr {$::DSx_scale_x + 1290}] [expr {$::DSx_scale_y + 1340}]
+    dui item moveto preheat_2 DSx_flush_icon_extend [expr {1400 + 620}] $::DSx_start_button_y
+    dui item moveto "preheat_2" flush_extend_info [expr {1400 + 720}] [expr {$::DSx_start_button_y + 82}]
+    dui item moveto "preheat_2" DSx_flush_extend_button* [expr {1400 + 620}] [expr {$::DSx_start_button_y + 0}]
+
+    if {$::DSx_lower_y > 0} {
+        after 1 DSx_show_graphs
+    }
+    if {$::DSx_lower_y == 0} {
+        set ::DSx_show_cache_graphs 1
+        $::DSx_home_espresso_graph_1a configure -width [rescale_x_skin [DSx_graph_size 640]] -height [rescale_y_skin [DSx_graph_size 280]]
+        $::DSx_home_espresso_graph_1b configure -width [rescale_x_skin [DSx_graph_size 640]] -height [rescale_y_skin [DSx_graph_size 280]]
+        $::DSx_home_espresso_graph_1c configure -width [rescale_x_skin [DSx_graph_size 640]] -height [rescale_y_skin [DSx_graph_size 280]]
+        $::DSx_home_steam_graph_1 configure -width [rescale_x_skin 640] -height [rescale_y_skin 220]
+        $::DSx_home_steam_graph_2 configure -width [rescale_x_skin 640] -height [rescale_y_skin 220]
+        dui item show $::DSx_standby_pages cga_p
+        dui item show $::DSx_standby_pages cga_d
+        dui item show $::DSx_standby_pages cgb_p
+        dui item show $::DSx_standby_pages cgb_d
+        dui item show $::DSx_standby_pages cgc_p
+        dui item show $::DSx_standby_pages cgc_d
+    }
+    dui item hide $::DSx_standby_pages history_button*
+}
+
+proc toggle_DSx_graphs {} {
+    if {$::DSx_settings(cache_graphs_show) == 1} {
+        DSx_hide_graphs
+        set ::DSx_settings(cache_graphs_show) 0
+        set ::DSx_graph_shift_button "\uf0d8"
+    } else {
+        DSx_show_graphs
+        set ::DSx_settings(cache_graphs_show) 1
+        set ::DSx_graph_shift_button "\uf0dd"
+    }
+    save_DSx_settings
+}
+
+proc DSx_start_cache_graphs {} {
+    if {[info exists ::DSx_settings(cache_graphs_show)] != 1} {
+        set ::DSx_settings(cache_graphs_show) 1
+    }
+    if {$::DSx_settings(cache_graphs_show) == 1} {
+        DSx_show_graphs
+        set ::DSx_graph_shift_button "\uf0dd"
+    } else {
+        DSx_hide_graphs
+        set ::DSx_graph_shift_button "\uf0d8"
+    }
+}
+
+
+# cache graph data
+dui add variable "$::DSx_home_pages" 20 1318 -justify right -anchor "nw" -font [DSx_font font 6] -fill $::DSx_settings(font_colour) -width [rescale_x_skin 320] -tags cga_p -textvariable {$::DSx_home2_cache(DSx_1a_profile)}
+dui add variable "$::DSx_home_pages" 590 1318 -justify left -anchor "ne" -font [DSx_font font 6] -fill $::DSx_settings(font_colour) -width [rescale_x_skin 320] -tags cga_d -textvariable {[DSx_date_time_format $::DSx_home2_cache(DSx_1a_time)]}
+dui add variable "$::DSx_home_pages" 650 1318 -justify right -anchor "nw" -font [DSx_font font 6] -fill $::DSx_settings(font_colour) -width [rescale_x_skin 320] -tags cgb_p -textvariable {$::DSx_home2_cache(DSx_1b_profile)}
+dui add variable "$::DSx_home_pages" 1220 1318 -justify left -anchor "ne" -font [DSx_font font 6] -fill $::DSx_settings(font_colour) -width [rescale_x_skin 320] -tags cgb_d -textvariable {[DSx_date_time_format $::DSx_home2_cache(DSx_1b_time)]}
+dui add variable "$::DSx_home_pages" 1280 1318 -justify right -anchor "nw" -font [DSx_font font 6] -fill $::DSx_settings(font_colour) -width [rescale_x_skin 320] -tags cgc_p -textvariable {$::DSx_home2_cache(DSx_1c_profile)}
+dui add variable "$::DSx_home_pages" 1850 1318 -justify left -anchor "ne" -font [DSx_font font 6] -fill $::DSx_settings(font_colour) -width [rescale_x_skin 320] -tags cgc_d -textvariable {[DSx_date_time_format $::DSx_home2_cache(DSx_1c_time)]}
+
+# history/godshot overlay button
+set ::DSx_gs_toggle_icon2 [add_de1_variable "$::DSx_standby_pages espresso" 2390 700 -justify center -anchor n -font [DSx_font {Font Awesome 5 Pro-Regular-400} 10] -fill #777 -textvariable {\uf3e5}]
+set ::DSx_gs_toggle_icon [add_de1_variable "$::DSx_standby_pages espresso" 2420 740 -justify center -anchor n -font [DSx_font {Font Awesome 5 Pro-Regular-400} 12] -tag gs1 -fill $::DSx_settings(font_colour) -textvariable {\uf004}]
+add_de1_button "$::DSx_standby_pages espresso" {say "" $::settings(sound_button_in); DSx_toggle_godshot;} 2320 660 2520 860
+
+# programming stuff
+blt::vector create DSx_0_espresso_elapsed DSx_0_espresso_pressure DSx_0_espresso_flow_2x DSx_0_espresso_flow_weight_2x DSx_0_espresso_state_change
+blt::vector create DSx_1a_espresso_elapsed DSx_1a_espresso_pressure DSx_1a_espresso_flow_2x DSx_1a_espresso_flow_weight_2x DSx_1a_espresso_state_change
+blt::vector create DSx_1b_espresso_elapsed DSx_1b_espresso_pressure DSx_1b_espresso_flow_2x DSx_1b_espresso_flow_weight_2x DSx_1b_espresso_state_change
+blt::vector create DSx_1c_espresso_elapsed DSx_1c_espresso_pressure DSx_1c_espresso_flow_2x DSx_1c_espresso_flow_weight_2x DSx_1c_espresso_state_change
+
+proc DSx_home_page_theme_update {} {
+    $::DSx_home_espresso_graph_1a configure -plotbackground $::DSx_settings(bg_colour) -background $::DSx_settings(bg_colour)
+	$::DSx_home_espresso_graph_1b configure -plotbackground $::DSx_settings(bg_colour) -background $::DSx_settings(bg_colour)
+	$::DSx_home_espresso_graph_1c configure -plotbackground $::DSx_settings(bg_colour) -background $::DSx_settings(bg_colour)
+}
+
+if { $::skin::dsx::use_event_system } {
+	::de1::event::listener::on_major_state_change_add [lambda {event_dict} {
+		set ps [dict get $event_dict previous_state]
+		set ts [dict get $event_dict this_state]
+		if { $ps == "Idle" && $ts == "Espresso" } {
+			DSx_shift_graphs $ps $ts}
+	}]
+} else {
+	::register_state_change_handler Idle Espresso DSx_shift_graphs
+}
+
+if { $::skin::dsx::use_event_system } {
+	::de1::event::listener::on_major_state_change_add [lambda {event_dict} {
+		set ps [dict get $event_dict previous_state]
+		set ts [dict get $event_dict this_state]
+		if { $ps == "Espresso" && $ts == "Idle" } {
+			save_DSx_home2_cache $ps $ts}
+	}]
+} else {
+	::register_state_change_handler Espresso Idle save_DSx_home2_cache
+}
+
+proc DSx_shift_graph_list {} {
+    return [list espresso_elapsed espresso_pressure espresso_flow_2x espresso_flow_weight_2x espresso_state_change]
+}
+
+proc DSx_shift_variable_list {} {
+    return [list time profile]
+}
+
+proc DSx_shift_graphs { args } {
+    foreach lg [DSx_shift_graph_list] {
+	    if {[info exists ::DSx_home2_cache(DSx_1b_$lg)] == 1} {
+	        set ::DSx_home2_cache(DSx_1c_$lg) $::DSx_home2_cache(DSx_1b_$lg)
+	    }
+	    if {[info exists ::DSx_home2_cache(DSx_1a_$lg)] == 1} {
+	        set ::DSx_home2_cache(DSx_1b_$lg) $::DSx_home2_cache(DSx_1a_$lg)
+	    }
+	    if {[info exists ::DSx_settings(live_graph_$lg)] == 1} {
+	        set ::DSx_home2_cache(DSx_1a_$lg) $::DSx_settings(live_graph_$lg)
+	    }
+	}
+	foreach lv [DSx_shift_variable_list] {
+	    if {[info exists ::DSx_home2_cache(DSx_1b_$lv)] == 1} {
+	        set ::DSx_home2_cache(DSx_1c_$lv) $::DSx_home2_cache(DSx_1b_$lv)
+	    }
+	    if {[info exists ::DSx_home2_cache(DSx_1a_$lv)] == 1} {
+	        set ::DSx_home2_cache(DSx_1b_$lv) $::DSx_home2_cache(DSx_1a_$lv)
+	    }
+	    if {[info exists ::DSx_settings(live_graph_$lv)] == 1} {
+	        set ::DSx_home2_cache(DSx_1a_$lv) $::DSx_settings(live_graph_$lv)
+	    }
+	}
+	restore_DSx_1a-d_graph
+    if {$::DSx_gs_showing != 1} {
+        set ::DSx_graph_overlay 0
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_flow_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_flow_weight_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_flow_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_flow_weight_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_flow_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_flow_weight_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change
+    }
+}
+
+proc DSx_date_time_format { time } {
+    set date [clock format $time -format {%a %d %b}]
+    if {$::settings(enable_ampm) == 0} {
+        set a [clock format $time -format {%H}]
+        set b [clock format $time -format {:%M}]
+        set c $a
+    } else {
+        set a [clock format $time -format {%I}]
+        set b [clock format $time -format {:%M}]
+        set c $a
+        regsub {^[0]} $c {\1} c
+    }
+    if {$::settings(enable_ampm) == 1} {
+        set pm [clock format $time -format %P]
+    } else {
+        set pm ""
+    }
+    return "$date $c$b$pm"
+}
+
+proc restore_DSx_1a-d_graph {} {
+	foreach lg [DSx_shift_graph_list] {
+		if {[info exists ::DSx_home2_cache(DSx_1a_$lg)] == 1} {
+			DSx_1a_$lg length 0
+			DSx_1a_$lg append $::DSx_home2_cache(DSx_1a_$lg)
+		}
+		if {[info exists ::DSx_home2_cache(DSx_1b_$lg)] == 1} {
+			DSx_1b_$lg length 0
+			DSx_1b_$lg append $::DSx_home2_cache(DSx_1b_$lg)
+		}
+		if {[info exists ::DSx_home2_cache(DSx_1c_$lg)] == 1} {
+			DSx_1c_$lg length 0
+			DSx_1c_$lg append $::DSx_home2_cache(DSx_1c_$lg)
+		}
+	}
+}
+
+proc save_DSx_home2_cache { args } {
+    msg "saving DSx_home2_cache"
+
+    set DSx_home2_cache_data {}
+    foreach k [DSx_shift_graph_list] {
+        if {[info exists ::DSx_home2_cache(DSx_1a_$k)] == 1} {
+            set v $::DSx_home2_cache(DSx_1a_$k)
+            append DSx_home2_cache_data [subst {[list DSx_1a_$k] [list $v]\n}]
+        }
+    }
+    foreach k [DSx_shift_variable_list] {
+        if {[info exists ::DSx_home2_cache(DSx_1a_$k)] == 1} {
+            set v $::DSx_home2_cache(DSx_1a_$k)
+            append DSx_home2_cache_data [subst {[list DSx_1a_$k] [list $v]\n}]
+        }
+    }
+    append DSx_home2_cache_data \n
+    foreach k [DSx_shift_graph_list] {
+        if {[info exists ::DSx_home2_cache(DSx_1b_$k)] == 1} {
+            set v $::DSx_home2_cache(DSx_1b_$k)
+            append DSx_home2_cache_data [subst {[list DSx_1b_$k] [list $v]\n}]
+        }
+    }
+    foreach k [DSx_shift_variable_list] {
+        if {[info exists ::DSx_home2_cache(DSx_1b_$k)] == 1} {
+            set v $::DSx_home2_cache(DSx_1b_$k)
+            append DSx_home2_cache_data [subst {[list DSx_1b_$k] [list $v]\n}]
+        }
+    }
+    append DSx_home2_cache_data \n
+    foreach k [DSx_shift_graph_list] {
+        if {[info exists ::DSx_home2_cache(DSx_1c_$k)] == 1} {
+            set v $::DSx_home2_cache(DSx_1c_$k)
+            append DSx_home2_cache_data [subst {[list DSx_1c_$k] [list $v]\n}]
+        }
+    }
+    foreach k [DSx_shift_variable_list] {
+        if {[info exists ::DSx_home2_cache(DSx_1c_$k)] == 1} {
+            set v $::DSx_home2_cache(DSx_1c_$k)
+            append DSx_home2_cache_data [subst {[list DSx_1c_$k] [list $v]\n}]
+        }
+    }
+    write_file "[skin_directory]/DSx_User_Set/DSx_home2_cache.tdb" $DSx_home2_cache_data
+}
+
+proc load_DSx_home2_cache {} {
+    array set ::DSx_home2_cache [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/DSx_User_Set/DSx_home2_cache.tdb"]]
+}
+
+proc load_DSx_home2_cacheNEW {} {
+    if {[file exists [skin_directory]/DSx_User_set/DSx_home2_cache.tdb] != 1} {
+        return
+        } else {
+        array unset -nocomplain cache
+        array set cache [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/DSx_User_set/DSx_home2_cache.tdb"]]
+
+        array set settings $cache(settings)
+        set settings_vars [favourites_settings_vars]
+        foreach k $settings_vars {
+            set ::settings($k) $settings($k)
+        }
+    }
+}
+
+load_DSx_home2_cache
+restore_DSx_1a-d_graph
+
+set ::DSx_graph_x 1350
+set ::DSx_graph_multiplier .9
+
+proc DSx_graph_size { value } {
+    set x [expr {$::DSx_graph_multiplier * $value}]
+    return $x
+}
+
+set ::DSx_graph_overlay 0
+set ::gst_start 0
+proc DSx_graph_switch { graph } {
+    set ::DSx_gs_showing 0
+    .can itemconfigure $::DSx_gs_toggle_icon -fill $::DSx_settings(font_colour)
+    if {$::gst_start > [clock milliseconds] && $::DSx_graph_overlay == $graph && $::de1_num_state($::de1(state)) == "Idle"} {
+        history_prep;
+        #history_viewer open -callback_cmd [namespace current]::history_viewer_callback
+        set ::DSx_graph_overlay 0
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_flow_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_flow_weight_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_flow_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_flow_weight_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_flow_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_flow_weight_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change
+
+    } else {
+        if {$::DSx_graph_overlay == $graph} {
+            set ::DSx_graph_overlay 0
+            set ::gst_start [expr {[clock milliseconds] + 1200}]
+            $::DSx_home_espresso_graph_1 element configure uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure
+            $::DSx_home_espresso_graph_1 element configure uline_espresso_flow_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x
+            $::DSx_home_espresso_graph_1 element configure uline_espresso_flow_weight_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x
+            $::DSx_home_espresso_graph_1 element configure uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change
+            $::DSx_home_espresso_graph_2 element configure uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure
+            $::DSx_home_espresso_graph_2 element configure uline_espresso_flow_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x
+            $::DSx_home_espresso_graph_2 element configure uline_espresso_flow_weight_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x
+            $::DSx_home_espresso_graph_2 element configure uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change
+            $::DSx_home_espresso_graph_3 element configure uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure
+            $::DSx_home_espresso_graph_3 element configure uline_espresso_flow_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x
+            $::DSx_home_espresso_graph_3 element configure uline_espresso_flow_weight_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x
+            $::DSx_home_espresso_graph_3 element configure uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change
+        } else {
+            set ::DSx_graph_overlay $graph
+            set ::gst_start [expr {[clock milliseconds] + 1200}]
+            $::DSx_home_espresso_graph_1 element configure uline_espresso_pressure -xdata DSx_${graph}_espresso_elapsed -ydata DSx_${graph}_espresso_pressure
+            $::DSx_home_espresso_graph_1 element configure uline_espresso_flow_2x -xdata DSx_${graph}_espresso_elapsed -ydata DSx_${graph}_espresso_flow_2x
+            $::DSx_home_espresso_graph_1 element configure uline_espresso_flow_weight_2x -xdata DSx_${graph}_espresso_elapsed -ydata DSx_${graph}_espresso_flow_weight_2x
+            $::DSx_home_espresso_graph_1 element configure uline_espresso_state_change_1 -xdata DSx_${graph}_espresso_elapsed -ydata DSx_${graph}_espresso_state_change
+            $::DSx_home_espresso_graph_2 element configure uline_espresso_pressure -xdata DSx_${graph}_espresso_elapsed -ydata DSx_${graph}_espresso_pressure
+            $::DSx_home_espresso_graph_2 element configure uline_espresso_flow_2x -xdata DSx_${graph}_espresso_elapsed -ydata DSx_${graph}_espresso_flow_2x
+            $::DSx_home_espresso_graph_2 element configure uline_espresso_flow_weight_2x -xdata DSx_${graph}_espresso_elapsed -ydata DSx_${graph}_espresso_flow_weight_2x
+            $::DSx_home_espresso_graph_2 element configure uline_espresso_state_change_1 -xdata DSx_${graph}_espresso_elapsed -ydata DSx_${graph}_espresso_state_change
+            $::DSx_home_espresso_graph_3 element configure uline_espresso_pressure -xdata DSx_${graph}_espresso_elapsed -ydata DSx_${graph}_espresso_pressure
+            $::DSx_home_espresso_graph_3 element configure uline_espresso_flow_2x -xdata DSx_${graph}_espresso_elapsed -ydata DSx_${graph}_espresso_flow_2x
+            $::DSx_home_espresso_graph_3 element configure uline_espresso_flow_weight_2x -xdata DSx_${graph}_espresso_elapsed -ydata DSx_${graph}_espresso_flow_weight_2x
+            $::DSx_home_espresso_graph_3 element configure uline_espresso_state_change_1 -xdata DSx_${graph}_espresso_elapsed -ydata DSx_${graph}_espresso_state_change
+        }
+    }
+}
+
+set ::DSx_gs_showing 0
+proc DSx_toggle_godshot {} {
+    if {($::DSx_settings(history_godshots) == "godshots" || $::DSx_settings(history_godshots) == "history") && $::DSx_gs_showing == 0} {
+        set ::DSx_gs_showing 1
+        .can itemconfigure $::DSx_gs_toggle_icon -fill $::DSx_settings(green)
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_pressure -xdata espresso_elapsed2 -ydata DSx_past2_espresso_pressure
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_flow_2x -xdata espresso_elapsed2 -ydata DSx_past2_espresso_flow_2x
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_flow_weight_2x -xdata espresso_elapsed2 -ydata DSx_past2_espresso_flow_weight_2x
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_state_change_1 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_state_change
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_pressure -xdata espresso_elapsed2 -ydata DSx_past2_espresso_pressure
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_flow_2x -xdata espresso_elapsed2 -ydata DSx_past2_espresso_flow_2x
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_flow_weight_2x -xdata espresso_elapsed2 -ydata DSx_past2_espresso_flow_weight_2x
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_state_change_1 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_state_change
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_pressure -xdata espresso_elapsed2 -ydata DSx_past2_espresso_pressure
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_flow_2x -xdata espresso_elapsed2 -ydata DSx_past2_espresso_flow_2x
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_flow_weight_2x -xdata espresso_elapsed2 -ydata DSx_past2_espresso_flow_weight_2x
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_state_change_1 -xdata espresso_elapsed2 -ydata DSx_past2_espresso_state_change
+    } else {
+        set ::DSx_gs_showing 0
+        .can itemconfigure $::DSx_gs_toggle_icon -fill $::DSx_settings(font_colour)
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_flow_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_flow_weight_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x
+        $::DSx_home_espresso_graph_1 element configure uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_flow_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_flow_weight_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x
+        $::DSx_home_espresso_graph_2 element configure uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_flow_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_flow_weight_2x -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x
+        $::DSx_home_espresso_graph_3 element configure uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change
+    }
+}
+
+### Graphs ###
+# espresso graph
+add_de1_widget "off" graph 1060 290 {
+    set ::DSx_home_espresso_graph_1 $widget
+    bind $widget [platform_button_press] {
+        say [translate {zoom}] $::settings(sound_button_in);
+        DSx_reset_graphs;
+        set_next_page off off_zoomed;
+        set_next_page espresso espresso_zoomed;
+        page_show $::de1(current_context);
+    }
+    $widget element create uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure -symbol none -label "" -linewidth [rescale_x_skin 4] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create uline_espresso_flow_2x  -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x -symbol none -label "" -linewidth [rescale_x_skin 4] -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create uline_espresso_flow_weight_2x  -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 4] -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change -label "" -linewidth [rescale_x_skin 2] -color #a2a293  -pixels 0;
+    $widget element create line_espresso_pressure_goal -xdata espresso_elapsed -ydata espresso_pressure_goal -symbol none -label "" -linewidth [rescale_x_skin 4] -color #69fdb3  -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {2 2};
+    $widget element create line2_espresso_pressure -xdata espresso_elapsed -ydata espresso_pressure -symbol none -label "" -linewidth [rescale_x_skin 8] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_goal_2x  -xdata espresso_elapsed -ydata espresso_flow_goal_2x -symbol none -label "" -linewidth [rescale_x_skin 4] -color #7aaaff -smooth $::settings(live_graph_smoothing_technique) -pixels 0  -dashes {2 2};
+    $widget element create line_espresso_flow_2x  -xdata espresso_elapsed -ydata espresso_flow_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_weight_2x  -xdata espresso_elapsed -ydata espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_state_change_1 -xdata espresso_elapsed -ydata espresso_state_change -label "" -linewidth [rescale_x_skin 4] -color #AAAAAA  -pixels 0 ;
+    $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -min 0.0;
+    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -min 0.0 -max $::de1(max_pressure) -subdivisions 5 -majorticks {0  2  4  6  8  10  12}  -hide 0;
+    $widget axis configure y2 -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -min 0.0 -max 6 -subdivisions 2 -majorticks {0  1  2  3  4  5  6} -hide 0;
+    $widget grid configure -color $::DSx_settings(grid_colour)
+} -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 1250] -height [rescale_y_skin 590] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
+
+add_de1_widget "espresso" graph 1060 290 {
+    set ::DSx_home_espresso_graph_2 $widget
+    bind $widget [platform_button_press] {
+        say [translate {zoom}] $::settings(sound_button_in);
+        DSx_reset_graphs;
+        set_next_page off off;
+        set_next_page espresso espresso_zoomed;
+        page_show $::de1(current_context);
+    }
+    $widget element create uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure -symbol none -label "" -linewidth [rescale_x_skin 4] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create uline_espresso_flow_2x  -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x -symbol none -label "" -linewidth [rescale_x_skin 4] -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create uline_espresso_flow_weight_2x  -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 4] -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change -label "" -linewidth [rescale_x_skin 2] -color #a2a293  -pixels 0;
+    $widget element create line_espresso_pressure_goal -xdata espresso_elapsed -ydata espresso_pressure_goal -symbol none -label "" -linewidth [rescale_x_skin 4] -color #69fdb3  -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {2 2};
+    $widget element create line2_espresso_pressure -xdata espresso_elapsed -ydata espresso_pressure -symbol none -label "" -linewidth [rescale_x_skin 8] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_goal_2x  -xdata espresso_elapsed -ydata espresso_flow_goal_2x -symbol none -label "" -linewidth [rescale_x_skin 4] -color #7aaaff -smooth $::settings(live_graph_smoothing_technique) -pixels 0  -dashes {2 2};
+    $widget element create line_espresso_flow_2x  -xdata espresso_elapsed -ydata espresso_flow_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_weight_2x  -xdata espresso_elapsed -ydata espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_state_change_1 -xdata espresso_elapsed -ydata espresso_state_change -label "" -linewidth [rescale_x_skin 4] -color #AAAAAA  -pixels 0 ;
+    $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -min 0.0;
+    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -min 0.0 -max $::de1(max_pressure) -subdivisions 5 -majorticks {0  2  4  6  8  10  12}  -hide 0;
+    $widget axis configure y2 -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -min 0.0 -max 6 -subdivisions 2 -majorticks {0  1  2  3  4  5  6} -hide 0;
+    $widget grid configure -color $::DSx_settings(grid_colour)
+} -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 1250] -height [rescale_y_skin 590] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
+
+add_de1_widget "preheat_2 water" graph 1060 290 {
+    set ::DSx_home_espresso_graph_3 $widget
+    bind $widget [platform_button_press] {
+    }
+    $widget element create uline_espresso_pressure -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_pressure -symbol none -label "" -linewidth [rescale_x_skin 4] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create uline_espresso_flow_2x  -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_2x -symbol none -label "" -linewidth [rescale_x_skin 4] -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create uline_espresso_flow_weight_2x  -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 4] -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create uline_espresso_state_change_1 -xdata DSx_0_espresso_elapsed -ydata DSx_0_espresso_state_change -label "" -linewidth [rescale_x_skin 2] -color #a2a293  -pixels 0;
+    $widget element create line_espresso_pressure_goal -xdata espresso_elapsed -ydata espresso_pressure_goal -symbol none -label "" -linewidth [rescale_x_skin 4] -color #69fdb3  -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {2 2};
+    $widget element create line2_espresso_pressure -xdata espresso_elapsed -ydata espresso_pressure -symbol none -label "" -linewidth [rescale_x_skin 8] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_goal_2x  -xdata espresso_elapsed -ydata espresso_flow_goal_2x -symbol none -label "" -linewidth [rescale_x_skin 4] -color #7aaaff -smooth $::settings(live_graph_smoothing_technique) -pixels 0  -dashes {2 2};
+    $widget element create line_espresso_flow_2x  -xdata espresso_elapsed -ydata espresso_flow_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_weight_2x  -xdata espresso_elapsed -ydata espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 8] -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_state_change_1 -xdata espresso_elapsed -ydata espresso_state_change -label "" -linewidth [rescale_x_skin 4] -color #AAAAAA  -pixels 0 ;
+    $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -min 0.0;
+    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -min 0.0 -max $::de1(max_pressure) -subdivisions 5 -majorticks {0  2  4  6  8  10  12}  -hide 0;
+    $widget axis configure y2 -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -min 0.0 -max 6 -subdivisions 2 -majorticks {0  1  2  3  4  5  6} -hide 0;
+    $widget grid configure -color $::DSx_settings(grid_colour)
+} -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 1250] -height [rescale_y_skin 590] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
+
+
+
+add_de1_widget "$::DSx_home_pages" graph 15 $::DSx_graph_x {
+    set ::DSx_home_espresso_graph_1a $widget
+    bind $widget [platform_button_press] {
+        DSx_graph_switch 1a
+        #DSx_shift_graphs;
+        #restore_DSx_1a-d_graph;
+    }
+    $widget element create line2_espresso_pressure -xdata DSx_1a_espresso_elapsed -ydata DSx_1a_espresso_pressure -symbol none -label "" -linewidth [rescale_x_skin 6] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_2x  -xdata DSx_1a_espresso_elapsed -ydata DSx_1a_espresso_flow_2x -symbol none -label "" -linewidth [rescale_x_skin 6] -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_weight_2x  -xdata DSx_1a_espresso_elapsed -ydata DSx_1a_espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 4] -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_state_change_1 -xdata DSx_1a_espresso_elapsed -ydata DSx_1a_espresso_state_change -label "" -linewidth [rescale_x_skin 3] -color #AAAAAA  -pixels 0 ;
+    $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 4] -min 0.0;
+    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 4] -min 0.0 -max $::de1(max_pressure) -subdivisions 5 -majorticks {0  2  4  6  8  10  12}  -hide 0;
+    $widget axis configure y2 -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 4] -min 0.0 -max 6 -subdivisions 2 -majorticks {0  1  2  3  4  5  6} -hide 0;
+    $widget grid configure -color $::DSx_settings(grid_colour)
+} -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin [DSx_graph_size 640]] -height [rescale_y_skin [DSx_graph_size 280]] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
+
+add_de1_widget "$::DSx_home_pages" graph 645 $::DSx_graph_x {
+    set ::DSx_home_espresso_graph_1b $widget
+    bind $widget [platform_button_press] {
+        say [translate {zoom}] $::settings(sound_button_in);
+        DSx_graph_switch 1b;
+    }
+    $widget element create line2_espresso_pressure -xdata DSx_1b_espresso_elapsed -ydata DSx_1b_espresso_pressure -symbol none -label "" -linewidth [rescale_x_skin 6] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_2x  -xdata DSx_1b_espresso_elapsed -ydata DSx_1b_espresso_flow_2x -symbol none -label "" -linewidth [rescale_x_skin 6] -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_weight_2x  -xdata DSx_1b_espresso_elapsed -ydata DSx_1b_espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 4] -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_state_change_1 -xdata DSx_1b_espresso_elapsed -ydata DSx_1b_espresso_state_change -label "" -linewidth [rescale_x_skin 3] -color #AAAAAA  -pixels 0 ;
+    $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 4] -min 0.0;
+    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 4] -min 0.0 -max $::de1(max_pressure) -subdivisions 5 -majorticks {0  2  4  6  8  10  12}  -hide 0;
+    $widget axis configure y2 -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 4] -min 0.0 -max 6 -subdivisions 2 -majorticks {0  1  2  3  4  5  6} -hide 0;
+    $widget grid configure -color $::DSx_settings(grid_colour)
+} -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin [DSx_graph_size 640]] -height [rescale_y_skin [DSx_graph_size 280]] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
+
+add_de1_widget "$::DSx_home_pages" graph 1275 $::DSx_graph_x {
+    set ::DSx_home_espresso_graph_1c $widget
+    bind $widget [platform_button_press] {
+        say [translate {zoom}] $::settings(sound_button_in);
+        DSx_graph_switch 1c;
+    }
+    $widget element create line2_espresso_pressure -xdata DSx_1c_espresso_elapsed -ydata DSx_1c_espresso_pressure -symbol none -label "" -linewidth [rescale_x_skin 6] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_2x  -xdata DSx_1c_espresso_elapsed -ydata DSx_1c_espresso_flow_2x -symbol none -label "" -linewidth [rescale_x_skin 6] -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_weight_2x  -xdata DSx_1c_espresso_elapsed -ydata DSx_1c_espresso_flow_weight_2x -symbol none -label "" -linewidth [rescale_x_skin 4] -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_state_change_1 -xdata DSx_1c_espresso_elapsed -ydata DSx_1c_espresso_state_change -label "" -linewidth [rescale_x_skin 3] -color #AAAAAA  -pixels 0 ;
+    $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 4] -min 0.0;
+    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 4] -min 0.0 -max $::de1(max_pressure) -subdivisions 5 -majorticks {0  2  4  6  8  10  12}  -hide 0;
+    $widget axis configure y2 -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 4] -min 0.0 -max 6 -subdivisions 2 -majorticks {0  1  2  3  4  5  6} -hide 0;
+    $widget grid configure -color $::DSx_settings(grid_colour)
+} -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin [DSx_graph_size 640]] -height [rescale_y_skin [DSx_graph_size 280]] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
+
+# Steam graph
+add_de1_widget "off espresso preheat_2 water" graph 1905 $::DSx_graph_x {
+    set ::DSx_home_steam_graph_1 $widget
+    bind $widget [platform_button_press] {
+        say [translate {zoom}] $::settings(sound_button_in);
+        set_next_page off off_steam_zoomed;
+        set_next_page steam steam_steam_zoomed;
+        page_show $::de1(current_context);
+    }
+    $widget element create line_steam_pressure -xdata steam_elapsed -ydata steam_pressure -symbol none -label "" -linewidth [rescale_x_skin 4] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_steam_flow -xdata steam_elapsed -ydata steam_flow -symbol none -label "" -linewidth [rescale_x_skin 4] -color #4e85f4  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_steam_temperature -xdata steam_elapsed -ydata steam_temperature -symbol none -label "" -linewidth [rescale_x_skin 5] -color #e73249  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -linewidth [rescale_x_skin 2]
+    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -min 0.0 -max [expr {$::settings(max_steam_pressure) + 0.01}] -subdivisions 5 -majorticks {1 2 3}
+    $widget grid configure -color $::DSx_settings(grid_colour)
+} -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 640] -height [rescale_y_skin 220] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
+
+add_de1_widget "steam" graph 1905 $::DSx_graph_x {
+    set ::DSx_home_steam_graph_2 $widget
+    bind $widget [platform_button_press] {
+        say [translate {zoom}] $::settings(sound_button_in);
+        set_next_page off off;
+        set_next_page steam steam_steam_zoomed;
+        page_show $::de1(current_context);
+    }
+    $widget element create line_steam_pressure -xdata steam_elapsed -ydata steam_pressure -symbol none -label "" -linewidth [rescale_x_skin 4] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_steam_flow -xdata steam_elapsed -ydata steam_flow -symbol none -label "" -linewidth [rescale_x_skin 4] -color #4e85f4  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_steam_temperature -xdata steam_elapsed -ydata steam_temperature -symbol none -label "" -linewidth [rescale_x_skin 5] -color #e73249  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -linewidth [rescale_x_skin 2]
+    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -min 0.0 -max [expr {$::settings(max_steam_pressure) + 0.01}] -subdivisions 5 -majorticks {1 2 3}
+    $widget grid configure -color $::DSx_settings(grid_colour)
+} -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 640] -height [rescale_y_skin 220] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
+
+add_de1_widget "steam" graph 1060 290 {
+    set ::DSx_home_steam_graph_3 $widget
+    bind $widget [platform_button_press] {
+        say [translate {zoom}] $::settings(sound_button_in);
+        set_next_page off off;
+        set_next_page steam steam_steam_zoomed;
+        page_show $::de1(current_context);
+    }
+    $widget element create line_steam_pressure -xdata steam_elapsed -ydata steam_pressure -symbol none -label "" -linewidth [rescale_x_skin 8] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_steam_flow -xdata steam_elapsed -ydata steam_flow -symbol none -label "" -linewidth [rescale_x_skin 8] -color #4e85f4  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_steam_temperature -xdata steam_elapsed -ydata steam_temperature -symbol none -label "" -linewidth [rescale_x_skin 8] -color #e73249  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -linewidth [rescale_x_skin 2]
+    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -min 0.0 -max [expr {$::settings(max_steam_pressure) + 0.01}] -subdivisions 5 -majorticks {1 2 3}
+    $widget grid configure -color $::DSx_settings(grid_colour)
+} -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 1250] -height [rescale_y_skin 590] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
+
+### Graph (zoom) Pages
+#### to make the graph work for sim
+add_de1_variable "$::DSx_zoomed_pages $::DSx_steam_zoomed_pages" 0 2000 -font [DSx_font font 6] -fill #000 -textvariable {
+    [pressure_text]
+    [waterflow_text]
+    [waterweight_text]
+    [waterweightflow_text]
+    [watervolume_text]
+    [watertemp_text]
+    [mixtemp_text]
+    [steamtemp_text]
+    [group_head_heater_temperature_text]
+    [espresso_goal_temp_text]
+    [pour_volume]
+    [preinfusion_volume]
+    [profile_type_text]
+}
+# zoomed espresso
+add_de1_widget "$::DSx_zoomed_pages" graph 40 70 {
+    set ::DSx_espresso_zoomed_graph $widget
+    bind $widget [platform_button_press] {
+        set x [translate_coordinates_finger_down_x %x]
+        set y [translate_coordinates_finger_down_y %y]
+        if {$x < [rescale_y_skin 500]} {
+            # left column clicked on chart, indicates zoom
+
+            if {$y > [rescale_y_skin 610]} {
+                DSx_scroll_down
+            } else {
+                DSx_scroll_up
+            }
+        } else {
+        save_DSx_settings;
+        set_next_page off off;
+        set_next_page espresso_zoomed espresso;
+        set_next_page espresso espresso;
+        set_next_page off_zoomed off;
+        page_show $::de1(current_context);
+        }
+    }
+    $widget element create line2_espresso_pressure -xdata espresso_elapsed -ydata espresso_pressure -symbol none -label "" -linewidth $::DSx_settings(glt1) -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_temperature_basket -xdata espresso_elapsed -ydata DSx_espresso_temperature_basket -symbol none -label ""  -linewidth $::DSx_settings(glt2) -color #e73249 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_temperature_mix -xdata espresso_elapsed -ydata DSx_espresso_temperature_mix -symbol none -label ""  -linewidth $::DSx_settings(glb2) -color #ff9900 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_weight_2x  -xdata espresso_elapsed -ydata espresso_flow_weight_2x -symbol none -label "" -linewidth $::DSx_settings(glt4) -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_weight_2x  -xdata espresso_elapsed -ydata espresso_weight_chartable -symbol none -label "" -linewidth $::DSx_settings(glb4) -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes $::settings(chart_dashes_espresso_weight);
+    $widget element create line_espresso_flow_2x  -xdata espresso_elapsed -ydata espresso_flow_2x -symbol none -label "" -linewidth $::DSx_settings(glt5) -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_resistance  -xdata espresso_elapsed -ydata espresso_resistance -symbol none -label "" -linewidth $::DSx_settings(glb1) -color #e5e500 -smooth $::settings(live_graph_smoothing_technique) -pixels 0
+
+    $widget element create line_espresso_flow_delta_1  -xdata espresso_elapsed -ydata espresso_flow_delta -symbol none -label "" -linewidth $::DSx_settings(glb5) -color #98c5ff -pixels 0 -smooth $::settings(live_graph_smoothing_technique)
+    $widget element create line_espresso_state_change_1 -xdata espresso_elapsed -ydata espresso_state_change -label "" -linewidth $::DSx_settings(glt3) -color #AAAAAA  -pixels 0 ;
+    $widget element create line_espresso_temperature_goal -xdata espresso_elapsed -ydata DSx_espresso_temperature_goal -symbol none -label "" -linewidth $::DSx_settings(glb3) -color #e73249 -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
+    $widget element create line_espresso_pressure_goal -xdata espresso_elapsed -ydata espresso_pressure_goal -symbol none -label "" -linewidth $::DSx_settings(glb3) -color #69fdb3  -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes {5 5};
+    $widget element create line_espresso_flow_goal_2x  -xdata espresso_elapsed -ydata espresso_flow_goal_2x -symbol none -label "" -linewidth $::DSx_settings(glb3) -color #7aaaff -smooth $::settings(live_graph_smoothing_technique) -pixels 0  -dashes {5 5};
+    $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 9] -min 0.0;
+    $widget axis configure y -color #008c4c -tickfont [DSx_font font 9] -min $::DSx_settings(zoomed_y_axis_min) -max $::DSx_settings(zoomed_y_axis_max) -subdivisions 5 -majorticks {0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15}  -hide 0;
+    $widget axis configure y2 -color #206ad4 -tickfont [DSx_font font 9] -min $::DSx_settings(zoomed_y2_axis_min) -max $::DSx_settings(zoomed_y2_axis_max) -subdivisions 2 -majorticks {0 0.5 1 1.5 2 2.5 3 3.5 4 4.5 5 5.5 6 6.5 7 7.5 8} -hide 0;
+    $widget grid configure -color $::DSx_settings(grid_colour)
+} -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 2490] -height [rescale_y_skin 1230] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
+add_de1_image "$::DSx_zoomed_pages" 2200 1295 "[skin_directory_graphics]/icons/button5.png"
+add_de1_image "$::DSx_zoomed_pages" 40 1400 "[skin_directory_graphics]/icons/zoomminus.png"
+add_de1_image "$::DSx_zoomed_pages" 240 1400 "[skin_directory_graphics]/icons/zoomplus.png"
+add_de1_image "$::DSx_zoomed_pages" 1 375 "[skin_directory_graphics]/icons/zoomshift.png"
+add_de1_image "$::DSx_zoomed_pages" 480 1300 "[skin_directory_graphics]/icons/button4.png"
+add_de1_image "$::DSx_zoomed_pages" 700 1300 "[skin_directory_graphics]/icons/button4.png"
+add_de1_image "$::DSx_zoomed_pages" 920 1300 "[skin_directory_graphics]/icons/button4.png"
+add_de1_image "$::DSx_zoomed_pages" 1140 1300 "[skin_directory_graphics]/icons/button4.png"
+add_de1_image "$::DSx_zoomed_pages" 1360 1300 "[skin_directory_graphics]/icons/button4.png"
+add_de1_image "$::DSx_zoomed_pages" 480 1444 "[skin_directory_graphics]/icons/button4.png"
+add_de1_image "$::DSx_zoomed_pages" 700 1444 "[skin_directory_graphics]/icons/button4.png"
+add_de1_image "$::DSx_zoomed_pages" 920 1444 "[skin_directory_graphics]/icons/button4.png"
+add_de1_image "$::DSx_zoomed_pages" 1140 1444 "[skin_directory_graphics]/icons/button4.png"
+add_de1_image "$::DSx_zoomed_pages" 1360 1444 "[skin_directory_graphics]/icons/button4.png"
+add_de1_image "espresso_zoomed steam_steam_zoomed" 2258 1340 "[skin_directory_graphics]/icons/stop.png"
+# Reset
+set ::DSx_graph_temp_units_text [add_de1_variable "$::DSx_zoomed_pages" 20 1314 -text "" -font [DSx_font font 7] -fill #e73249 -anchor "w"  -justify "center" -textvariable {[DSx_graph_temp_units_text]}]
+set ::DSx_graph_reset_button_text [add_de1_variable "$::DSx_zoomed_pages" 240 1350 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor "center"  -justify "center" -textvariable {[DSx_graph_reset_button_text]}]
+add_de1_button "$::DSx_zoomed_pages" {say [translate {reset}] $::settings(sound_button_in); DSx_graph_reset_button;} 100 1200 400 1410
+# top row buttons
+add_de1_variable "$::DSx_zoomed_pages" 590 1370 -text "" -font [DSx_font font 8] -fill "#18c37e" -anchor "center"  -justify "center" -textvariable {[round_to_one_digits [expr $::de1(pressure)]]bar}
+add_de1_variable "$::DSx_zoomed_pages" 810 1370 -text "" -font [DSx_font font 8] -fill "#e73249" -anchor "center"  -justify "center" -textvariable {[group_head_heater_temperature_text]}
+add_de1_variable "$::DSx_zoomed_pages" 1030 1370 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor "center"  -justify "center" -textvariable {steps}
+add_de1_variable "$::DSx_zoomed_pages" 1250 1370 -text "" -font [DSx_font font 8] -fill "#a2693d" -anchor "center"  -justify "center" -textvariable {[round_to_one_digits [expr $::de1(scale_weight_rate)]]g/s}
+add_de1_variable "$::DSx_zoomed_pages" 1470 1370 -text "" -font [DSx_font font 8] -fill "#4e85f4" -anchor "center"  -justify "center" -textvariable {[round_to_one_digits [expr $::de1(flow)]]mL/s}
+# bottom row buttons
+add_de1_variable "$::DSx_zoomed_pages" 590 1515 -text "" -font [DSx_font font 8] -fill #e5e500 -anchor "center"  -justify "center" -textvariable {[DSx_R]}
+add_de1_variable "$::DSx_zoomed_pages" 810 1515 -text "" -font [DSx_font font 8] -fill "#ff9900" -anchor "center"  -justify "center" -textvariable {[mixtemp_text]}
+add_de1_variable "$::DSx_zoomed_pages" 1030 1515 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor "center"  -justify "center" -textvariable {goal}
+add_de1_variable "$::DSx_zoomed_pages" 1250 1515 -text "" -font [DSx_font font 8] -fill "#a2693d" -anchor "center"  -justify "center" -textvariable {[round_to_one_digits [expr $::de1(scale_weight)]]g }
+add_de1_variable "$::DSx_zoomed_pages" 1470 1515 -text "" -font [DSx_font font 8] -fill "#4e85f4" -anchor "center"  -justify "center" -textvariable {delta}
+add_de1_variable "off_zoomed" 1280 0 -text "" -font [DSx_font font 9] -fill $::DSx_settings(font_colour) -anchor n -textvariable {$::DSx_settings(live_graph_profile)   -   [last_shot_date]}
+add_de1_variable "off_zoomed" 1650 1340 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor w -textvariable {Beans   [round_to_one_digits $::DSx_settings(live_graph_beans)]g}
+add_de1_variable "off_zoomed" 1650 1400 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor w -textvariable {Shot   $::DSx_settings(live_graph_weight)g  ([last_extraction_ratio])}
+add_de1_variable "off_zoomed" 1650 1460 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor w -textvariable {Water  [DSx_live_graph_data_water]mL}
+add_de1_variable "off_zoomed" 1650 1520 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor w -textvariable {Time   [DSx_live_graph_data_timer]s}
+add_de1_variable "espresso_zoomed" 1650 1340 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor w -textvariable {Beans   [round_to_one_digits [expr $::settings(grinder_dose_weight)]]g}
+add_de1_variable "espresso_zoomed" 1650 1400 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor w -textvariable {Shot   [round_to_one_digits $::de1(scale_sensor_weight)]g  ([live_extraction_ratio])}
+add_de1_variable "espresso_zoomed" 1650 1460 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor w -textvariable {Water  [DSx_water_data]mL}
+add_de1_variable "espresso_zoomed" 1650 1520 -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor w -textvariable {Time   [DSx_espresso_elapsed_timer]s}
+add_de1_variable "off_zoomed" 2342 1430 -text [translate "START"] -font [DSx_font font 13] -fill $::DSx_settings(green) -anchor "center" -justify "center" -textvariable {[start_text_if_espresso_ready]}
+add_de1_text "off_zoomed" 2342 1486 -text [translate "ESPRESSO"] -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center"
+add_de1_button "off_zoomed" {say [translate {espresso}] $::settings(sound_button_in); set ::DSxv 0; DSx_espresso;} 2200 1280 2560 1600
+add_de1_button "espresso_zoomed" {say [translate {stop}] $::settings(sound_button_in); set_next_page off off; start_idle} 2200 1280 2560 1600
+add_de1_button "$::DSx_zoomed_pages" {say [translate {zoom}] $::settings(sound_button_in); DSx_zoom_out;} 0 1420 230 1600
+add_de1_button "$::DSx_zoomed_pages" {say [translate {zoom}] $::settings(sound_button_in); DSx_zoom_in;} 230 1420 460 1600
+add_de1_button "$::DSx_zoomed_pages" {say [translate {zoom}] $::settings(sound_button_in); push_t1;} 480 1300 700 1440
+add_de1_button "$::DSx_zoomed_pages" {say [translate {zoom}] $::settings(sound_button_in); push_t2;} 700 1300 920 1440
+add_de1_button "$::DSx_zoomed_pages" {say [translate {zoom}] $::settings(sound_button_in); push_t3;} 920 1300 1140 1440
+add_de1_button "$::DSx_zoomed_pages" {say [translate {zoom}] $::settings(sound_button_in); push_t4;} 1140 1300 1360 1440
+add_de1_button "$::DSx_zoomed_pages" {say [translate {zoom}] $::settings(sound_button_in); push_t5;} 1360 1300 1580 1440
+add_de1_button "$::DSx_zoomed_pages" {say [translate {zoom}] $::settings(sound_button_in); push_b1;} 480 1440 700 1600
+add_de1_button "$::DSx_zoomed_pages" {say [translate {zoom}] $::settings(sound_button_in); push_b2;} 700 1440 920 1600
+add_de1_button "$::DSx_zoomed_pages" {say [translate {zoom}] $::settings(sound_button_in); push_b3;} 920 1440 1140 1600
+add_de1_button "$::DSx_zoomed_pages" {say [translate {zoom}] $::settings(sound_button_in); push_b4;} 1140 1440 1360 1600
+add_de1_button "$::DSx_zoomed_pages" {say [translate {zoom}] $::settings(sound_button_in); push_b5;} 1360 1440 1580 1600
+
+# Steam zoomed
+add_de1_widget "$::DSx_steam_zoomed_pages" graph 40 0 {
+    set ::DSx_home_steam_zoomed_graph $widget
+    bind $widget [platform_button_press] {
+        say [translate {zoom}] $::settings(sound_button_in);
+        set_next_page off off;
+        set_next_page steam_steam_zoomed steam;
+        set_next_page steam steam;
+        set_next_page off_steam_zoomed off;
+        page_show $::de1(current_context);
+    }
+    $widget element create line_steam_pressure -xdata steam_elapsed -ydata steam_pressure -symbol none -label "" -linewidth [rescale_x_skin 10] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_steam_flow -xdata steam_elapsed -ydata steam_flow -symbol none -label "" -linewidth [rescale_x_skin 10] -color #4e85f4  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -linewidth [rescale_x_skin 2]
+    $widget axis configure y -color #008c4c -tickfont [DSx_font font 6] -min 0.0;
+    $widget grid configure -color $::DSx_settings(grid_colour)
+} -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 2490] -height [rescale_y_skin 800] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
+
+add_de1_widget "$::DSx_steam_zoomed_pages" graph 40 800 {
+    set ::DSx_home_steam_zoomed_graph $widget
+    bind $widget [platform_button_press] {
+        say [translate {zoom}] $::settings(sound_button_in);
+        set_next_page off off;
+        set_next_page steam_steam_zoomed steam;
+        set_next_page steam steam;
+        set_next_page off_steam_zoomed off;
+        page_show $::de1(current_context);
+    }
+    $widget element create line_steam_temperature -xdata steam_elapsed -ydata steam_temperature -symbol none -label ""  -linewidth [rescale_x_skin 10] -color #e73249  -pixels 0 -dashes $::settings(chart_dashes_temperature);
+    if {$::settings(enable_fahrenheit) == 1} {
+        $widget axis configure y -color #e73249 -tickfont [DSx_font font 6] -min 250 -max 350;
+    } else {
+        $widget axis configure y -color #e73249 -tickfont [DSx_font font 6] -min 130 -max 180;
+    }
+    $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -linewidth [rescale_x_skin 2]
+    $widget grid configure -color $::DSx_settings(grid_colour)
+} -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 2490] -height [rescale_y_skin 500] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
+add_de1_variable "steam_steam_zoomed" 1960 1400 -text "" -font [DSx_font font 20] -fill $::DSx_settings(font_colour) -anchor "center" -textvariable {[DSx_steam_time]}
+add_de1_variable "$::DSx_steam_zoomed_pages" 1800 1430 -justify center -anchor "center" -text "" -font [DSx_font font 8] -fill $::DSx_settings(red) -textvariable {$::steam_off_message}
+add_de1_variable "steam_steam_zoomed" 1960 1460 -text "" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center" -textvariable {[DSx_steam_info]}
+add_de1_text "$::DSx_steam_zoomed_pages" 50 24 -text [translate "Pressure (bar)"] -font [DSx_font font 9] -fill "#008c4c" -justify "left" -anchor "nw"
+add_de1_text "$::DSx_steam_zoomed_pages" 2460 24 -text [translate "Flow (mL/s)"] -font [DSx_font font 9] -fill "#206ad4" -justify "left" -anchor "ne"
+add_de1_text "$::DSx_steam_zoomed_pages" 1600 24 -text [translate "Temperature ([return_html_temperature_units])"] -font [DSx_font font 9] -fill "#e73249" -justify "left" -anchor "nw"
+add_de1_image "$::DSx_steam_zoomed_pages" 2200 1295 "[skin_directory_graphics]/icons/button5.png"
+add_de1_variable "off_steam_zoomed" 2342 1430 -text [translate "START"] -font [DSx_font font 13] -fill $::DSx_settings(green) -anchor "center" -justify "center" -textvariable {[start_text_if_espresso_ready]}
+add_de1_text "off_steam_zoomed" 2342 1486 -text [translate "STEAM"] -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center"
+add_de1_button "off_steam_zoomed" {say [translate {steam}] $::settings(sound_button_in); DSx_steam} 2200 1280 2560 1600
+add_de1_button "steam_steam_zoomed" {say [translate {stop}] $::settings(sound_button_in); DSx_steam_state_off; set_next_page off off; start_idle; check_if_steam_clogged} 2200 1280 2560 1600
+add_de1_variable "$::DSx_steam_zoomed_pages" 300 1300 -justify right -anchor "nw" -font [DSx_font font 8] -fill #18c37e -textvariable {Pressure - [pressure_text]}
+add_de1_variable "$::DSx_steam_zoomed_pages" 300 1360 -justify right -anchor "nw" -font [DSx_font font 8] -fill #4e85f4 -textvariable {Flow - [waterflow_text]}
+add_de1_variable "$::DSx_steam_zoomed_pages" 300 1420 -justify right -anchor "nw" -font [DSx_font font 8] -fill #e73249 -textvariable {Temperature - [steamtemp_text]}
+add_de1_variable "$::DSx_steam_zoomed_pages" 300 1480 -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Steam Timer - [DSx_steam_time_text]}
+add_de1_variable "$::DSx_steam_zoomed_pages" 1000 1300 -justify right -anchor "nw" -font [DSx_font font 8] -fill #18c37e -textvariable {}
+add_de1_variable "$::DSx_steam_zoomed_pages" 1000 1360 -justify right -anchor "nw" -font [DSx_font font 8] -fill #4e85f4 -textvariable {Flow setting - [return_steam_flow_calibration $::settings(steam_flow)]}
+add_de1_variable "$::DSx_steam_zoomed_pages" 1000 1420 -justify right -anchor "nw" -font [DSx_font font 8] -fill #e73249 -textvariable {Temperature setting - [return_steam_heater_calibration $::settings(steam_temperature)]}
+add_de1_variable "$::DSx_steam_zoomed_pages" 1000 1480 -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Counter - [round_to_integer $::settings(steaming_count)]}
+
+# end graphs
+
+DSx_start_cache_graphs

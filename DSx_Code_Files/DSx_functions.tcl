@@ -46,7 +46,7 @@ proc DSx_startup {} {
     check_MySaver_exists
     join_DSx_plugins
     no_machine_prep
-    #history_vars
+    history_vars
     save_DSx_settings
     save_settings
 }
@@ -196,6 +196,9 @@ proc delete_old_variables {} {
 }
 
 proc check_DSx_variables {} {
+    if {[info exists ::DSx_settings(DSx_home)] == 0} {
+        set ::DSx_settings(DSx_home) "dial"
+    }
     if {[info exists ::DSx_settings(past_clock)] == 0} {
         set ::DSx_settings(past_clock) {}
     }
@@ -392,6 +395,8 @@ proc set_colour {} {
     $::DSx_home_steam_graph_2 configure -plotbackground $::DSx_settings(bg_colour) -background $::DSx_settings(bg_colour)
     $::DSx_home_steam_graph_3 configure -plotbackground $::DSx_settings(bg_colour) -background $::DSx_settings(bg_colour)
     $::DSx_home_steam_zoomed_graph  configure -plotbackground $::DSx_settings(bg_colour) -background $::DSx_settings(bg_colour)
+    $::DSx_6_theme_home1 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour)
+    $::DSx_6_theme_home2 configure -bg $::DSx_settings(bg_colour) -activebackground $::DSx_settings(bg_colour)
     $::DSx_6_theme_radiobutton1 configure -bg $::DSx_settings(bg_colour) -foreground $::DSx_settings(font_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
     $::DSx_6_theme_radiobutton2 configure -bg $::DSx_settings(bg_colour) -foreground $::DSx_settings(font_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
     $::DSx_6_theme_radiobutton3 configure -bg $::DSx_settings(bg_colour) -foreground $::DSx_settings(font_colour) -activebackground $::DSx_settings(bg_colour) -font "[DSx_font font 8]"
@@ -513,6 +518,7 @@ proc load_DSx_settings {} {
     set version $::DSx_settings(version)
     array set ::DSx_settings [encoding convertfrom utf-8 [read_binary_file [DSx_filename]]]
     set ::DSx_settings(version) $version
+    set ::DSx_flush_time2 $::DSx_settings(flush_time2)
     blt::vector create espresso_elapsed1 espresso_elapsed2  DSx_past_espresso_resistance DSx_past_espresso_elapsed DSx_past_espresso_pressure DSx_past_espresso_flow DSx_past_espresso_flow_weight DSx_past_espresso_flow_weight_2x DSx_past_espresso_flow_2x DSx_past_espresso_temperature_basket DSx_past_espresso_temperature_mix  DSx_past_espresso_flow_goal DSx_past_espresso_flow_goal_2x DSx_past_espresso_pressure_goal DSx_past_espresso_temperature_goal DSx_past_espresso_temperature_goal_01 DSx_past_espresso_temperature_basket_01
     blt::vector create espresso_elapsed1 espresso_elapsed2  DSx_past2_espresso_resistance DSx_past2_espresso_elapsed DSx_past2_espresso_pressure DSx_past2_espresso_flow DSx_past2_espresso_flow_weight DSx_past2_espresso_flow_weight_2x DSx_past2_espresso_flow_2x DSx_past2_espresso_temperature_basket  DSx_past2_espresso_temperature_mix  DSx_past2_espresso_flow_goal DSx_past2_espresso_flow_goal_2x DSx_past2_espresso_pressure_goal DSx_past2_espresso_temperature_goal DSx_past2_espresso_temperature_goal_01 DSx_past2_espresso_temperature_basket_01
     blt::vector create espresso_elapsed1 espresso_elapsed2  DSx_last_espresso_resistance DSx_last_espresso_elapsed DSx_last_espresso_pressure DSx_last_espresso_flow DSx_last_espresso_flow_weight DSx_last_espresso_flow_weight_2x DSx_last_espresso_flow_2x DSx_last_espresso_temperature_basket DSx_last_espresso_temperature_mix  DSx_last_espresso_flow_goal DSx_last_espresso_flow_goal_2x DSx_last_espresso_pressure_goal DSx_last_espresso_temperature_goal DSx_last_espresso_temperature_goal_01 DSx_last_espresso_temperature_basket_01
