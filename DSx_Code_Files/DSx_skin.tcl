@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 4.72
+set ::DSx_settings(version) 4.73
 
 package provide DSx_skin 1.0
 
@@ -353,7 +353,7 @@ if {[file exists "[skin_directory]/DSx_Home_Page/DSx_home.page"] == 1} {
         $widget element create line_steam_flow -xdata steam_elapsed -ydata steam_flow -symbol none -label "" -linewidth [rescale_x_skin 4] -color #4e85f4  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
         #$widget element create line_steam_temperature -xdata steam_elapsed -ydata steam_temperature -symbol none -label "" -linewidth [rescale_x_skin 5] -color #e73249  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
         $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -linewidth [rescale_x_skin 2]
-        $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -min 0.0; -subdivisions 1
+        $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -min 0.0 -subdivisions 1
         $widget grid configure -color $::DSx_settings(grid_colour)
     } -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 650] -height [rescale_y_skin 220] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
     # Espresso action graph
@@ -387,7 +387,7 @@ if {[file exists "[skin_directory]/DSx_Home_Page/DSx_home.page"] == 1} {
         $widget element create line_steam_flow -xdata steam_elapsed -ydata steam_flow -symbol none -label "" -linewidth [rescale_x_skin 4] -color #4e85f4  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
         #$widget element create line_steam_temperature -xdata steam_elapsed -ydata steam_temperature -symbol none -label "" -linewidth [rescale_x_skin 5] -color #e73249  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
         $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -linewidth [rescale_x_skin 2]
-        $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -min 0.0; -subdivisions 1
+        $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -min 0.0 -subdivisions 1
         $widget grid configure -color $::DSx_settings(grid_colour)
     } -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 650] -height [rescale_y_skin 220] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
     # Espresso action graph
