@@ -1,5 +1,5 @@
 ### Home page for DSx by Damian ###
-set ::DSx_home_page_version {2021 v3.5}
+set ::DSx_home_page_version {2021 v3.6}
 
 set listbox_font [DSx_font font 8]
 set ::DSx_settings(next_shot_DSx_home_coords) {500 974}
@@ -1002,9 +1002,9 @@ add_de1_widget "off espresso preheat_2 water" graph 1905 $::DSx_graph_x {
     }
     $widget element create line_steam_pressure -xdata steam_elapsed -ydata steam_pressure -symbol none -label "" -linewidth [rescale_x_skin 4] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create line_steam_flow -xdata steam_elapsed -ydata steam_flow -symbol none -label "" -linewidth [rescale_x_skin 4] -color #4e85f4  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
-    $widget element create line_steam_temperature -xdata steam_elapsed -ydata steam_temperature -symbol none -label "" -linewidth [rescale_x_skin 5] -color #e73249  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    #$widget element create line_steam_temperature -xdata steam_elapsed -ydata steam_temperature -symbol none -label "" -linewidth [rescale_x_skin 5] -color #e73249  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -linewidth [rescale_x_skin 2]
-    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -min 0.0 -max [expr {$::settings(max_steam_pressure) + 0.01}] -subdivisions 5 -majorticks {1 2 3}
+    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -min 0.0  -subdivisions 1
     $widget grid configure -color $::DSx_settings(grid_colour)
 } -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 640] -height [rescale_y_skin 220] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
 
@@ -1018,9 +1018,9 @@ add_de1_widget "steam" graph 1905 $::DSx_graph_x {
     }
     $widget element create line_steam_pressure -xdata steam_elapsed -ydata steam_pressure -symbol none -label "" -linewidth [rescale_x_skin 4] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create line_steam_flow -xdata steam_elapsed -ydata steam_flow -symbol none -label "" -linewidth [rescale_x_skin 4] -color #4e85f4  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
-    $widget element create line_steam_temperature -xdata steam_elapsed -ydata steam_temperature -symbol none -label "" -linewidth [rescale_x_skin 5] -color #e73249  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    #$widget element create line_steam_temperature -xdata steam_elapsed -ydata steam_temperature -symbol none -label "" -linewidth [rescale_x_skin 5] -color #e73249  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -linewidth [rescale_x_skin 2]
-    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -min 0.0 -max [expr {$::settings(max_steam_pressure) + 0.01}] -subdivisions 5 -majorticks {1 2 3}
+    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 5] -min 0.0 -subdivisions 1
     $widget grid configure -color $::DSx_settings(grid_colour)
 } -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 640] -height [rescale_y_skin 220] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
 
@@ -1034,9 +1034,9 @@ add_de1_widget "steam" graph 1060 290 {
     }
     $widget element create line_steam_pressure -xdata steam_elapsed -ydata steam_pressure -symbol none -label "" -linewidth [rescale_x_skin 8] -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create line_steam_flow -xdata steam_elapsed -ydata steam_flow -symbol none -label "" -linewidth [rescale_x_skin 8] -color #4e85f4  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
-    $widget element create line_steam_temperature -xdata steam_elapsed -ydata steam_temperature -symbol none -label "" -linewidth [rescale_x_skin 8] -color #e73249  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    #$widget element create line_steam_temperature -xdata steam_elapsed -ydata steam_temperature -symbol none -label "" -linewidth [rescale_x_skin 8] -color #e73249  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -linewidth [rescale_x_skin 2]
-    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -min 0.0 -max [expr {$::settings(max_steam_pressure) + 0.01}] -subdivisions 5 -majorticks {1 2 3}
+    $widget axis configure y -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 6] -min 0.0 -subdivisions 1
     $widget grid configure -color $::DSx_settings(grid_colour)
 } -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 1250] -height [rescale_y_skin 590] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
 
