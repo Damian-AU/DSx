@@ -3169,12 +3169,12 @@ proc DSx_load_font {name fn pcsize {androidsize {}} } {
     }
     set platform_font_size [expr {int(1.0 * $::fontm * $pcsize * $f * $offset)}]
 
-    if {[language] == "zh-hant" || [language] == "zh-hans"} {
-        set fn ""
-        set familyname $::helvetica_font
-    } elseif {[language] == "th"} {
-        set fn "[homedir]/fonts/sarabun.ttf"
-    }
+    #if {[language] == "zh-hant" || [language] == "zh-hans"} {
+    #    set fn ""
+    #    set familyname $::helvetica_font
+    #} elseif {[language] == "th"} {
+    #   set fn "[homedir]/fonts/sarabun.ttf"
+    #}
     if {[info exists ::loaded_fonts] != 1} {
         set ::loaded_fonts list
     }
