@@ -679,9 +679,10 @@ proc DSx_steam_time {} {
 }
 
 proc DSx_steam_state_off {} {
-    set ::DSx_steam_state 0
+    #set ::DSx_steam_state 0
+    set ::DSx_steam_state 3
+    set ::DSx_purging_text_hold_time [clock seconds]
 }
-
 
 proc DSx_steam_info {} {
     if {$::DSx_steam_purge_state != 1} {
@@ -690,6 +691,12 @@ proc DSx_steam_info {} {
     if {[expr "\[round_to_integer $::settings(steam_timeout)] - \[steam_pour_timer]"] < 0 && [expr "\[round_to_integer $::settings(steam_timeout)] - \[steam_pour_timer]" + 2] > 0} {
         set ::DSx_steam_purge_state 1
         set ::DSx_steam_state_text "Start steam purge"
+    }
+    if {$::DSx_steam_state == 3 && $::DSx_purging_text_hold_time < [expr [clock seconds] - 5]} {
+        set ::DSx_steam_state 0
+    }
+    if {$::DSx_steam_state == 3} {
+        set ::DSx_steam_state_text "purging"
     }
     return $::DSx_steam_state_text
 }

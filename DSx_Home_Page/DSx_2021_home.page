@@ -1,5 +1,8 @@
 ### Home page for DSx by Damian ###
-set ::DSx_home_page_version {2021 v3.6}
+set ::DSx_home_page_version {2021 v3.6.2}
+### added - profile title to Dflowset page
+### add - purgin message to steam stop - for non GHC machines
+### remove s from steam timer
 
 set listbox_font [DSx_font font 8]
 set ::DSx_settings(next_shot_DSx_home_coords) {500 974}
@@ -34,7 +37,8 @@ add_de1_button "$::DSx_standby_pages" { say [translate {settings}] $::settings(s
 # setup data
 set ::DSx_data_x 0
 set ::DSx_data_y -260
-set ::DSx_profile_name [add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 480}] [expr {$::DSx_data_y + 640}] -text "" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center" -width [rescale_x_skin 600] -textvariable {$::settings(profile_title)}]
+set ::DSx_profile_name [add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 480}] [expr {$::DSx_data_y + 625}] -text "" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -justify "center" -width [rescale_x_skin 700] -textvariable {$::settings(profile_title)}]
+
 set ::DSx_bean_name [add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 320}] [expr {$::DSx_data_y + 724}] -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {*}]
 set ::DSx_saw_name [add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 320}] [expr {$::DSx_data_y + 774}] -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {*}]
 set ::DSx_sav_name [add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 320}] [expr {$::DSx_data_y + 824}] -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {*}]
@@ -43,14 +47,34 @@ set ::DSx_steam_name [add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x 
 set ::DSx_water_name [dui add variable "$::DSx_home_pages" [expr {$::DSx_data_x + 320}] [expr {$::DSx_data_y + 974}] -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -tags DSx_water_fav_indicator -textvariable {*}]
 set ::DSx_wsaw_name [dui add variable "$::DSx_home_pages" [expr {$::DSx_data_x + 320}] [expr {$::DSx_data_y + 1024}] -justify right -anchor "nw" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -tags DSx_wsaw_fav_indicator -textvariable {[wsaw_fav_indicator]}]
 set ::DSx_jug_name [add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 190}] [expr {$::DSx_data_y + 850}] -justify center -anchor "n" -text "" -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -textvariable {}]
-add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 720}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Beans - [round_to_one_digits $::DSx_settings(bean_weight)]g}
-add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 770}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Shot - (1:[round_to_one_digits [expr (0.01 + $::DSx_settings(saw))/$::DSx_settings(bean_weight)]])  $::DSx_settings(saw)g}
-add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 820}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {[DSx_profile_type] [DSx_sav]}
-add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 870}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Flush - [round_to_integer $::DSx_settings(flush_time)][translate "s"]}
-add_de1_variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 920}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Steam - [DSx_jug_label] - [DSx_steam_time_text]}
+
+dui add variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 720}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Beans - [round_to_one_digits $::DSx_settings(bean_weight)]g}
+dui add variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 770}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Shot - (1:[round_to_one_digits [expr (0.01 + $::DSx_settings(saw))/$::DSx_settings(bean_weight)]])  $::DSx_settings(saw)g}
+dui add variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 820}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {[DSx_profile_type] [DSx_sav]}
+dui add variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 870}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Flush - [round_to_integer $::DSx_settings(flush_time)][translate "s"]}
+dui add variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 920}] -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {Steam - [DSx_jug_label] - [DSx_steam_time_text]}
 dui add variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 970}] -tags DSx_data_water_text -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -initial_state show -textvariable {Water - [return_liquid_measurement $::settings(water_volume)] [return_temperature_measurement $::settings(water_temperature)]}
 dui add variable "$::DSx_home_pages" [expr {$::DSx_data_x + 350}] [expr {$::DSx_data_y + 1020}] -tags DSx_data_wsaw_text -justify right -anchor "nw" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -initial_state show -textvariable {[wsaw_text]}
-add_de1_button "$::DSx_standby_pages" {say [translate {}] $::settings(sound_button_in); show_settings; after 500 update_de1_explanation_chart; say [translate {settings}] $::settings(sound_button_in); set_next_page off settings_1; page_show off; set ::settings(active_settings_tab) settings_1; set_profiles_scrollbar_dimensions;}  [expr {$::DSx_data_x + 100}] [expr {$::DSx_data_y + 550}] [expr {$::DSx_data_x + 800}] [expr {$::DSx_data_y + 720}]
+add_de1_button "$::DSx_standby_pages" {
+    say [translate {}] $::settings(sound_button_in)
+    show_settings
+    set title_test [string range [ifexists ::settings(profile_title)] 0 7]
+    if {$title_test != "D-Flow /"} {
+        after 500 update_de1_explanation_chart
+    }
+    say [translate {settings}] $::settings(sound_button_in)
+    set_next_page off settings_1
+    page_show off
+    set ::settings(active_settings_tab) settings_1
+    set_profiles_scrollbar_dimensions
+    if {$title_test == "D-Flow /" && [file exists "[homedir]/plugins/D_Flow_Espresso_Profile/plugin.tcl"] == 1} {
+    ::plugins::D_Flow_Espresso_Profile::prep
+    ::plugins::D_Flow_Espresso_Profile::demo_graph
+    set ::settings(grinder_dose_weight) [round_to_one_digits $::DSx_settings(bean_weight)]
+    set_next_page off Dflowset; page_show Dflowset
+    }
+}  [expr {$::DSx_data_x + 100}] [expr {$::DSx_data_y + 550}] [expr {$::DSx_data_x + 800}] [expr {$::DSx_data_y + 720}]
+
 add_de1_button "$::DSx_standby_pages" {say [translate {}] $::settings(sound_button_in); load_test; set_next_page off DSx_4_workflow; start_idle} [expr {$::DSx_data_x + 100}] [expr {$::DSx_data_y + 730}] [expr {$::DSx_data_x + 800}] [expr {$::DSx_data_y + 1040}]
 
 # favourites
@@ -114,7 +138,7 @@ if {$::DSx_settings(no_scale) == 1} {
 
 dui add variable "$::DSx_home_pages" [expr {$::DSx_scale_x + 1280}] [expr {$::DSx_scale_y + 1410}] -justify center -anchor "n" -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -tags scale_disc_var -textvariable {[DSx_scale_disconnected]}
 # Count down timer
-dui add variable "steam" [expr {$::DSx_scale_x + 1290}] [expr {$::DSx_scale_y + 1340}] -text "" -font [DSx_font font 13] -fill $::DSx_settings(font_colour) -anchor "n" -justify center -tags flush_timer -textvariable {[DSx_steam_time]s}
+dui add variable "steam" [expr {$::DSx_scale_x + 1290}] [expr {$::DSx_scale_y + 1340}] -text "" -font [DSx_font font 13] -fill $::DSx_settings(font_colour) -anchor "n" -justify center -tags flush_timer -textvariable {[DSx_steam_time]}
 dui add variable "preheat_2" [expr {$::DSx_scale_x + 1290}] [expr {$::DSx_scale_y + 1340}] -text "" -font [DSx_font font 13] -fill $::DSx_settings(font_colour) -anchor "n" -justify center -tags steam_timer -textvariable {[DSx_flush_time_display]s}
 
 
@@ -230,7 +254,8 @@ dui add dbutton "off" [expr {$::DSx_start_button_x + 1060}] [expr {$::DSx_start_
 
 # operation stop button
 add_de1_image "espresso steam preheat_2 water" 1680 940 "[skin_directory_graphics]/icons/stop.png"
-add_de1_button "espresso steam preheat_2 water" {say [translate {stop}] $::settings(sound_button_in); DSx_stop} 1440 880 2040 1280
+add_de1_button "espresso preheat_2 water" {say [translate {stop}] $::settings(sound_button_in); DSx_stop} 1440 880 2040 1280
+add_de1_button "steam" {say [translate {stop}] $::settings(sound_button_in); DSx_steam_state_off; DSx_stop; check_if_steam_clogged} 1440 880 2040 1280
 
 # flush extention timer
 dui add variable "preheat_2" [expr {$::DSx_start_button_x + 720}] [expr {$::DSx_start_button_y + 82}] -text "" -font [DSx_font font 8] -fill #8efba2 -anchor "center" -justify "center" -tags flush_extend_info -textvariable {[DSx_add_flush_time_extend_text]}
