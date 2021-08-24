@@ -2007,8 +2007,6 @@ proc history_prep {} {
     fill_DSx_past_shots_listbox
     fill_DSx_past2_shots_listbox
     page_show DSx_past
-    set_DSx_past_shot_scrollbar_dimensions
-    set_DSx_past2_shot_scrollbar_dimensions
     DSx_reset_graphs
     borg spinner off
     borg systemui $::android_full_screen_flags
@@ -2780,8 +2778,6 @@ proc DSx_save_h2g {} {
         fill_DSx_past2_shots_listbox;
         set_next_page off off;
         page_show DSx_past;
-        set_DSx_past_shot_scrollbar_dimensions;
-        set_DSx_past2_shot_scrollbar_dimensions;
         DSx_past2_shot_files
     }
 }
