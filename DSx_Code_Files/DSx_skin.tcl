@@ -635,53 +635,20 @@ add_de1_button "$::DSx_other_pages" {say "" $::settings(sound_button_in); restor
 add_de1_variable "DSx_message" 1280 800 -font [DSx_font font 12] -fill $::DSx_settings(orange) -justify center -anchor center -textvariable {Shutting down to apply changes, please restart}
 
 ##### History Page ########################################################################################
-set DSx_past_shots_listbox_height 9
-set DSx_past2_shots_listbox_height 9
 set ::DSx_message2 ""
 
 # EB VERSION: ##############################
-add_de1_widget "DSx_past" listbox 40 1000 {
-	set ::globals(DSx_past_shots_widget) $widget
-	fill_DSx_past_shots_listbox
-	bind $widget <<ListboxSelect>> ::load_DSx_past_shot; set ::time_line $::DSx_settings(DSx_past_espresso_elapsed); save_DSx_settings;
-} -background $::DSx_settings(bg_colour) -yscrollcommand {scale_scroll_new $::globals(DSx_past_shots_widget) ::DSx_past_slider} -font [DSx_font font 8] -bd 0 -height $DSx_past_shots_listbox_height -width 16 -foreground $::DSx_settings(font_colour) -borderwidth 0 -selectborderwidth 0  -relief flat -highlightthickness 0 -selectmode single  -selectbackground $::DSx_settings(font_colour)
+set ::globals(DSx_past_shots_widget) [dui add listbox DSx_past 40 1000 -tags history_left_lbox -select_cmd ::load_DSx_past_shot \
+	-canvas_height 550 -width 16 -background $::DSx_settings(bg_colour) -font [DSx_font font 8] -bd 0 \
+	-foreground $::DSx_settings(font_colour) -borderwidth 1 -selectborderwidth 0 -relief flat \
+	-highlightthickness 0 -selectmode single -selectbackground $::DSx_settings(font_colour) \
+	-yscrollbar yes -yscrollbar_troughcolor $::DSx_settings(bg_colour)]
 
-add_de1_widget "DSx_past" listbox 1940 1000 {
-	set ::globals(DSx_past2_shots_widget) $widget
-	fill_DSx_past2_shots_listbox
-	bind $widget <<ListboxSelect>> ::load_DSx_past2_shot;
-} -background $::DSx_settings(bg_colour) -yscrollcommand {scale_scroll_new $::globals(DSx_past2_shots_widget) ::DSx_past2_slider} -font [DSx_font font 8] -bd 0 -height $DSx_past2_shots_listbox_height -width 16 -foreground $::DSx_settings(font_colour) -borderwidth 0 -selectborderwidth 0  -relief flat -highlightthickness 0 -selectmode single  -selectbackground $::DSx_settings(font_colour)
-##############################
-
-set ::DSx_past_slider 0
-set ::DSx_past2_slider 0
-# draw the scrollbar off screen so that it gets resized and moved to the right place on the first draw
-
-# EB VERSION: ##############################
-set ::DSx_past_shots_scrollbar [add_de1_widget "DSx_past" scale 1000 1000 {} -from 0 -to 1.0 -bigincrement 0.2 -background $::DSx_settings(font_colour) -borderwidth 1 -showvalue 0 -resolution .01 -length [rescale_x_skin 400] -width [rescale_y_skin 150] -variable ::DSx_past_slider -font [DSx_font font 10] -sliderlength [rescale_x_skin 125] -relief flat -command {listbox_moveto $::globals(DSx_past_shots_widget) $::DSx_past_slider}  -foreground #FFFFFF -troughcolor $::DSx_settings(bg_colour) -borderwidth 0  -highlightthickness 0]
-set ::DSx_past2_shots_scrollbar [add_de1_widget "DSx_past" scale 1000 1000 {} -from 0 -to 1.0 -bigincrement 0.2 -background $::DSx_settings(font_colour) -borderwidth 1 -showvalue 0 -resolution .01 -length [rescale_x_skin 400] -width [rescale_y_skin 150] -variable ::DSx_past2_slider -font [DSx_font font 10] -sliderlength [rescale_x_skin 125] -relief flat -command {listbox_moveto $::globals(DSx_past2_shots_widget) $::DSx_past2_slider}  -foreground #FFFFFF -troughcolor $::DSx_settings(bg_colour) -borderwidth 0  -highlightthickness 0]
-##############################
-
-proc set_DSx_past_shot_scrollbar_dimensions {} {
-	# set the height of the scrollbar to be the same as the listbox
-	$::DSx_past_shots_scrollbar configure -length [winfo height $::globals(DSx_past_shots_widget)]
-	set coords [.can coords $::globals(DSx_past_shots_widget) ]
-	set newx [expr {[winfo width $::globals(DSx_past_shots_widget)] + [lindex $coords 0]}]
-	.can coords $::DSx_past_shots_scrollbar "$newx [lindex $coords 1]"
-	if {$::DSx_settings(DSx_past_espresso_name) == "" || $::DSx_settings(DSx_past_espresso_name) == [translate "None"]} {
-		set ::DSx_settings(DSx_past_espresso_name) $::settings(profile_title)
-	}
-}
-proc set_DSx_past2_shot_scrollbar_dimensions {} {
-	# set the height of the scrollbar to be the same as the listbox
-	$::DSx_past2_shots_scrollbar configure -length [winfo height $::globals(DSx_past2_shots_widget)]
-	set coords [.can coords $::globals(DSx_past2_shots_widget) ]
-	set newx [expr {[winfo width $::globals(DSx_past2_shots_widget)] + [lindex $coords 0]}]
-	.can coords $::DSx_past2_shots_scrollbar "$newx [lindex $coords 1]"
-	if {$::DSx_settings(DSx_past2_espresso_name) == "" || $::DSx_settings(DSx_past2_espresso_name) == [translate "None"]} {
-		set ::DSx_settings(DSx_past2_espresso_name) $::settings(profile_title)
-	}
-}
+set ::globals(DSx_past2_shots_widget) [dui add listbox DSx_past 1940 1000 -tags history_right_lbox -select_cmd ::load_DSx_past2_shot \
+	-canvas_height 550 -width 16 -background $::DSx_settings(bg_colour) -font [DSx_font font 8] -bd 0 \
+	-foreground $::DSx_settings(font_colour) -borderwidth 1 -selectborderwidth 0 -relief flat \
+	-highlightthickness 0 -selectmode single -selectbackground $::DSx_settings(font_colour) \
+	-yscrollbar yes -yscrollbar_troughcolor $::DSx_settings(bg_colour)]
 
 #### Graphs
 ## Left graph
