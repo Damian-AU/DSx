@@ -775,7 +775,7 @@ add_de1_widget "DSx_past_zoomed" graph 30 80 {
     $widget element create DSx_past_line_espresso_resistance  -xdata espresso_elapsed1 -ydata DSx_past_espresso_resistance -symbol none -label "" -linewidth $::DSx_settings(hist_resistance_curve) -color #e5e500 -smooth $::settings(live_graph_smoothing_technique) -pixels 0
     $widget element create DSx_past_line_espresso_state_change_1 -xdata espresso_elapsed1 -ydata DSx_past_espresso_state_change -label "" -linewidth $::DSx_settings(hist_goal_curve) -color #AAAAAA  -pixels 0 ;
     $widget axis configure x -color $::DSx_settings(x_axis_colour) -tickfont [DSx_font font 9] -min 0.0;
-	$widget axis configure y -color #008c4c -tickfont [DSx_font font 9] -min 0.0 -max 17 -subdivisions 5 -majorticks {0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16}  -hide 0;
+	$widget axis configure y -color #008c4c -tickfont [DSx_font font 9] -min 0.0 -max 17 -subdivisions 5 -majorticks {0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18}  -hide 0;
 	$widget axis configure y2 -color #206ad4 -tickfont [DSx_font font 9] -min 0.0 -max 8.5 -subdivisions 2 -majorticks {0 0.5 1 1.5 2 2.5 3 3.5 4 4.5 5 5.5 6 6.5 7 7.5 8} -hide 0;
     $widget grid configure -color $::DSx_settings(grid_colour)
 } -plotbackground $::DSx_settings(bg_colour) -width [rescale_x_skin 2500] -height [rescale_y_skin 1340] -borderwidth 1 -background $::DSx_settings(bg_colour) -plotrelief flat
