@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 4.74
+set ::DSx_settings(version) 4.76
 
 package provide DSx_skin 1.0
 
@@ -639,13 +639,13 @@ set ::DSx_message2 ""
 
 # EB VERSION: ##############################
 set ::globals(DSx_past_shots_widget) [dui add listbox DSx_past 40 1000 -tags history_left_lbox -select_cmd ::load_DSx_past_shot \
-	-canvas_height 550 -width 16 -background $::DSx_settings(bg_colour) -font [DSx_font font 8] -bd 0 \
+	-canvas_height 480 -width 16 -background $::DSx_settings(bg_colour) -font [DSx_font font 8] -bd 0 \
 	-foreground $::DSx_settings(font_colour) -borderwidth 1 -selectborderwidth 0 -relief flat \
 	-highlightthickness 0 -selectmode single -selectbackground $::DSx_settings(font_colour) \
 	-yscrollbar yes -yscrollbar_troughcolor $::DSx_settings(bg_colour)]
 
 set ::globals(DSx_past2_shots_widget) [dui add listbox DSx_past 1940 1000 -tags history_right_lbox -select_cmd ::load_DSx_past2_shot \
-	-canvas_height 550 -width 16 -background $::DSx_settings(bg_colour) -font [DSx_font font 8] -bd 0 \
+	-canvas_height 480 -width 16 -background $::DSx_settings(bg_colour) -font [DSx_font font 8] -bd 0 \
 	-foreground $::DSx_settings(font_colour) -borderwidth 1 -selectborderwidth 0 -relief flat \
 	-highlightthickness 0 -selectmode single -selectbackground $::DSx_settings(font_colour) \
 	-yscrollbar yes -yscrollbar_troughcolor $::DSx_settings(bg_colour)]

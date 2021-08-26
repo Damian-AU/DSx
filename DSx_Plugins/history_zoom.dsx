@@ -1,0 +1,100 @@
+package provide history_zoom.dsx 1.0
+
+
+lappend ::run_after_startup HZ_procedures
+
+set ::DSx_HZ_view 2
+set ::DSx_HZ_view_lable "1 y-axis"
+
+proc DSx_HZ_toggle_graph {} {
+    if {$::DSx_HZ_view == 2} {
+        set ::DSx_HZ_view 1
+        set ::DSx_HZ_view_lable "zoomed"
+        $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_flow_2x -ydata DSx_past_espresso_flow
+        $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_flow_weight_2x -ydata DSx_past_espresso_flow_weight
+        $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_flow_goal_2x -ydata DSx_past_espresso_flow_goal
+        $::DSx_history_left_zoomed_graph axis configure y -color $::DSx_settings(x_axis_colour) -min 0.0 -max 12
+        $::DSx_history_left_zoomed_graph axis configure y2 -hide 1
+    } elseif {$::DSx_HZ_view == 1} {
+        set ::DSx_HZ_view 3
+        set ::DSx_HZ_view_lable "2 y-axis"
+        $::DSx_history_left_zoomed_graph axis configure y -min 8.3 -max 9.3 -majorticks {8.3 8.4 8.5 8.6 8.7 8.8 8.9 9 9.1 9.2 9.3 }
+    } else {
+        set ::DSx_HZ_view 2
+        set ::DSx_HZ_view_lable "1 y-axis"
+        $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_flow_2x -ydata DSx_past_espresso_flow_2x
+        $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_flow_weight_2x -ydata DSx_past_espresso_flow_weight_2x
+        $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_flow_goal_2x -ydata DSx_past_espresso_flow_goal_2x
+        $::DSx_history_left_zoomed_graph axis configure y -color #18c37e -min 0.0 -max 17 -majorticks {0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17}
+        $::DSx_history_left_zoomed_graph axis configure y2 -hide 0
+    }
+}
+
+proc HZ_procedures {} {
+    dui add dbutton DSx_past_zoomed 450 1460 \
+        -bwidth 250 -bheight 120 \
+        -shape outline -width 3 -outline #ddd \
+        -label {show} -label_font [DSx_font font 8] -label_justify center -label_anchor center -label_fill $::DSx_settings(font_colour) -label_pos {0.5 0.35} \
+        -label1variable {$::DSx_HZ_view_lable} -label1_justify center -label1_anchor center -label1_font [DSx_font font 8] -label1_fill $::DSx_settings(font_colour) -label1_pos {0.5 0.65} \
+        -command {
+            DSx_HZ_toggle_graph
+    }
+}
+
+
+### overlay
+
+set ::DSx_HZ_view 2
+set ::DSx_HZ_view_lable "1 y-axis"
+
+proc DSx_HZ_toggle_graph {} {
+    if {$::DSx_HZ_view == 2} {
+        set ::DSx_HZ_view 1
+        set ::DSx_HZ_view_lable "zoomed"
+        $::DSx_history_icon_zoomed_graph element configure DSx_past_line_espresso_flow_2x -ydata DSx_past_espresso_flow
+        $::DSx_history_icon_zoomed_graph element configure DSx_past_line_espresso_flow_weight_2x -ydata DSx_past_espresso_flow_weight
+        $::DSx_history_icon_zoomed_graph element configure DSx_past2_line_espresso_flow_2x -ydata DSx_past2_espresso_flow
+        $::DSx_history_icon_zoomed_graph element configure DSx_past2_line_espresso_flow_weight_2x -ydata DSx_past2_espresso_flow_weight
+        $::DSx_history_icon_zoomed_graph axis configure y -color $::DSx_settings(x_axis_colour) -min 0.0 -max 12
+        $::DSx_history_icon_zoomed_graph axis configure y2 -hide 1
+
+        $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_flow_2x -ydata DSx_past_espresso_flow
+        $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_flow_weight_2x -ydata DSx_past_espresso_flow_weight
+        $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_flow_goal_2x -ydata DSx_past_espresso_flow_goal
+        $::DSx_history_left_zoomed_graph axis configure y -color $::DSx_settings(x_axis_colour) -min 0.0 -max 12
+        $::DSx_history_left_zoomed_graph axis configure y2 -hide 1
+    } elseif {$::DSx_HZ_view == 1} {
+        set ::DSx_HZ_view 3
+        set ::DSx_HZ_view_lable "2 y-axis"
+        $::DSx_history_icon_zoomed_graph axis configure y -min 8.3 -max 9.3 -majorticks {8.3 8.4 8.5 8.6 8.7 8.8 8.9 9 9.1 9.2 9.3 }
+
+        $::DSx_history_left_zoomed_graph axis configure y -min 8.3 -max 9.3 -majorticks {8.3 8.4 8.5 8.6 8.7 8.8 8.9 9 9.1 9.2 9.3 }
+    } else {
+        set ::DSx_HZ_view 2
+        set ::DSx_HZ_view_lable "1 y-axis"
+        $::DSx_history_icon_zoomed_graph element configure DSx_past_line_espresso_flow_2x -ydata DSx_past_espresso_flow_2x
+        $::DSx_history_icon_zoomed_graph element configure DSx_past_line_espresso_flow_weight_2x -ydata DSx_past_espresso_flow_weight_2x
+        $::DSx_history_icon_zoomed_graph element configure DSx_past2_line_espresso_flow_2x -ydata DSx_past2_espresso_flow_2x
+        $::DSx_history_icon_zoomed_graph element configure DSx_past2_line_espresso_flow_weight_2x -ydata DSx_past2_espresso_flow_weight_2x
+        $::DSx_history_icon_zoomed_graph axis configure y -color #18c37e -min 0.0 -max 17 -majorticks {0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17}
+        $::DSx_history_icon_zoomed_graph axis configure y2 -hide 0
+
+        $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_flow_2x -ydata DSx_past_espresso_flow_2x
+        $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_flow_weight_2x -ydata DSx_past_espresso_flow_weight_2x
+        $::DSx_history_left_zoomed_graph element configure DSx_past_line_espresso_flow_goal_2x -ydata DSx_past_espresso_flow_goal_2x
+        $::DSx_history_left_zoomed_graph axis configure y -color #18c37e -min 0.0 -max 17 -majorticks {0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17}
+        $::DSx_history_left_zoomed_graph axis configure y2 -hide 0
+    }
+}
+
+
+proc HZ_procedures {} {
+    dui add dbutton "DSx_past_zoomed DSx_past3_zoomed" 450 1460 \
+        -bwidth 250 -bheight 120 \
+        -shape outline -width 3 -outline #ddd \
+        -label {show} -label_font [DSx_font font 8] -label_justify center -label_anchor center -label_fill $::DSx_settings(font_colour) -label_pos {0.5 0.35} \
+        -label1variable {$::DSx_HZ_view_lable} -label1_justify center -label1_anchor center -label1_font [DSx_font font 8] -label1_fill $::DSx_settings(font_colour) -label1_pos {0.5 0.65} \
+        -command {
+            DSx_HZ_toggle_graph
+    }
+}
