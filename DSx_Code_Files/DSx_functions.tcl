@@ -1380,7 +1380,7 @@ proc load_pinkcup {} {
 
         array set settings $pinkcup_props(settings)
         set settings_vars [favourites_settings_vars]
-        foreach k $settings_vars {
+        foreach k [ifexists $settings_vars] {
             set ::settings($k) $settings($k)
         }
 
@@ -1422,7 +1422,7 @@ proc load_bluecup {} {
 
         array set settings $bluecup_props(settings)
         set settings_vars [favourites_settings_vars]
-        foreach k $settings_vars {
+        foreach k [ifexists $settings_vars] {
             set ::settings($k) $settings($k)
         }
 
@@ -1464,7 +1464,7 @@ proc load_orangecup {} {
 
         array set settings $orangecup_props(settings)
         set settings_vars [favourites_settings_vars]
-        foreach k $settings_vars {
+        foreach k [ifexists $settings_vars] {
             set ::settings($k) $settings($k)
         }
 
