@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 4.79
+set ::DSx_settings(version) 4.80
 
 package provide DSx_skin 1.0
 
@@ -600,18 +600,30 @@ add_de1_button "saver descaling cleaning" {say [translate {awake}] $::settings(s
 add_de1_variable "$::DSx_other_pages" 2150 1560 -text "" -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -justify center -anchor center -textvariable {[translate "$::DSx_home_page_version DSx Version [package version DSx] - by Damian"] }
 add_de1_image "$::DSx_other_pages" 1820 1280 "[skin_directory_graphics]/icons/arrow_left.png"
 add_de1_image "$::DSx_other_pages" 2260 1280 "[skin_directory_graphics]/icons/arrow_right.png"
-add_de1_button "$::DSx_page_name" {set ::Dsx_temperature_shift_amount 0; page_show [DSx_page_right]} 2250 1250 2470 1500
-add_de1_button "$::DSx_page_name" {set ::Dsx_temperature_shift_amount 0; page_show [DSx_page_left]} 1810 1250 2030 1500
+add_de1_button "$::DSx_page_name" {set ::Dsx_temperature_shift_amount 0; page_show [DSx_page_right]; set_ble_scrollbar_dimensions; set_ble_scale_scrollbar_dimensions} 2250 1250 2470 1500
+add_de1_button "$::DSx_page_name" {set ::Dsx_temperature_shift_amount 0; page_show [DSx_page_left]; set_ble_scrollbar_dimensions; set_ble_scale_scrollbar_dimensions} 1810 1250 2030 1500
 
 # save
 add_de1_image "$::DSx_other_pages" 2040 1280 "[skin_directory_graphics]/icons/home.png"
 add_de1_button "$::DSx_other_pages" {say "" $::settings(sound_button_in); restore_DSx_live_graph; save_DSx_settings; save_settings;
-    if {[array_item_difference ::settings ::settings_backup "steam_temperature water_refill_point"] == 1} {
-        # resend the calibration settings if they were changed
-        de1_send_steam_hotwater_settings
+    if {[ifexists ::settings_backup(calibration_flow_multiplier)] != [ifexists ::settings(calibration_flow_multiplier)]} {
+        set_calibration_flow_multiplier $::settings(calibration_flow_multiplier)
+    }
+    if {[ifexists ::settings_backup(fan_threshold)] != [ifexists ::settings(fan_threshold)]} {
+        set_fan_temperature_threshold $::settings(fan_threshold)
+    }
+    if {[ifexists ::settings_backup(water_refill_point)] != [ifexists ::settings(water_refill_point)]} {
         de1_send_waterlevel_settings
     }
-    if {[array_item_difference ::settings ::settings_backup "enable_fahrenheit scale_bluetooth_address language skin waterlevel_indicator_on waterlevel_indicator_blink display_rate_espresso display_espresso_water_delta_number display_group_head_delta_number display_pressure_delta_line display_flow_delta_line display_weight_delta_line allow_unheated_water"] == 1  || [ifexists ::app_has_updated] == 1} {
+    if {[array_item_difference ::settings ::settings_backup "steam_temperature steam_flow"] == 1} {
+        # resend the calibration settings if they were changed
+        de1_send_steam_hotwater_settings
+        de1_enable_water_level_notifications
+    }
+    if {[array_item_difference ::settings ::settings_backup "enable_fahrenheit orientation screen_size_width saver_brightness use_finger_down_for_tap log_enabled hot_water_idle_temp espresso_warmup_timeout language skin waterlevel_indicator_on default_font_calibration waterlevel_indicator_blink display_rate_espresso display_espresso_water_delta_number display_group_head_delta_number display_pressure_delta_line display_flow_delta_line display_weight_delta_line allow_unheated_water display_time_in_screen_saver enabled_plugins plugin_tabs"] == 1  || [ifexists ::app_has_updated] == 1} {
+        set_next_page off DSx_message; page_show DSx_message
+        after 2000 app_exit
+    } elseif {[ifexists ::settings_backup(scale_bluetooth_address)] == "" && [ifexists ::settings(scale_bluetooth_address)] != ""} {
         set_next_page off DSx_message; page_show DSx_message
         after 2000 app_exit
     } else {
@@ -1181,9 +1193,9 @@ add_de1_variable "DSx_5_admin" 980 1016 -text {} -font [DSx_font font 8] -fill $
 add_de1_button "DSx_5_admin" {say [translate {Search}] $::settings(sound_button_in); scanning_restart} 650 960 1260 1070
 add_de1_text "DSx_5_admin" 60 1100 -text [translate "Espresso machine"] -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -justify "left" -anchor "nw"
 add_de1_text "DSx_5_admin" 680 1100 -text [translate "Scale"] -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -justify "left" -anchor "nw"
-add_de1_variable "DSx_5_admin" 1200 1100 -text \[[translate "Remove"]\] -font [DSx_font font 7] -fill "#bec7db" -justify "right" -anchor "ne" -textvariable {[if {$::settings(scale_bluetooth_address) != ""} { return \[[translate "Remove"]\]} else {return "" } ] }
-add_de1_button "DSx_5_admin" {say [translate {Remove}] $::settings(sound_button_in);set ::settings(scale_bluetooth_address) ""; fill_ble_scale_listbox} 940 1100 1230 1140 ""
-
+add_de1_variable "DSx_5_admin" 1240 1100 -text \[[translate "Remove"]\] -font [DSx_font font 7] -fill "#bec7db" -justify "right" -anchor "ne" -textvariable {[if {$::settings(scale_bluetooth_address) != ""} { return \[[translate "Remove"]\]} else {return "" } ] }
+add_de1_variable "DSx_5_admin" 900 1100 -font [DSx_font font 7] -fill "#bec7db" -justify "left" -anchor "nw" -textvariable {[if {$::settings(scale_bluetooth_address) != ""} { return [return_weight_measurement [ifexists ::de1(scale_weight_rate_raw)]] } else {return "" } ] }
+add_de1_button "DSx_5_admin" {say [translate {Remove}] $::settings(sound_button_in);set ::settings(scale_bluetooth_address) ""; fill_peripheral_listbox} 960 1100 1250 1140 ""
 
 add_de1_widget "DSx_5_admin settings_4" listbox 55 1150 {
     set ::ble_listbox_widget $widget
@@ -1193,8 +1205,18 @@ add_de1_widget "DSx_5_admin settings_4" listbox 55 1150 {
 add_de1_widget "DSx_5_admin settings_4" listbox 670 1150 {
     set ::ble_scale_listbox_widget $widget
     bind $widget <<ListboxSelect>> ::change_scale_bluetooth_device
-    fill_ble_scale_listbox
+    fill_peripheral_listbox
 } -background #fbfaff -font [DSx_font font 9] -bd 0 -height 3 -width 15  -foreground #d3dbf3 -borderwidth 0 -selectborderwidth 0  -relief flat -highlightthickness 0 -selectmode single -selectbackground #c0c4e1 -yscrollcommand {scale_scroll_new $::ble_scale_listbox_widget ::ble_scale_slider}
+set ::ble_slider 0
+set ::ble_scrollbar [add_de1_widget "DSx_5_admin settings_4" scale 10000 1 {} -from 0 -to 1.0 -bigincrement 0.2 -background "#d3dbf3" -borderwidth 1 -showvalue 0 -resolution .01 -length [rescale_x_skin 400] -width [rescale_y_skin 150] -variable ::ble_slider -font Helv_10_bold -sliderlength [rescale_x_skin 125] -relief flat -command {listbox_moveto $::ble_listbox_widget $::ble_slider}  -foreground #FFFFFF -troughcolor "#f7f6fa" -borderwidth 0  -highlightthickness 0]
+set ::ble_scale_slider 0
+set ::ble_scale_scrollbar [add_de1_widget "DSx_5_admin settings_4" scale 10000 1 {} -from 0 -to .90 -bigincrement 0.2 -background "#d3dbf3" -borderwidth 1 -showvalue 0 -resolution .01 -length [rescale_x_skin 400] -width [rescale_y_skin 150] -variable ::ble_scale_slider -font Helv_10_bold -sliderlength [rescale_x_skin 125] -relief flat -command {listbox_moveto $::ble_scale_listbox_widget $::ble_scale_slider}  -foreground #FFFFFF -troughcolor "#f7f6fa" -borderwidth 0  -highlightthickness 0]
+proc set_ble_scrollbar_dimensions {} {
+    set_scrollbar_dimensions $::ble_scrollbar $::ble_listbox_widget
+}
+proc set_ble_scale_scrollbar_dimensions {} {
+    set_scrollbar_dimensions $::ble_scale_scrollbar $::ble_scale_listbox_widget
+}
 
 ###### Sub Pages ######
 # "done" button for all these sub-pages.
@@ -1397,38 +1419,57 @@ proc DSx_add_to_profile_settings_ok_button_leave {} {
 }
 
 add_de1_button "settings_1 settings_2 settings_2a settings_2b settings_2c settings_2czoom settings_2c2 settings_3 settings_4" {save_settings_to_de1; set_alarms_for_de1_wake_sleep; say [translate {save}] $::settings(sound_button_in); save_settings; profile_has_changed_set_colors;
-    DSx_add_to_profile_settings_ok_button_enter
-    if {[ifexists ::profiles_hide_mode] == 1} {
-		unset -nocomplain ::profiles_hide_mode
-		fill_profiles_listbox
-	}
-	if {[array_item_difference ::settings ::settings_backup "steam_temperature calibration_flow_multiplier steam_flow water_refill_point fan_threshold"] == 1} {
-		# resend the calibration settings if they were changed
-		de1_send_steam_hotwater_settings
-		de1_send_waterlevel_settings
-		set_calibration_flow_multiplier $::settings(calibration_flow_multiplier)
-		set_fan_temperature_threshold $::settings(fan_threshold)
-		de1_enable_water_level_notifications
-	}
-	if {[array_item_difference ::settings ::settings_backup "enable_fahrenheit saver_brightness use_finger_down_for_tap log_enabled hot_water_idle_temp espresso_warmup_timeout scale_bluetooth_address language skin waterlevel_indicator_on default_font_calibration waterlevel_indicator_blink display_rate_espresso display_espresso_water_delta_number display_group_head_delta_number display_pressure_delta_line display_flow_delta_line display_weight_delta_line allow_unheated_water display_time_in_screen_saver enabled_plugins plugin_tabs"] == 1  || [ifexists ::app_has_updated] == 1} {
-		# changes that effect the skin require an app restart
-		.can itemconfigure $::message_label -text [translate "Please quit and restart this app to apply your changes."]
-		.can itemconfigure $::message_button_label -text [translate "Wait"]
+        DSx_add_to_profile_settings_ok_button_enter
+        if {[ifexists ::profiles_hide_mode] == 1} {
+            unset -nocomplain ::profiles_hide_mode
+            fill_profiles_listbox
+        }
+        if {[ifexists ::settings_backup(calibration_flow_multiplier)] != [ifexists ::settings(calibration_flow_multiplier)]} {
+            set_calibration_flow_multiplier $::settings(calibration_flow_multiplier)
+        }
+        if {[ifexists ::settings_backup(fan_threshold)] != [ifexists ::settings(fan_threshold)]} {
+            set_fan_temperature_threshold $::settings(fan_threshold)
+        }
+        if {[ifexists ::settings_backup(water_refill_point)] != [ifexists ::settings(water_refill_point)]} {
+            de1_send_waterlevel_settings
+        }
+        if {[array_item_difference ::settings ::settings_backup "steam_temperature steam_flow"] == 1} {
+            # resend the calibration settings if they were changed
+            de1_send_steam_hotwater_settings
+            de1_enable_water_level_notifications
+        }
+        if {[array_item_difference ::settings ::settings_backup "enable_fahrenheit orientation screen_size_width saver_brightness use_finger_down_for_tap log_enabled hot_water_idle_temp espresso_warmup_timeout language skin waterlevel_indicator_on default_font_calibration waterlevel_indicator_blink display_rate_espresso display_espresso_water_delta_number display_group_head_delta_number display_pressure_delta_line display_flow_delta_line display_weight_delta_line allow_unheated_water display_time_in_screen_saver enabled_plugins plugin_tabs"] == 1  || [ifexists ::app_has_updated] == 1} {
+            # changes that effect the skin require an app restart
+            .can itemconfigure $::message_label -text [translate "Please quit and restart this app to apply your changes."]
+            .can itemconfigure $::message_button_label -text [translate "Wait"]
 
-		set_next_page off message; page_show message
-		after 200 app_exit
-	} else {
+            set_next_page off message; page_show message
+            after 200 app_exit
 
-		if {[ifexists ::settings(settings_profile_type)] == "settings_2c2"} {
-			# if they were on the LIMITS tab of the Advanced profiles, reset the ui back to the main tab
-			set ::settings(settings_profile_type) "settings_2c"
-		}
-    	#set_next_page off off; page_show off
-    	DSx_add_to_profile_settings_ok_button_leave
-    }
-} 2016 1430 2560 1600
+        } elseif {[ifexists ::settings_backup(scale_bluetooth_address)] == "" && [ifexists ::settings(scale_bluetooth_address)] != ""} {
+            # if no scale was previously defined, and there is one now, then force an app restart
+            # but if there was a scale previously, and now there is a new one, let that be w/o an app restart
 
-add_de1_button "settings_1 settings_2 settings_2a settings_2b settings_2c settings_2czoom settings_2c2 settings_3 settings_4" {if {[ifexists ::profiles_hide_mode] == 1} { unset -nocomplain ::profiles_hide_mode; fill_profiles_listbox }; array unset ::settings {\*}; array set ::settings [array get ::settings_backup]; update_de1_explanation_chart; fill_skin_listbox; profile_has_changed_set_colors; say [translate {Cancel}] $::settings(sound_button_in); back_to_previous_page; fill_advanced_profile_steps_listbox; restore_espresso_chart; LRv2_preview; DSx_graph_restore; save_settings_to_de1; fill_profiles_listbox; refresh_DSx_temperature;} 1505 1430 2015 1600
+            # changes that effect the skin require an app restart
+            .can itemconfigure $::message_label -text [translate "Please quit and restart this app to apply your changes."]
+            .can itemconfigure $::message_button_label -text [translate "Wait"]
+
+            set_next_page off message; page_show message
+            after 200 app_exit
+
+        } else {
+
+            if {[ifexists ::settings(settings_profile_type)] == "settings_2c2"} {
+                # if they were on the LIMITS tab of the Advanced profiles, reset the ui back to the main tab
+                set ::settings(settings_profile_type) "settings_2c"
+            }
+
+            #set_next_page off off; page_show off
+            DSx_add_to_profile_settings_ok_button_leave
+        }
+    } 2016 1430 2560 1600
+
+add_de1_button "settings_1 settings_2 settings_2a settings_2b settings_2c settings_2czoom settings_2c2 settings_3 settings_4" {if {[ifexists ::profiles_hide_mode] == 1} { unset -nocomplain ::profiles_hide_mode; fill_profiles_listbox }; array unset ::settings {\*}; array set ::settings [array get ::settings_backup]; update_de1_explanation_chart; fill_skin_listbox; profile_has_changed_set_colors; say [translate {Cancel}] $::settings(sound_button_in); back_to_previous_page; fill_advanced_profile_steps_listbox; restore_espresso_chart; LRv2_preview; DSx_graph_restore; save_settings_to_de1; fill_profiles_listbox; refresh_DSx_temperature; fill_extensions_listbox} 1505 1430 2015 1600
 
 add_de1_widget "settings_1" graph 1330 300 {
     set ::DSx_preview_graph_advanced $widget

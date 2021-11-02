@@ -436,8 +436,6 @@ proc set_colour {} {
     .can itemconfigure $::DSx_6_theme_var_9_1 -font "[DSx_font font 9]"
     $::globals(DSx_past_shots_widget) configure -background $::DSx_settings(bg_colour) -foreground $::DSx_settings(font_colour) -selectbackground $::DSx_settings(font_colour)
     $::globals(DSx_past2_shots_widget) configure -background $::DSx_settings(bg_colour) -foreground $::DSx_settings(font_colour) -selectbackground $::DSx_settings(font_colour)
-    $::DSx_past_shots_scrollbar configure -troughcolor $::DSx_settings(bg_colour) -background $::DSx_settings(font_colour)
-    $::DSx_past2_shots_scrollbar configure -troughcolor $::DSx_settings(bg_colour) -background $::DSx_settings(font_colour)
     $::DSx_history_left_graph configure -plotbackground $::DSx_settings(bg_colour) -background $::DSx_settings(bg_colour)
     $::DSx_history_right_graph configure -plotbackground $::DSx_settings(bg_colour) -background $::DSx_settings(bg_colour)
     $::DSx_history_icon_graph configure -plotbackground $::DSx_settings(bg_colour) -background $::DSx_settings(bg_colour)
