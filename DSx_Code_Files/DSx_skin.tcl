@@ -26,8 +26,8 @@ if {[file exists "[skin_directory]/DSx_Home_Page/DSx_home.page"] == 1} {
     set ::DSx_settings(next_shot_DSx_home_coords) {500 1150}
     set ::DSx_settings(last_shot_DSx_home_coords) {2120 1150}
     ### Heading
-    if {[ifexists ::DSx_settings(decent_logo) == 1} {
-        add_de1_image "off" 1100 40 "[skin_directory]/DSx_Plugins/decent_1200.png"
+    if {[ifexists ::DSx_settings(decent_logo)] == 1} {
+        add_de1_image "$::DSx_home_pages" 1100 40 "[skin_directory_graphics]/decent_logo.png"
     } else {
         set ::DSx_heading [add_de1_variable "$::DSx_home_pages" 1280 100 -font [DSx_font font 30] -fill $::DSx_settings(heading_colour) -anchor "center" -textvariable {$::DSx_settings(heading)}]
     }
