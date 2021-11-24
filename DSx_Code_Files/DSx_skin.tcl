@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 4.80
+set ::DSx_settings(version) 5.00
 
 package provide DSx_skin 1.0
 
@@ -26,7 +26,11 @@ if {[file exists "[skin_directory]/DSx_Home_Page/DSx_home.page"] == 1} {
     set ::DSx_settings(next_shot_DSx_home_coords) {500 1150}
     set ::DSx_settings(last_shot_DSx_home_coords) {2120 1150}
     ### Heading
-    set ::DSx_heading [add_de1_variable "$::DSx_home_pages" 1280 100 -font [DSx_font font 30] -fill $::DSx_settings(heading_colour) -anchor "center" -textvariable {$::DSx_settings(heading)}]
+    if {[ifexists ::DSx_settings(decent_logo) == 1} {
+        add_de1_image "off" 1100 40 "[skin_directory]/DSx_Plugins/decent_1200.png"
+    } else {
+        set ::DSx_heading [add_de1_variable "$::DSx_home_pages" 1280 100 -font [DSx_font font 30] -fill $::DSx_settings(heading_colour) -anchor "center" -textvariable {$::DSx_settings(heading)}]
+    }
     #Clock
     set ::DSx_clock_font_var_1 [add_de1_variable "$::DSx_home_pages" 2420 80 -font [DSx_font "$::DSx_settings(clock_font)" 14.5] -fill $::DSx_settings(font_colour) -justify right -anchor "e" -textvariable {[DSx_clock]}]
     set ::DSx_clock_font_var_2 [add_de1_variable "$::DSx_home_pages" 2450 130 -font [DSx_font "$::DSx_settings(clock_font)" 6.4] -fill #efbf63 -justify center -anchor "e" -textvariable {[DSx_date]}]
@@ -995,7 +999,18 @@ add_de1_widget "DSx_6_theme" entry 280 0 {
         bind $widget <Return> { say [translate {save}] $::settings(sound_button_in); borg toast [translate "Saved"]; save_DSx_settings; hide_android_keyboard}
 		bind $widget <Leave> hide_android_keyboard
     }  -width 21 -font [DSx_font font 30] -borderwidth 2 -bg $::DSx_settings(bg_colour) -textvariable ::DSx_settings(heading) -relief sunken -highlightthickness 0 -highlightcolor #000000 -justify center -foreground $::DSx_settings(heading_colour)
-
+add_de1_widget "DSx_6_theme" checkbutton 2100 30 {set ::DSx_6_theme_checkbutton_logo $widget} -text [translate "Use the\rDecent Espresso\rlogo heading"] -indicatoron true -font "[DSx_font font 8]" -bg $::DSx_settings(bg_colour) -justify center -anchor nw -foreground $::DSx_settings(orange) -variable ::DSx_settings(decent_logo) -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground #aaa -relief flat -command decent_logo_check;
+set ::DSx_logo_message ""
+add_de1_variable "DSx_6_theme" 2140 280 -font [DSx_font font 11] -fill $::DSx_settings(red) -justify center -anchor center -textvariable {$::DSx_logo_message}
+proc decent_logo_check {} {
+    if {[file exists "[skin_directory_graphics]/decent_logo.png"] == 1} {
+        restart_set
+    } else {
+        set ::DSx_settings(decent_logo) 0
+        set ::DSx_logo_message "I could not find\rthe decent_logo file"
+        after 2000 {set ::DSx_logo_message ""}
+    }
+}
 # Heading colour
 add_de1_image "DSx_6_theme" 100 350 "[skin_directory_graphics]/icons/button7.png"
 set ::DSx_6_theme_var_10_3 [add_de1_text "DSx_6_theme" 300 450 -font [DSx_font font 10] -justify center -anchor center -text [translate "Heading\rColor"] -fill $::DSx_settings(font_colour)]

@@ -1,15 +1,15 @@
 ### Home page for DSx by Damian ###
-set ::DSx_home_page_version {2021 v3.6.2}
-### added - profile title to Dflowset page
-### add - purgin message to steam stop - for non GHC machines
-### remove s from steam timer
+set ::DSx_home_page_version {2021 v3.6.3}
 
 set listbox_font [DSx_font font 8]
 set ::DSx_settings(next_shot_DSx_home_coords) {500 974}
 set ::DSx_settings(last_shot_DSx_home_coords) {2060 974}
 ### Heading
-set ::DSx_heading [add_de1_variable "$::DSx_home_pages" 1280 100 -font [DSx_font font 30] -fill $::DSx_settings(heading_colour) -anchor "center" -textvariable {$::DSx_settings(heading)}]
-
+if {[ifexists ::DSx_settings(decent_logo)] == 1} {
+    add_de1_image "off" 1100 40 "[skin_directory_graphics]/decent_logo.png"
+} else {
+    set ::DSx_heading [add_de1_variable "$::DSx_home_pages" 1280 100 -font [DSx_font font 30] -fill $::DSx_settings(heading_colour) -anchor "center" -textvariable {$::DSx_settings(heading)}]
+}
 #Clock
 set ::DSx_clock_font_var_1 [add_de1_variable "$::DSx_home_pages" 2420 80 -font [DSx_font "$::DSx_settings(clock_font)" 14.5] -fill $::DSx_settings(font_colour) -justify right -anchor "e" -textvariable {[DSx_clock]}]
 set ::DSx_clock_font_var_2 [add_de1_variable "$::DSx_home_pages" 2450 130 -font [DSx_font "$::DSx_settings(clock_font)" 6.4] -fill #efbf63 -justify center -anchor "e" -textvariable {[DSx_date]}]
@@ -1108,9 +1108,11 @@ add_de1_widget "$::DSx_zoomed_pages" graph 40 70 {
     $widget element create line2_espresso_pressure -xdata espresso_elapsed -ydata espresso_pressure -symbol none -label "" -linewidth $::DSx_settings(glt1) -color #18c37e  -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create line_espresso_temperature_basket -xdata espresso_elapsed -ydata DSx_espresso_temperature_basket -symbol none -label ""  -linewidth $::DSx_settings(glt2) -color #e73249 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create line_espresso_temperature_mix -xdata espresso_elapsed -ydata DSx_espresso_temperature_mix -symbol none -label ""  -linewidth $::DSx_settings(glb2) -color #ff9900 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
-    $widget element create line_espresso_flow_weight_2x  -xdata espresso_elapsed -ydata espresso_flow_weight_2x -symbol none -label "" -linewidth $::DSx_settings(glt4) -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    #$widget element create line_espresso_flow_weight_2x  -xdata espresso_elapsed -ydata espresso_flow_weight_2x -symbol none -label "" -linewidth $::DSx_settings(glt4) -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_weight_2x  -xdata espresso_elapsed -ydata espresso_flow_weight -symbol none -label "" -linewidth $::DSx_settings(glt4) -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create line_espresso_weight_2x  -xdata espresso_elapsed -ydata espresso_weight_chartable -symbol none -label "" -linewidth $::DSx_settings(glb4) -color #a2693d -smooth $::settings(live_graph_smoothing_technique) -pixels 0 -dashes $::settings(chart_dashes_espresso_weight);
-    $widget element create line_espresso_flow_2x  -xdata espresso_elapsed -ydata espresso_flow_2x -symbol none -label "" -linewidth $::DSx_settings(glt5) -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    #$widget element create line_espresso_flow_2x  -xdata espresso_elapsed -ydata espresso_flow_2x -symbol none -label "" -linewidth $::DSx_settings(glt5) -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
+    $widget element create line_espresso_flow_2x  -xdata espresso_elapsed -ydata espresso_flow -symbol none -label "" -linewidth $::DSx_settings(glt5) -color #4e85f4 -smooth $::settings(live_graph_smoothing_technique) -pixels 0;
     $widget element create line_espresso_resistance  -xdata espresso_elapsed -ydata espresso_resistance -symbol none -label "" -linewidth $::DSx_settings(glb1) -color #e5e500 -smooth $::settings(live_graph_smoothing_technique) -pixels 0
 
     $widget element create line_espresso_flow_delta_1  -xdata espresso_elapsed -ydata espresso_flow_delta -symbol none -label "" -linewidth $::DSx_settings(glb5) -color #98c5ff -pixels 0 -smooth $::settings(live_graph_smoothing_technique)
