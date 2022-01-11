@@ -532,7 +532,7 @@ proc off_timer {} {
     set_next_page off DSx_power;
     page_show DSx_power;
 
-    after 3000 {set_next_page off off; set ::current_espresso_page "off"; start_sleep}
+    set ::DSx_sleep_timer [ after 3000 {set_next_page off off; set ::current_espresso_page "off"; start_sleep} ]
 }
 
 proc window_expand {} {
