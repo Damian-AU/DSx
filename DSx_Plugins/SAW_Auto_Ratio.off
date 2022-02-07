@@ -1,0 +1,19 @@
+set version 2.0
+
+proc DSx_Auto_ER { args } {
+    if {$::de1(scale_sensor_weight) < 0} {
+        return
+    }
+    set er [round_to_one_digits [expr (0.01 + $::DSx_settings(saw))/$::DSx_settings(bean_weight)]]
+
+    if {($::de1(scale_sensor_weight) - $::DSx_settings(bean_offset)) >= 0 && $::DSx_settings(bean_offset) > 0 && ($::de1(scale_sensor_weight) - $::DSx_settings(bean_offset)) < $::DSx_settings(bean_nett_range)} {
+        set ::DSx_settings(saw) [round_to_one_digits [expr ($::de1(scale_sensor_weight) - $::DSx_settings(bean_offset)) * $er]]
+    } else {
+        set ::DSx_settings(saw) [round_to_one_digits [expr $::de1(scale_sensor_weight) * $er]]
+    }
+    set ::settings(final_desired_shot_weight_advanced) $::DSx_settings(saw)
+    set ::settings(final_desired_shot_weight) $::DSx_settings(saw)
+    save_settings
+}
+
+trace add execution DSx_set_dose {enter} DSx_Auto_ER
