@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 5.02
+set ::DSx_settings(version) 5.03
 
 package provide DSx_skin 1.0
 
@@ -594,6 +594,8 @@ if {[file exists "[skin_directory]/DSx_Home_Page/DSx_home.page"] == 1} {
 add_de1_text "sleep" 2500 1440 -justify right -anchor "ne" -text [translate "Going to sleep"] -font [DSx_font font 20] -fill $::DSx_settings(font_colour)
 add_de1_text "DSx_power" 1370 760 -justify left -anchor "ne" -text [translate "Power off  >>> "] -font [DSx_font font 16] -fill $::DSx_settings(font_colour)
 add_de1_text "DSx_power" 1600 1400 -justify center -anchor center -text [translate "...or wait for sleep"] -font [DSx_font font 16] -fill $::DSx_settings(font_colour)
+### Allow canceling sleep by clicking the background on power off page - by Steve Hill
+add_de1_button "DSx_power" {say [translate {awake}] $::settings(sound_button_in); after cancel $::DSx_sleep_timer; set_next_page off off; start_idle} 0 0 2560 1600
 add_de1_button "DSx_power" {say [translate {sleep}] $::settings(sound_button_in); set ::current_espresso_page "off"; power_off} 1400 700 1600 900
 add_de1_button "saver descaling cleaning" {say [translate {awake}] $::settings(sound_button_in); set_next_page off off; start_idle; clearshit} 1280 0 2560 1600
 add_de1_button "saver descaling cleaning" {say [translate {awake}] $::settings(sound_button_in); first_page_from_saver} 0 0 1280 1600

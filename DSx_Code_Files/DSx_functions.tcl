@@ -528,11 +528,11 @@ proc load_DSx_settings {} {
 }
 
 proc off_timer {} {
-
     set_next_page off DSx_power;
     page_show DSx_power;
-
-    after 3000 {set_next_page off off; set ::current_espresso_page "off"; start_sleep}
+    #after 3000 {set_next_page off off; set ::current_espresso_page "off"; start_sleep}
+    ### Allow canceling sleep by clicking the background on power off page - by Steve Hill
+    set ::DSx_sleep_timer [ after 3000 {set_next_page off off; set ::current_espresso_page "off"; start_sleep} ]
 }
 
 proc window_expand {} {
@@ -3755,6 +3755,10 @@ proc DSx_coffee_temperature_adjust  {} {
         foreach s $::settings(advanced_shot) {
         lappend newlist $s
         array set x $s
+        set stepw [ifexists x(weight)]
+        if {$stepw == ""} {
+            set x(weight) 0
+        }
         set x(temperature) [round_to_one_digits [expr {$x(temperature) + $::DSx_settings(temperature_adjustment)}]]
         lappend newlist2 [array get x]
         set ::settings(advanced_shot) $newlist2
