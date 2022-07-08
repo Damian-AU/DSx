@@ -18,7 +18,7 @@ proc DSx_ssButton {} {
     dui add dbutton "saver" 1160 1230 \
         -bwidth 240 -bheight 240 -tags DSx_ss_button_sleep -initial_state normal \
         -shape round -fill #222 \
-        -labelvariable {scale} -label_font [DSx_font font 13] -label_fill #333 -label_pos {0.5 0.5} \
+        -labelvariable {scale} -label_font [DSx_font font 13] -label_fill #555 -label_pos {0.5 0.5} \
     -command {DSx_reset_ss_timer; DSx_ss_timer_run; catch {ble_connect_to_scale}; if {$::DSx_settings(saver_scale_display_on) == 1} {scale_enable_lcd}; after 300 {dui item config saver DSx_ss_button_sleep* -state hidden}}
 }
 proc DSx_reset_ss_timer {} {
