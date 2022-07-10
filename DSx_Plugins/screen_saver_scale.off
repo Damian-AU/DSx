@@ -1,4 +1,4 @@
-package provide DSx_saver_scale.dsx 1.0
+package provide DSx_saver_scale.dsx 1.1
 
 ### set how mow many seconds to keep the scale awake ###
 set ::DSx_settings(saver_scale_seconds) 30
@@ -6,20 +6,22 @@ set ::DSx_settings(saver_scale_seconds) 30
 ### set to 1 if you want the scale LCD to turn on or 0 to leave it turned off ###
 set ::DSx_settings(saver_scale_display_on) 1
 
+set ::DSx_ss_pages "saver pizza_dough"
+
 lappend ::run_after_startup DSx_ssButton
 
 proc DSx_ssButton {} {
-    dui add dbutton "saver" 1160 1230 \
+    dui add dbutton "$::DSx_ss_pages" 1160 1230 \
         -bwidth 240 -bheight 240 \
         -shape round -fill #222 \
         -labelvariable {[round_to_one_digits $::de1(scale_sensor_weight)]g} -label_font [DSx_font font 13] -label_fill #fff -label_pos {0.5 0.5} \
         -command {DSx_reset_ss_timer; scale_tare; catch {ble_connect_to_scale}}
 
-    dui add dbutton "saver" 1160 1230 \
+    dui add dbutton "$::DSx_ss_pages" 1160 1230 \
         -bwidth 240 -bheight 240 -tags DSx_ss_button_sleep -initial_state normal \
         -shape round -fill #222 \
         -labelvariable {scale} -label_font [DSx_font font 13] -label_fill #555 -label_pos {0.5 0.5} \
-    -command {DSx_reset_ss_timer; DSx_ss_timer_run; catch {ble_connect_to_scale}; if {$::DSx_settings(saver_scale_display_on) == 1} {scale_enable_lcd}; after 300 {dui item config saver DSx_ss_button_sleep* -state hidden}}
+    -command {DSx_reset_ss_timer; DSx_ss_timer_run; catch {ble_connect_to_scale}; if {$::DSx_settings(saver_scale_display_on) == 1} {scale_enable_lcd}; after 300 {dui item config saver DSx_ss_button_sleep* -state hidden}; dui item config saver DSx_ss_button_sleep* -initial_state hidden}
 }
 proc DSx_reset_ss_timer {} {
     set ::DSx_ss_timer_start [clock seconds]
@@ -32,9 +34,9 @@ proc DSx_ss_timer_run {} {
     }
     if {[clock seconds] > [expr {$::DSx_ss_timer_start + $::DSx_settings(saver_scale_seconds)}]} {
         dui item config saver DSx_ss_button_sleep* -state normal
+        dui item config saver DSx_ss_button_sleep* -initial_state normal
         if {$::DSx_settings(saver_scale_display_on) == 1} {scale_disable_lcd}
     } else {
         after 100 DSx_ss_timer_run
     }
 }
-
