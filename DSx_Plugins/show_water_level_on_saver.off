@@ -1,0 +1,11 @@
+package provide show_water_level_on_saver.dsx 1.0
+
+lappend ::run_after_startup swlos
+
+proc swlos {} {
+    add_de1_variable "saver" 2502 60 -justify right -anchor e -font [DSx_font font 11] -fill #aaa -textvariable {Tank [DSx_low_water]}
+    add_de1_variable "saver" 2502 62 -justify right -anchor e -font [DSx_font font 11] -fill #333 -textvariable {Tank [DSx_low_water]}
+    add_de1_variable "saver" 2500 62 -justify right -anchor e -font [DSx_font font 11] -fill #aaa -textvariable {Tank [DSx_low_water]}
+    add_de1_variable "saver" 2500 60 -justify right -anchor e -font [DSx_font font 11] -fill #ddd -textvariable {Tank [DSx_low_water]}
+    add_de1_variable "saver" 2501 61 -justify right -anchor e -font [DSx_font font 11] -fill #bcc -textvariable {Tank [DSx_low_water]}
+}
