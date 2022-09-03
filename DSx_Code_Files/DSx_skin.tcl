@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 5.03
+set ::DSx_settings(version) 5.04
 
 package provide DSx_skin 1.0
 
@@ -1063,7 +1063,11 @@ set ::DSx_6_theme_var_9_1 [add_de1_variable "DSx_6_theme" 1000 1540 -text "" -fo
 ###### DSx cal ########################################################################################
 add_de1_widget "DSx_2_cal" checkbutton 920 500 {set ::DSx_2_cal_checkbutton_1 $widget} -text [translate "Select if you\rprefer to tare\rwith the empty\rjug before weighing\rwith milk"] -indicatoron true  -font "[DSx_font font 8]" -bg $::DSx_settings(bg_colour) -justify left -anchor nw -foreground $::DSx_settings(orange) -variable ::DSx_settings(pre_tare) -borderwidth 0 -selectcolor $::DSx_settings(bg_colour) -highlightthickness 0 -activebackground $::DSx_settings(bg_colour) -bd 0 -activeforeground $::DSx_settings(orange) -relief flat -command save_DSx_settings;
 
-set ::cal_instructions "Tare the scale with your empty jug, add some milk and record its weight, steam to your desired temperature and record the time. \rSet the weight for your empty jug/s and you're set to go! "
+add_de1_image "DSx_2_cal" 880 1200 "[skin_directory_graphics]/big_scale.png"
+add_de1_variable "DSx_2_cal" 1290 1340 -justify center -anchor "n" -text "" -font [DSx_font font 13] -fill $::DSx_settings(font_colour) -textvariable {[round_to_one_digits $::de1(scale_sensor_weight)]g}
+add_de1_button "DSx_2_cal" {say [translate {connect}] $::settings(sound_button_in); scale_tare; catch {ble_connect_to_scale}} 1150 1200 1400 1500
+
+set ::cal_instructions "SETUP:\rTare the scale with your empty jug, add some milk and record its weight, steam to your desired temperature and record the time. \rSet the weight for your empty jug/s and you're set to go! "
 add_de1_variable "DSx_2_cal" 1920 840 -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor "center" -width [rescale_x_skin 1100] -textvariable {$::cal_instructions}
 add_de1_variable "DSx_2_cal" 1280 60 -font [DSx_font font 10] -fill $::DSx_settings(font_colour) -anchor "center" -textvariable {Steam by Weight Setup Page}
 add_de1_variable "DSx_2_cal" 600 304 -font [DSx_font font 7] -fill $::DSx_settings(font_colour) -anchor "center" -textvariable {Empty jug weight}

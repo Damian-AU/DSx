@@ -332,7 +332,9 @@ proc check_DSx_variables {} {
 	if {[info exists ::DSx_settings(extra_past_shot_fields)] == 0 } {
 		set ::DSx_settings(extra_past_shot_fields) {bean_brand bean_type roast_date roast_level bean_notes grinder_model grinder_setting drink_tds drink_ey espresso_enjoyment espresso_notes my_name scentone skin beverage_type}
 	}
-	### end of addition ###	
+	### end of addition ###
+	set ::settings(flush_seconds) 120
+    set_flush_timeout $::settings(flush_seconds)
 }
 
 proc check_settings_for_DSx_added_variables {} {
