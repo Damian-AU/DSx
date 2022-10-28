@@ -4334,6 +4334,12 @@ proc profile_has_not_changed_set args {
     LRv2_preview
 }
 
+rename start_espresso_timers start_espresso_timers_orig
+proc start_espresso_timers {} {
+    clear_temp_data
+    start_espresso_timers_orig
+}
+
 if { $::skin::dsx::use_event_system } {
 
 	### TODO: Confirm if this can be done once, or really needs to be done on every update
