@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 5.2
+set ::DSx_settings(version) 5.3
 
 package provide DSx_skin 1.0
 
@@ -1423,9 +1423,6 @@ proc DSx_add_to_profile_settings_ok_button_enter {} {
     LRv2_preview
     DSx_graph_restore
     refresh_DSx_temperature
-    if {[array_item_difference ::settings ::settings_backup "steam_temperature"] == 1 && $::settings(steam_temperature) > 130} {
-        set ::DSx_settings(steam_temperature_backup) $::settings(steam_temperature);
-    }
     if {[array_item_difference ::settings ::settings_backup "enable_fahrenheit language skin waterlevel_indicator_on waterlevel_indicator_blink display_rate_espresso display_espresso_water_delta_number display_group_head_delta_number display_pressure_delta_line display_flow_delta_line display_weight_delta_line allow_unheated_water"] == 1 } {
         set ::DSx_workflow_to_settings_1 0;
     }

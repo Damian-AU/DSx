@@ -1,0 +1,11 @@
+set version 1.1
+### By Damian ###
+
+
+add_de1_variable "$::DSx_home_pages" 3000 3000 -justify right -anchor "nw" -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {[DSx_neg_tare]}
+
+proc DSx_neg_tare {} {
+    if {$::de1(scale_sensor_weight) < 0} {
+        scale_tare
+    }
+}

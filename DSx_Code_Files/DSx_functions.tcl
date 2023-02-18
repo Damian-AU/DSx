@@ -288,11 +288,6 @@ proc check_DSx_variables {} {
         set ::DSx_settings(wsaw_cal) 1.4
         set ::DSx_settings(no_scale) 0
         set ::DSx_settings(dial) 3
-        if {$::settings(steam_temperature) > 129} {
-            set ::DSx_settings(steam_temperature_backup) $::settings(steam_temperature)
-        } else {
-            set ::DSx_settings(steam_temperature_backup) 160
-        }
         set ::settings(DSx_volume) 0
         set ::DSx_settings(past_volume1) 0
         set ::DSx_settings(past_volume2) 0
@@ -315,8 +310,8 @@ proc check_DSx_variables {} {
             #set ::DSx_settings(font_name) "Handlee-Regular"
         }
     }
-    if {$::settings(steam_temperature) > 130} {
-            set ::DSx_settings(steam_temperature_backup) $::settings(steam_temperature)
+    if {[info  exists ::DSx_settings(steam_temperature_backup)]} {
+        unset ::DSx_settings(steam_temperature_backup)
     }
     if {[info exists ::DSx_settings(flush_time)] == 0 } {
         set ::DSx_settings(flush_time) $::settings(preheat_volume)
@@ -335,6 +330,11 @@ proc check_DSx_variables {} {
 	### end of addition ###
 	set ::settings(flush_seconds) 120
     set_flush_timeout $::settings(flush_seconds)
+
+    set ::de1(steam_disable_toggle) [expr {!$::settings(steam_disabled)}]
+    if {$::settings(steam_disabled) == 1} {
+        set ::settings(steam_timeout) 0
+    }
 }
 
 proc check_settings_for_DSx_added_variables {} {
@@ -602,6 +602,9 @@ proc clearshit {} {
 proc start_button_ready {} {
 	set num $::de1(substate)
 	set substate_txt $::de1_substate_types($num)
+	if {$substate_txt == "ready" && $::de1(in_eco_steam_mode) == 1} {
+	    return [translate "READY"]
+	}
 	if {$substate_txt == "ready" && $::de1(device_handle) != 0} {
 		if {$::settings(steam_timeout) > 0 && [steamtemp] > [expr {$::settings(steam_temperature) - 11}]} {
 		    return [translate "READY"]
@@ -656,13 +659,12 @@ proc DSx_preheat_status {} {
 }
 
 proc check_steam_on {} {
-    if {$::settings(steam_temperature) > 130} {
-        set ::DSx_settings(steam_temperature_backup) $::settings(steam_temperature)
-    }
     if {$::settings(steam_timeout) > 0} {
-        set ::settings(steam_temperature) $::DSx_settings(steam_temperature_backup)
+        set ::settings(steam_disabled) 0
+        set ::de1(steam_disable_toggle) 1
     } else {
-        set ::settings(steam_temperature) 0
+        set ::settings(steam_disabled) 1
+        set ::de1(steam_disable_toggle) 0
     }
     save_settings
     de1_send_steam_hotwater_settings
@@ -1114,8 +1116,8 @@ proc steam_time_calc {} {
             set a [expr {($t/$m*($s-$j))/1000}]
             set ::DSx_settings(steam_calc) [round_to_integer $a]
             if {[expr ($::DSx_settings(steam_calc) > 0)]} {
-                if {$::settings(steam_temperature) < 130} {
-                    set ::settings(steam_temperature) $::DSx_settings(steam_temperature_backup)
+                if {$::settings(steam_disabled) == 1} {
+                    set ::settings(steam_disabled) 0
                 }
                 set ::settings(steam_timeout) $::DSx_settings(steam_calc)
                 save_settings
@@ -1123,15 +1125,15 @@ proc steam_time_calc {} {
             }
         }
     } else {
-    set t [expr {$::DSx_settings(milk_s)*1000}]
+        set t [expr {$::DSx_settings(milk_s)*1000}]
         set m $::DSx_settings(milk_g)
         set j 0
         set s $::de1(scale_sensor_weight)
         set a [expr {($t/$m*($s-$j))/1000}]
         set ::DSx_settings(steam_calc) [round_to_integer $a]
         if {[expr ($::DSx_settings(steam_calc) > 0)]} {
-            if {$::settings(steam_temperature) < 130} {
-                set ::settings(steam_temperature) $::DSx_settings(steam_temperature_backup)
+            if {$::settings(steam_disabled) == 1} {
+                set ::settings(steam_disabled) 0
             }
             set ::settings(steam_timeout) $::DSx_settings(steam_calc)
             save_settings
@@ -4008,13 +4010,13 @@ proc DSx_app_update {} {
 proc DSx_done_button {} {
 
     if {$::settings(steam_temperature) > 130} {
-                set ::DSx_settings(steam_temperature_backup) $::settings(steam_temperature)
+                #set ::DSx_settings(steam_temperature_backup) $::settings(steam_temperature)
             }
     if {$::settings(steam_temperature) < 130} {
-                set ::settings(steam_timeout) 0
+                #set ::settings(steam_timeout) 0
             }
-    if {$::settings(steam_temperature) > 130 && $::settings(steam_timeout) < 1} {
-                set ::settings(steam_timeout) 1
+    if {$::settings(steam_temperature) > 134 && $::settings(steam_timeout) < 1} {
+                #set ::settings(steam_timeout) 1
             }
     save_DSx_settings
     save_settings
