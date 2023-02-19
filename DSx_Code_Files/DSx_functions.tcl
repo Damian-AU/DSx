@@ -602,9 +602,11 @@ proc clearshit {} {
 proc start_button_ready {} {
 	set num $::de1(substate)
 	set substate_txt $::de1_substate_types($num)
-	if {$substate_txt == "ready" && $::de1(in_eco_steam_mode) == 1} {
-	    return [translate "READY"]
-	}
+    if {[info exists ::de1(in_eco_steam_mode)] == 1} {
+        if {$substate_txt == "ready" && $::de1(in_eco_steam_mode) == 1} {
+            return [translate "READY"]
+        }
+    }
 	if {$substate_txt == "ready" && $::de1(device_handle) != 0} {
 		if {$::settings(steam_timeout) > 0 && [steamtemp] > [expr {$::settings(steam_temperature) - 11}]} {
 		    return [translate "READY"]
