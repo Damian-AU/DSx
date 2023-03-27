@@ -3003,7 +3003,7 @@ proc DSx_water {} {
     if {[start_button_ready] == [translate "READY"]} {
         if {$::settings(scale_bluetooth_address) != ""} {
             set ::wsaw_run 0;
-            skale_tare;
+            scale_tare;
             after 600 {set_next_page water water; start_water; set ::wsaw_run 1};
         } else {
             set_next_page water water
