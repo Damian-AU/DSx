@@ -1,0 +1,10 @@
+package provide wake_to_orangecup.dsx 1.0
+set version 1.3.11
+lappend ::run_after_startup load_wake_to_orangecup
+proc load_wake_to_orangecup {} {
+    trace add execution clearshit {enter} wake_to_orangecup
+}
+proc wake_to_orangecup args {
+    load_orangecup
+    borg toast "Reloading orange Cup"
+}
