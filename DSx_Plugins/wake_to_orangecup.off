@@ -1,10 +1,13 @@
 package provide wake_to_orangecup.dsx 1.0
-set version 1.3.11
+set version 1.4.0
 lappend ::run_after_startup load_wake_to_orangecup
+
 proc load_wake_to_orangecup {} {
-    trace add execution clearshit {enter} wake_to_orangecup
+    ::de1::event::listener::on_major_state_change_add [lambda {event_dict} {
+        if {[dict get $event_dict previous_state] == "Sleep"} {
+            load_orangecup
+            borg toast "Reloading Orange Cup"
+        }
+    }]
 }
-proc wake_to_orangecup args {
-    load_orangecup
-    borg toast "Reloading orange Cup"
-}
+load_wake_to_orangecup

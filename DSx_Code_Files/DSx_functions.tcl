@@ -531,10 +531,8 @@ proc load_DSx_settings {} {
 
 proc off_timer {} {
     set_next_page off DSx_power;
-    page_show DSx_power;
-    #after 3000 {set_next_page off off; set ::current_espresso_page "off"; start_sleep}
-    ### Allow canceling sleep by clicking the background on power off page - by Cheesy
     set ::DSx_sleep_timer [ after 3000 {set_next_page off off; set ::current_espresso_page "off"; start_sleep} ]
+    page_show DSx_power;
 }
 
 proc window_expand {} {
@@ -4260,16 +4258,20 @@ proc DSx_active_plugin_rename {} {
         set fn "[DSx_plugin_dir]/${plugin}.dsx"
         set nfn "[DSx_plugin_dir]/${plugin}.off"
         if {[file exists [DSx_plugin_dir]/${plugin}.off] == 1} {
-            file delete -force [DSx_plugin_dir]/${plugin}.off
-        }
-        if {[catch {file rename $fn $nfn} err] == 0} {
+            file delete -force [DSx_plugin_dir]/${plugin}.dsx
             set ::DSx_plugin_message " $plugin   deactivated! \r\r When you tap the home button, you will be asked\r to exit and restart the app"
             fill_DSx_active_plugin_listbox
             fill_DSx_inactive_plugin_listbox
         } else {
-            set ::DSx_plugin_message "Oops, try again"
-            fill_DSx_active_plugin_listbox
-            fill_DSx_intive_plugin_listbox
+            if {[catch {file rename $fn $nfn} err] == 0} {
+                set ::DSx_plugin_message " $plugin   deactivated! \r\r When you tap the home button, you will be asked\r to exit and restart the app"
+                fill_DSx_active_plugin_listbox
+                fill_DSx_inactive_plugin_listbox
+            } else {
+                set ::DSx_plugin_message "Oops, try again"
+                fill_DSx_active_plugin_listbox
+                fill_DSx_intive_plugin_listbox
+            }
         }
     }
 }
@@ -4285,8 +4287,11 @@ proc DSx_inactive_plugin_rename {} {
         set infn "[DSx_plugin_dir]/${iplugin}.dsx"
         if {[catch {file copy $ifn $infn} err] == 0} {
             unset -nocomplain version
-
             if {[catch {source  [file join "./skins/DSx/DSx_Plugins/" ${iplugin}.dsx]} err] == 0} {
+                package forget $iplugin
+                package provide $iplugin $version
+                package ifneeded $iplugin $version [list source [file join "./skins/DSx/DSx_Plugins/" $iplugin]]
+                package require $iplugin
                 page_show DSx_plugin_UI
                 if {[info exists version] != 1} {
                     set version {1.0}
