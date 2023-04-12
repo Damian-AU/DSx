@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 5.33
+set ::DSx_settings(version) 5.4
 
 package provide DSx_skin 1.0
 
@@ -1514,6 +1514,7 @@ proc skins_page_change_due_to_de1_state_change { textstate } {
         set ::DSx_timer_start 0
         set ::flush_counting 0
         set ::flush_run 0
+        set ::wsaw_run 0
         set ::DSx_steam_purge_state 0
         set ::DSx_steam_state_text "Steaming"
     } elseif {$textstate == "Steam"} {
@@ -1522,7 +1523,11 @@ proc skins_page_change_due_to_de1_state_change { textstate } {
     } elseif {$textstate == "Espresso"} {
         set_next_page off off;
     } elseif {$textstate == "HotWater"} {
-        set ::wsaw_run 1
+        if {$::settings(scale_bluetooth_address) != ""} {
+            set ::wsaw_run 0;
+            scale_tare;
+            after 1000 {set ::wsaw_run 1};
+        }
         set_next_page off off;
     } elseif {$textstate == "HotWaterRinse"} {
         set_next_page off off;

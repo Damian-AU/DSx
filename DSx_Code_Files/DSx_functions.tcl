@@ -1264,8 +1264,142 @@ proc save_DSx_settings {} {
 
 
 ########
+proc favourites_settings_vars_old {} {
+    set favourites_settings_vars {
+        DSx_flush_time
+        DSx_wsaw DSx_jug_size
+        advanced_shot
+        espresso_chart_over
+        espresso_chart_under
+        espresso_decline_time
+        espresso_hold_time
+        espresso_max_time
+        espresso_notes
+        espresso_pressure
+        espresso_step_1
+        espresso_step_2
+        espresso_step_3
+        espresso_temperature
+        espresso_typical_volume
+        final_desired_shot_volume_advanced_count_start
+        final_desired_shot_volume
+        final_desired_shot_volume_advanced
+        final_desired_shot_weight
+        final_desired_shot_weight_advanced
+        flow_decline_stop_volumetric
+        flow_hold_stop_volumetric
+        flow_profile_decline
+        flow_profile_decline_time
+        flow_profile_hold
+        flow_profile_hold_time
+        flow_profile_minimum_pressure
+        flow_profile_preinfusion
+        flow_profile_preinfusion_time
+        flow_rate_transition
+        flow_rise_timeout
+        flying goal_is_basket_temp
+        minimum_water_temperature
+        original_profile_title
+        preheat_temperature
+        preinfusion_enabled
+        preinfusion_flow_rate
+        preinfusion_flow_rate2
+        preinfusion_stop_flow_rate
+        preinfusion_stop_pressure
+        preinfusion_stop_timeout
+        preinfusion_stop_volumetric
+        preinfusion_temperature
+        preinfusion_time
+        pressure_decline_stop_volumetric
+        pressure_end
+        pressure_hold_stop_volumetric
+        pressure_hold_time
+        pressure_rampup_stop_volumetric
+        pressure_rampup_timeout
+        profile
+        profile_filename
+        profile_has_changed
+        profile_notes
+        profile_step
+        profile_title
+        profile_to_save
+        settings_1_page
+        settings_profile_type
+        steam_timeout
+        tank_desired_water_temperature
+        temperature_target
+        water_temperature
+        water_volume
+        }
+}
 proc favourites_settings_vars {} {
-    set favourites_settings_vars {DSx_flush_time final_desired_shot_volume_advanced_count_start final_desired_shot_volume final_desired_shot_volume_advanced tank_desired_water_temperature DSx_wsaw DSx_jug_size advanced_shot espresso_chart_over espresso_chart_under espresso_decline_time espresso_hold_time espresso_max_time espresso_notes espresso_pressure espresso_step_1 espresso_step_2 espresso_step_3 espresso_temperature espresso_typical_volume final_desired_shot_weight final_desired_shot_weight_advanced flow_decline_stop_volumetric flow_hold_stop_volumetric flow_profile_decline flow_profile_decline_time flow_profile_hold flow_profile_hold_time flow_profile_minimum_pressure flow_profile_preinfusion flow_profile_preinfusion_time flow_rate_transition flow_rise_timeout flying goal_is_basket_temp minimum_water_temperature original_profile_title preheat_temperature preinfusion_enabled preinfusion_flow_rate preinfusion_flow_rate2 preinfusion_stop_flow_rate preinfusion_stop_pressure preinfusion_stop_timeout preinfusion_stop_volumetric preinfusion_temperature preinfusion_time pressure_decline_stop_volumetric pressure_end pressure_hold_stop_volumetric pressure_hold_time pressure_rampup_stop_volumetric pressure_rampup_timeout profile profile_filename profile_has_changed profile_notes profile_step profile_title profile_to_save settings_1_page settings_profile_type steam_timeout temperature_target water_temperature water_volume}
+    set favourites_settings_vars {
+        DSx_flush_time
+        DSx_wsaw DSx_jug_size
+        advanced_shot
+        beverage_type
+        espresso_chart_over
+        espresso_chart_under
+        espresso_decline_time
+        espresso_hold_time
+        espresso_max_time
+        espresso_notes
+        espresso_pressure
+        espresso_step_1
+        espresso_step_2
+        espresso_step_3
+        espresso_temperature
+        espresso_typical_volume
+        final_desired_shot_volume_advanced_count_start
+        final_desired_shot_volume
+        final_desired_shot_volume_advanced
+        final_desired_shot_weight
+        final_desired_shot_weight_advanced
+        flow_decline_stop_volumetric
+        flow_hold_stop_volumetric
+        flow_profile_decline
+        flow_profile_decline_time
+        flow_profile_hold
+        flow_profile_hold_time
+        flow_profile_minimum_pressure
+        flow_profile_preinfusion
+        flow_profile_preinfusion_time
+        flow_rate_transition
+        flow_rise_timeout
+        flying goal_is_basket_temp
+        minimum_water_temperature
+        original_profile_title
+        preheat_temperature
+        preinfusion_enabled
+        preinfusion_flow_rate
+        preinfusion_flow_rate2
+        preinfusion_stop_flow_rate
+        preinfusion_stop_pressure
+        preinfusion_stop_timeout
+        preinfusion_stop_volumetric
+        preinfusion_temperature
+        preinfusion_time
+        pressure_decline_stop_volumetric
+        pressure_end
+        pressure_hold_stop_volumetric
+        pressure_hold_time
+        pressure_rampup_stop_volumetric
+        pressure_rampup_timeout
+        profile
+        profile_filename
+        profile_has_changed
+        profile_notes
+        profile_step
+        profile_title
+        profile_to_save
+        settings_1_page
+        settings_profile_type
+        steam_timeout
+        tank_desired_water_temperature
+        temperature_target
+        water_temperature
+        water_volume
+        }
 }
 proc favourites_DSx_settings_vars {} {
     set favourites_DSx_settings_vars {
@@ -1381,11 +1515,16 @@ proc load_pinkcup {} {
         array set pinkcup_props [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/DSx_User_set/pink_cup.fav"]]
 
         array set settings $pinkcup_props(settings)
-        set settings_vars [favourites_settings_vars]
+        if {[llength [array names settings beverage_type,*]]} {
+            set settings_vars [favourites_settings_vars]
+        } else {
+            set settings_vars [favourites_settings_vars_old]
+            set ::settings(beverage_type) espresso
+            borg toast [translate "please update your Favourite"]
+        }
         foreach k $settings_vars {
             set ::settings($k) $settings($k)
         }
-
 
         array set DSx_settings $pinkcup_props(DSx_settings)
         set DSx_settings_vars [favourites_DSx_settings_vars]
@@ -1424,7 +1563,13 @@ proc load_bluecup {} {
         array set bluecup_props [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/DSx_User_set/blue_cup.fav"]]
 
         array set settings $bluecup_props(settings)
-        set settings_vars [favourites_settings_vars]
+        if {[llength [array names settings beverage_type,*]]} {
+            set settings_vars [favourites_settings_vars]
+        } else {
+            set settings_vars [favourites_settings_vars_old]
+            set ::settings(beverage_type) espresso
+            borg toast [translate "please update your Favourite"]
+        }
         foreach k $settings_vars {
             set ::settings($k) $settings($k)
         }
@@ -1466,7 +1611,13 @@ proc load_orangecup {} {
         array set orangecup_props [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/DSx_User_set/orange_cup.fav"]]
 
         array set settings $orangecup_props(settings)
-        set settings_vars [favourites_settings_vars]
+        if {[llength [array names settings beverage_type,*]]} {
+            set settings_vars [favourites_settings_vars]
+        } else {
+            set settings_vars [favourites_settings_vars_old]
+            set ::settings(beverage_type) espresso
+            borg toast [translate "please update your Favourite"]
+        }
         foreach k $settings_vars {
             set ::settings($k) $settings($k)
         }
@@ -3084,7 +3235,7 @@ proc DSx_add_flush_time_extend_text {} {
 #########
 proc wsaw {} {
     if {$::wsaw_run == 1 && $::settings(scale_bluetooth_address) != "" && ($::DSx_settings(wsaw) - $::DSx_settings(wsaw_cal)) > 1} {
-        if {$::de1(scale_sensor_weight) > ($::DSx_settings(wsaw) - $::DSx_settings(wsaw_cal))} {
+         if {$::de1(scale_sensor_weight) > ($::DSx_settings(wsaw) - $::DSx_settings(wsaw_cal))} {
             set ::wsaw_run 0
             DSx_stop
         }
