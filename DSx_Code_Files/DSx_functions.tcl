@@ -1515,7 +1515,7 @@ proc load_pinkcup {} {
         array set pinkcup_props [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/DSx_User_set/pink_cup.fav"]]
 
         array set settings $pinkcup_props(settings)
-        if {[llength [array names settings beverage_type,*]]} {
+        if {[info exists settings(beverage_type)] == 1} {
             set settings_vars [favourites_settings_vars]
         } else {
             set settings_vars [favourites_settings_vars_old]
@@ -1563,7 +1563,7 @@ proc load_bluecup {} {
         array set bluecup_props [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/DSx_User_set/blue_cup.fav"]]
 
         array set settings $bluecup_props(settings)
-        if {[llength [array names settings beverage_type,*]]} {
+        if {[info exists settings(beverage_type)] == 1} {
             set settings_vars [favourites_settings_vars]
         } else {
             set settings_vars [favourites_settings_vars_old]
@@ -1611,7 +1611,7 @@ proc load_orangecup {} {
         array set orangecup_props [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/DSx_User_set/orange_cup.fav"]]
 
         array set settings $orangecup_props(settings)
-        if {[llength [array names settings beverage_type,*]]} {
+        if {[info exists settings(beverage_type)] == 1} {
             set settings_vars [favourites_settings_vars]
         } else {
             set settings_vars [favourites_settings_vars_old]
