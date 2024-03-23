@@ -1339,8 +1339,16 @@ proc favourites_settings_vars {} {
         temperature_target
         water_temperature
         water_volume
-        }
+        maximum_flow
+        maximum_flow_pressure_range
+        maximum_flow_range
+        maximum_flow_range_advanced
+        maximum_pressure
+        maximum_pressure_range
+        maximum_pressure_range_advanced
+    }
 }
+
 proc favourites_DSx_settings_vars {} {
     set favourites_DSx_settings_vars {
         saturating_weight_rate
