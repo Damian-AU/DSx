@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 5.6
+set ::DSx_settings(version) 5.7
 
 package provide DSx_skin 1.0
 
@@ -299,7 +299,7 @@ if {[file exists "[skin_directory]/DSx_Home_Page/DSx_home.page"] == 1} {
         add_de1_variable "$::DSx_home_pages" 1290 1340 -justify center -anchor "n" -text "" -font [DSx_font font 13] -fill $::DSx_settings(font_colour) -textvariable {[round_to_one_digits $::de1(scale_sensor_weight)]g}
         add_de1_variable "$::DSx_home_pages" 1580 1270 -justify left -anchor "ne" -text "" -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -textvariable {[round_to_milk [expr ($::de1(scale_sensor_weight) - $::DSx_settings(jug_g))]]}
         # skale ble reconnection button
-        add_de1_button "$::DSx_home_pages" {say [translate {connect}] $::settings(sound_button_in); scale_tare; catch {ble_connect_to_scale}} 1150 1200 1400 1500
+        add_de1_button "$::DSx_home_pages" {say [translate {connect}] $::settings(sound_button_in); scale_tare; catch {set ::de1(bluetooth_scale_connection_attempts_tried) 0; ble_connect_to_scale}} 1150 1200 1400 1500
         add_de1_button "$::DSx_standby_pages" {say "" $::settings(sound_button_in); clear_bean_font; DSx_set_dose; DSx_bean_set_on; after 1500 DSx_set_off;} 930 1250 1150 1500
         add_de1_button "$::DSx_standby_pages" {say "" $::settings(sound_button_in); clear_steam_font; steam_time_calc; DSx_set_on; after 1200 DSx_set_off;} 1400 1250 1620 1500
     }
@@ -1065,7 +1065,7 @@ add_de1_widget "DSx_2_cal" checkbutton 920 500 {set ::DSx_2_cal_checkbutton_1 $w
 
 add_de1_image "DSx_2_cal" 880 1200 "[skin_directory_graphics]/big_scale.png"
 add_de1_variable "DSx_2_cal" 1290 1340 -justify center -anchor "n" -text "" -font [DSx_font font 13] -fill $::DSx_settings(font_colour) -textvariable {[round_to_one_digits $::de1(scale_sensor_weight)]g}
-add_de1_button "DSx_2_cal" {say [translate {connect}] $::settings(sound_button_in); scale_tare; catch {ble_connect_to_scale}} 1150 1200 1400 1500
+add_de1_button "DSx_2_cal" {say [translate {connect}] $::settings(sound_button_in); scale_tare; catch {set ::de1(bluetooth_scale_connection_attempts_tried) 0; ble_connect_to_scale}} 1150 1200 1400 1500
 
 set ::cal_instructions "SETUP:\rTare the scale with your empty jug, add some milk and record its weight, steam to your desired temperature and record the time. \rSet the weight for your empty jug/s and you're set to go! "
 add_de1_variable "DSx_2_cal" 1920 840 -font [DSx_font font 8] -fill $::DSx_settings(font_colour) -anchor "center" -width [rescale_x_skin 1100] -textvariable {$::cal_instructions}

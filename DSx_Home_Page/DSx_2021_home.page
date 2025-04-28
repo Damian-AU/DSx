@@ -132,7 +132,7 @@ if {$::DSx_settings(no_scale) == 1} {
         -label1variable {-} -label1_pos {0.5 0.65} -label1_font [DSx_font font 10] -label_justify center -label_anchor center -label1_fill $::DSx_settings(font_colour) \
         -tags scale_dclicker -orient vertical -min 10 -max 750 -use_biginc false -smallincrement 5 -variable ::de1(scale_sensor_weight)
 } else {
-    dui add dbutton "$::DSx_home_pages" [expr {$::DSx_scale_x + 1150}] [expr {$::DSx_scale_y + 1250}] -bwidth 250 -bheight 250 -command {say [translate {connect}] $::settings(sound_button_in); scale_tare; catch {ble_connect_to_scale}} -tags scale_tare_button
+    dui add dbutton "$::DSx_home_pages" [expr {$::DSx_scale_x + 1150}] [expr {$::DSx_scale_y + 1250}] -bwidth 250 -bheight 250 -command {say [translate {connect}] $::settings(sound_button_in); scale_tare; catch {set ::de1(bluetooth_scale_connection_attempts_tried) 0; ble_connect_to_scale}} -tags scale_tare_button
 }
 
 
