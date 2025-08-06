@@ -1273,6 +1273,7 @@ proc favourites_settings_vars {} {
         DSx_wsaw DSx_jug_size
         advanced_shot
         beverage_type
+        calibration_flow_multiplier
         espresso_chart_over
         espresso_chart_under
         espresso_decline_time
