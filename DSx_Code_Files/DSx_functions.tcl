@@ -1460,6 +1460,7 @@ proc load_pinkcup {} {
         load_test
         page_show DSx_4_workflow
         } else {
+        set old_flow_cal $::settings(calibration_flow_multiplier)
         array unset -nocomplain pinkcup_props
         array set pinkcup_props [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/DSx_User_set/pink_cup.fav"]]
 
@@ -1469,6 +1470,10 @@ proc load_pinkcup {} {
             catch {
                 set ::settings($k) $settings($k)
             }
+        }
+        if {$old_flow_cal != $::settings(calibration_flow_multiplier)} {
+            set_calibration_flow_multiplier $::settings(calibration_flow_multiplier)
+            popup [translate "Flow calibration set to: "]$::settings(calibration_flow_multiplier)
         }
 
         array set DSx_settings $pinkcup_props(DSx_settings)
@@ -1504,6 +1509,7 @@ proc load_bluecup {} {
         load_test
         page_show DSx_4_workflow
         } else {
+        set old_flow_cal $::settings(calibration_flow_multiplier)
         array unset -nocomplain bluecup_props
         array set bluecup_props [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/DSx_User_set/blue_cup.fav"]]
 
@@ -1513,6 +1519,10 @@ proc load_bluecup {} {
             catch {
                 set ::settings($k) $settings($k)
             }
+        }
+        if {$old_flow_cal != $::settings(calibration_flow_multiplier)} {
+            set_calibration_flow_multiplier $::settings(calibration_flow_multiplier)
+            popup [translate "Flow calibration set to: "]$::settings(calibration_flow_multiplier)
         }
 
         array set DSx_settings $bluecup_props(DSx_settings)
@@ -1548,6 +1558,7 @@ proc load_orangecup {} {
         load_test
         page_show DSx_4_workflow
         } else {
+        set old_flow_cal $::settings(calibration_flow_multiplier)
         array unset -nocomplain orangecup_props
         array set orangecup_props [encoding convertfrom utf-8 [read_binary_file "[skin_directory]/DSx_User_set/orange_cup.fav"]]
 
@@ -1557,6 +1568,10 @@ proc load_orangecup {} {
             catch {
                 set ::settings($k) $settings($k)
             }
+        }
+        if {$old_flow_cal != $::settings(calibration_flow_multiplier)} {
+            set_calibration_flow_multiplier $::settings(calibration_flow_multiplier)
+            popup [translate "Flow calibration set to: "]$::settings(calibration_flow_multiplier)
         }
 
         array set DSx_settings $orangecup_props(DSx_settings)
