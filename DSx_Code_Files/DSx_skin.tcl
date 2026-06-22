@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 5.9
+set ::DSx_settings(version) 6.0
 
 package provide DSx_skin 1.0
 
@@ -1582,3 +1582,4 @@ proc hide_android_keyboard {} {
 	sdltk textinput off
 	focus .can
 }
+

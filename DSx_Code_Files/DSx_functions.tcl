@@ -66,7 +66,10 @@ proc DSx_final_prep {} {
     plugins_run_after_startup
     refresh_DSx_temperature
     DSx_reset_graphs
+    page_show settings_1
+    after 50 page_show off
 }
+
 
 proc preload_history_page {} {
     after 1 {
