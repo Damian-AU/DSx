@@ -142,9 +142,9 @@ proc join_DSx_plugins {} {
 }
 
 proc no_machine_prep {} {
-    if {$::android == 0} {
-		start_idle
-	}
+    #if {$::android == 0} {
+	#	start_idle
+	#}
 }
 
 proc add_DSx_background {pages} {
@@ -716,11 +716,27 @@ proc de1_connected_state_DSx {} {
 }
 set ::DSx_blink 1
 
+#proc DSx_scale_disconnected {} {
+#	if {$::android == 1 && [ifexists ::settings(scale_bluetooth_address)] == ""} {
+#		return ""
+#	}
+#	if {$::de1(scale_device_handle) == "0" && $::DSx_settings(no_scale) != 1 && $::android == 1} {
+#		if {$::DSx_blink == 1} {
+#		    after 300 {set ::DSx_blink 0}
+#		    return "reconnect"
+#		} else {
+#		    set ::DSx_blink 1
+#		    return ""
+#		}
+#	}
+#	return ""
+#}
+
 proc DSx_scale_disconnected {} {
-	if {$::android == 1 && [ifexists ::settings(scale_bluetooth_address)] == ""} {
+	if {[ifexists ::settings(scale_bluetooth_address)] == ""} {
 		return ""
 	}
-	if {$::de1(scale_device_handle) == "0" && $::DSx_settings(no_scale) != 1 && $::android == 1} {
+	if {$::de1(scale_device_handle) == "0" && $::DSx_settings(no_scale) != 1} {
 		if {$::DSx_blink == 1} {
 		    after 300 {set ::DSx_blink 0}
 		    return "reconnect"
@@ -3397,12 +3413,12 @@ proc DSx_clock_s {} {
 }
 
 proc cancel_auto_stop {} {
-    if {$::android == 0 } {
-    after cancel [list update_de1_state "$::de1_state(Idle)\x5"]
-    after cancel [list update_de1_state "$::de1_state(Idle)\x5"]
-    after cancel [list update_de1_state "$::de1_state(Idle)\x5"]
-    after cancel [list update_de1_state "$::de1_state(Idle)\x5"]
-    }
+    #if {$::android == 0 } {
+    #after cancel [list update_de1_state "$::de1_state(Idle)\x5"]
+    #after cancel [list update_de1_state "$::de1_state(Idle)\x5"]
+    #after cancel [list update_de1_state "$::de1_state(Idle)\x5"]
+    #after cancel [list update_de1_state "$::de1_state(Idle)\x5"]
+    #}
 }
 
 proc DSx_return_temperature_number {in} {
