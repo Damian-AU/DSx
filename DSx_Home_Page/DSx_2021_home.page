@@ -1,5 +1,5 @@
 ### Home page for DSx by Damian ###
-set ::DSx_home_page_version {2021 v3.6.4}
+set ::DSx_home_page_version {2021 v3.6.5}
 
 set listbox_font [DSx_font font 8]
 set ::DSx_settings(next_shot_DSx_home_coords) {500 974}
@@ -108,11 +108,11 @@ dui add dbutton $::DSx_standby_pages 530 [expr {$::DSx_lower_y + 1050}] -tags or
 set ::DSx_scale_x 0
 set ::DSx_scale_y -200
 
-if {$::android != 1} {
-    set ::de1(scale_sensor_weight) 18
-    } else {
+#if {$::android != 1} {
+#    set ::de1(scale_sensor_weight) 18
+#    } else {
     set ::de1(scale_weight_rate) -1
-}
+#}
 set ::show_net_weight " "
 if {$::de1(scale_sensor_weight) <= $::show_net_weight || $::DSx_settings(jug_g) < 20} {
     set ::show_net_weight " "
@@ -155,6 +155,7 @@ dui add variable "$::DSx_home_pages" 2070 [expr {$::DSx_lower_y + 1160}] -tags h
 dui add variable "$::DSx_home_pages" 2050 [expr {$::DSx_lower_y + 1144}] -tags heating_icon2 -justify center -anchor center -font [DSx_font font 8] -fill $::DSx_settings(red) -textvariable {[DSx_heating_percentage]}
 
 # For testing purposes
+set {} {
 if {$::android == 0} {
     set ::DSx_heating_hold 0
     set ::testing_temp 141
@@ -167,6 +168,7 @@ if {$::android == 0} {
     }
     dui add dclicker "$::DSx_standby_pages" [expr {$::DSx_scale_x + 1150}] [expr {$::DSx_scale_y + 1250}] [expr {$::DSx_scale_x + 1400}] [expr {$::DSx_scale_y + 1500}] \
         -tags scale_dclicker -orient vertical -min 10 -max 750 -use_biginc false -smallincrement 5 -variable ::de1(scale_sensor_weight)
+}
 }
 
 # Heating info

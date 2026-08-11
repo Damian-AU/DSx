@@ -1,6 +1,6 @@
 #### Skin by Damian Brakel ####
 
-set ::DSx_settings(version) 6.1
+set ::DSx_settings(version) 6.2
 
 package provide DSx_skin 1.0
 
@@ -257,11 +257,11 @@ if {[file exists "[skin_directory]/DSx_Home_Page/DSx_home.page"] == 1} {
     ## scale
     if {$::DSx_settings(no_scale) == 1} {
         add_de1_image "$::DSx_home_pages" 880 1200 "[skin_directory_graphics]/big_scale1.png"
-        if {$::android != 1} {
-            set ::de1(scale_sensor_weight) 400
-            } else {
+        #if {$::android != 1} {
+        #    set ::de1(scale_sensor_weight) 400
+        #    } else {
             set ::de1(scale_weight_rate) -1
-        }
+        #}
         set ::show_net_weight " "
         if {$::de1(scale_sensor_weight) <= $::show_net_weight || $::DSx_settings(jug_g) < 50} {
             set ::show_net_weight " "
@@ -284,11 +284,11 @@ if {[file exists "[skin_directory]/DSx_Home_Page/DSx_home.page"] == 1} {
         add_de1_button "$::DSx_standby_pages" {say "" $::settings(sound_button_in); vertical_clicker 5 5 ::de1(scale_sensor_weight) 100 750 %x %y %x0 %y0 %x1 %y1;} 1150 1200 1400 1570 ""
         } else {
         add_de1_image "$::DSx_home_pages" 880 1200 "[skin_directory_graphics]/big_scale1.png"
-        if {$::android != 1} {
-            set ::de1(scale_sensor_weight) 18
-            } else {
+        #if {$::android != 1} {
+        #    set ::de1(scale_sensor_weight) 18
+        #    } else {
             set ::de1(scale_weight_rate) -1
-        }
+        #}
         set ::show_net_weight " "
         if {$::de1(scale_sensor_weight) <= $::show_net_weight || $::DSx_settings(jug_g) < 20} {
             set ::show_net_weight " "
